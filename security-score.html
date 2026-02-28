@@ -1058,7 +1058,7 @@
             rec: "Create separate admin accounts — never use admin privileges for daily work. Review who has admin access monthly. Consider Privileged Identity Management (PIM) for just-in-time access.",
             effort: "Medium",
             quickWin: false,
-            guide: 'm365-hardening-guide.html'
+            guide: 'https://resources.wehack.co.nz/m365-guide'
         },
         {
             cat: 0,
@@ -1090,7 +1090,7 @@
             rec: "Configure SPF, DKIM, and DMARC for your domain. Start DMARC at 'none' (monitor), then move to 'reject' over 4-6 weeks. This prevents email spoofing of your brand — it's free.",
             effort: "Medium",
             quickWin: false,
-            guide: 'm365-hardening-guide.html'
+            guide: 'https://resources.wehack.co.nz/m365-guide'
         },
         {
             cat: 1,
@@ -1105,7 +1105,7 @@
             rec: "Enable advanced email filtering with safe link scanning and attachment sandboxing. Microsoft Defender for Office 365 or Proofpoint Essentials are strong options for NZ SMBs.",
             effort: "Medium",
             quickWin: false,
-            guide: 'm365-hardening-guide.html'
+            guide: 'https://resources.wehack.co.nz/m365-guide'
         },
         {
             cat: 1,
@@ -1120,7 +1120,7 @@
             rec: "Start phishing simulations — even quarterly makes a massive difference. Services like KnowBe4, or free tools like GoPhish, let you test and train simultaneously.",
             effort: "Medium",
             quickWin: false,
-            guide: 'ai-social-engineering-defence.html'
+            guide: 'https://resources.wehack.co.nz/ai-defence'
         },
 
         /* --- DATA PROTECTION (7-9) --- */
@@ -1137,7 +1137,7 @@
             rec: "Map your data: what you collect, where it's stored, who has access, and how long you keep it. This is legally required under the NZ Privacy Act 2020 and critical for breach response.",
             effort: "Major",
             quickWin: false,
-            guide: 'breach-response-checklist.html'
+            guide: 'https://resources.wehack.co.nz/breach-checklist'
         },
         {
             cat: 2,
@@ -1199,7 +1199,7 @@
             rec: "Implement centralised logging and monitoring. At minimum, enable unified audit logging in M365 and review weekly. Consider a managed SOC service for 24/7 coverage.",
             effort: "Medium",
             quickWin: false,
-            guide: 'm365-hardening-guide.html'
+            guide: 'https://resources.wehack.co.nz/m365-guide'
         },
         {
             cat: 3,
@@ -1229,7 +1229,7 @@
             rec: "Get a professional cloud security review. CISA's SCuBA baselines cover M365 in detail. Default configurations are designed for convenience, not security — there are 47+ configuration points to check.",
             effort: "Major",
             quickWin: false,
-            guide: 'm365-hardening-guide.html'
+            guide: 'https://resources.wehack.co.nz/m365-guide'
         },
 
         /* --- HUMAN LAYER (14-16) --- */
@@ -1246,7 +1246,7 @@
             rec: "Build an ongoing security awareness program. Monthly 5-minute micro-trainings are more effective than annual hour-long sessions. Make it engaging and non-punitive.",
             effort: "Medium",
             quickWin: false,
-            guide: 'ai-social-engineering-defence.html'
+            guide: 'https://resources.wehack.co.nz/ai-defence'
         },
         {
             cat: 4,
@@ -1276,7 +1276,7 @@
             rec: "Implement a verification protocol: any financial or sensitive request must be confirmed out-of-band (call back on known number, not the one provided). Train staff on AI voice cloning — 3 seconds of audio is enough to clone a voice.",
             effort: "Quick Win",
             quickWin: true,
-            guide: 'ai-social-engineering-defence.html'
+            guide: 'https://resources.wehack.co.nz/ai-defence'
         },
 
         /* --- GOVERNANCE & COMPLIANCE (17-19) --- */
@@ -1293,7 +1293,7 @@
             rec: "Create and TEST an incident response plan. Define roles, communication chains, and decision authority BEFORE a breach. Tabletop exercises cost nothing and dramatically improve response speed.",
             effort: "Medium",
             quickWin: false,
-            guide: 'breach-response-checklist.html'
+            guide: 'https://resources.wehack.co.nz/breach-checklist'
         },
         {
             cat: 5,
@@ -1323,7 +1323,7 @@
             rec: "Appoint a privacy officer (can be an existing role). Document your data practices. Create a breach notification process — the NZ Privacy Act requires notification to the Privacy Commissioner within 72 hours of a notifiable breach.",
             effort: "Major",
             quickWin: false,
-            guide: 'breach-response-checklist.html'
+            guide: 'https://resources.wehack.co.nz/breach-checklist'
         }
     ];
 
@@ -1334,17 +1334,17 @@
        GUIDE METADATA
        ================================================================ */
     var guideInfo = {
-        'm365-hardening-guide.html': {
+        'https://resources.wehack.co.nz/m365-guide': {
             title: 'Microsoft 365 Hardening Guide',
             desc: '10 critical controls, AiTM attack flow, 5-minute audit checklist, real pentest findings',
             icon: 'M'
         },
-        'ai-social-engineering-defence.html': {
+        'https://resources.wehack.co.nz/ai-defence': {
             title: 'AI Social Engineering Defence Guide',
             desc: '5 AI attack vectors, voice cloning, deepfakes, 8-step defence framework, verification protocol',
             icon: 'AI'
         },
-        'breach-response-checklist.html': {
+        'https://resources.wehack.co.nz/breach-checklist': {
             title: '72-Hour Breach Response Checklist',
             desc: '18-step IR guide, NZ Privacy Act compliance, real NZ case study, printable checklist',
             icon: 'IR'
