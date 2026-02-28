@@ -80,10 +80,14 @@
         html.embed-mode .nav { display: flex !important; position: sticky; top: 0; left: 0; right: 0; width: 100%; max-width: 100%; overflow: hidden; box-sizing: border-box; }
         html.embed-mode .site-footer { display: none !important; }
         html.embed-mode .hero { padding-top: 20px; }
-        html.embed-mode body { min-height: auto !important; margin: 0 !important; padding: 0 !important; width: 100% !important; max-width: 100vw !important; overflow-x: hidden !important; }
-        html.embed-mode html { margin: 0 !important; padding: 0 !important; width: 100% !important; max-width: 100vw !important; overflow-x: hidden !important; }
-        html.embed-mode * { max-width: 100vw; }
+        html.embed-mode body { min-height: auto !important; margin: 0 auto !important; width: 100% !important; overflow-x: hidden !important; box-sizing: border-box !important; }
+        html.embed-mode html { margin: 0 !important; padding: 0 !important; width: 100% !important; overflow-x: hidden !important; }
         html.embed-mode .hero::before { width: 500px; height: 500px; top: -60px; }
+        /* Compensate for Wix iframe clipping: iframe is 1280px but viewport may be smaller */
+        @media (min-width: 1200px) {
+            html.embed-mode body { padding: 0 11% !important; }
+            html.embed-mode .nav { padding-left: 11% !important; padding-right: 11% !important; }
+        }
 
         /* ============================================================
            NAV
