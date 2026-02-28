@@ -1065,6 +1065,172 @@
     </div>
 </div>
 
+<!-- ═══════════════ CODE SAMPLES: VULNERABLE vs SECURE ═══════════════ -->
+<div class="page">
+    <div class="section-label">SHOW ME THE CODE</div>
+    <h2 class="section-title">Vulnerable vs Secure:<br>API Code Patterns</h2>
+    <p class="section-intro">These are the exact patterns we find during SaaS penetration tests. Copy-paste the secure versions into your codebase. Each example maps to an OWASP API risk and shows the fix in under 10 lines.</p>
+    <hr class="gradient-line">
+
+    <h4 style="color: var(--red); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px;">❌ BOLA — Broken Object Level Authorisation (API1)</h4>
+    <div class="code-block">
+<span class="comment">// VULNERABLE: No ownership check — any user can access any order</span>
+app.get(<span class="string">'/api/orders/:id'</span>, auth, async (req, res) => {
+  <span class="keyword">const</span> order = <span class="keyword">await</span> Order.findById(req.params.id);
+  res.json(order);  <span class="danger">// ← Attacker changes :id, gets other users' orders</span>
+});
+    </div>
+
+    <h4 style="color: var(--green); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; margin-top: 16px;">✅ SECURE: Ownership enforced at query level</h4>
+    <div class="code-block">
+app.get(<span class="string">'/api/orders/:id'</span>, auth, async (req, res) => {
+  <span class="keyword">const</span> order = <span class="keyword">await</span> Order.findOne({
+    _id: req.params.id,
+    <span class="string">tenant_id: req.user.tenant_id</span>,  <span class="comment">// ← Scoped to tenant</span>
+    <span class="string">user_id: req.user.id</span>             <span class="comment">// ← Scoped to user</span>
+  });
+  <span class="keyword">if</span> (!order) <span class="keyword">return</span> res.status(<span class="danger">404</span>).json({ error: <span class="string">'Not found'</span> });
+  res.json(order);
+});
+    </div>
+
+    <div style="height: 20px;"></div>
+
+    <h4 style="color: var(--red); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px;">❌ BROKEN AUTH — JWT Without Validation (API2)</h4>
+    <div class="code-block">
+<span class="comment">// VULNERABLE: Accepts any algorithm, no expiry check, secrets in code</span>
+<span class="keyword">const</span> decoded = jwt.verify(token, <span class="danger">'mysecret123'</span>);  <span class="danger">// ← Hardcoded secret</span>
+<span class="comment">// No audience check, no issuer check, accepts "alg": "none"</span>
+req.user = decoded;
+    </div>
+
+    <h4 style="color: var(--green); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; margin-top: 16px;">✅ SECURE: Strict JWT validation</h4>
+    <div class="code-block">
+<span class="keyword">const</span> decoded = jwt.verify(token, process.env.<span class="string">JWT_SECRET</span>, {
+  algorithms: [<span class="string">'RS256'</span>],           <span class="comment">// ← Only allow RS256</span>
+  audience: <span class="string">'https://api.yourapp.com'</span>,
+  issuer: <span class="string">'https://auth.yourapp.com'</span>,
+  maxAge: <span class="string">'15m'</span>,                   <span class="comment">// ← 15-min expiry</span>
+  clockTolerance: 30,
+});
+    </div>
+
+    <div style="height: 20px;"></div>
+
+    <h4 style="color: var(--red); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px;">❌ EXCESSIVE DATA EXPOSURE (API3)</h4>
+    <div class="code-block">
+<span class="comment">// VULNERABLE: Returns entire database model including internal fields</span>
+app.get(<span class="string">'/api/users/:id'</span>, auth, async (req, res) => {
+  <span class="keyword">const</span> user = <span class="keyword">await</span> User.findById(req.params.id);
+  res.json(user);  <span class="danger">// ← Exposes password_hash, internal_notes, stripe_id, role</span>
+});
+    </div>
+
+    <h4 style="color: var(--green); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; margin-top: 16px;">✅ SECURE: Response DTO with explicit field selection</h4>
+    <div class="code-block">
+<span class="keyword">const</span> UserResponseDTO = (user) => ({
+  id: user.id,
+  name: user.name,
+  email: user.email,
+  avatar_url: user.avatar_url,
+  created_at: user.created_at,
+  <span class="comment">// Explicitly omit: password_hash, stripe_id, internal_notes, role</span>
+});
+
+app.get(<span class="string">'/api/users/:id'</span>, auth, authorizeOwner, async (req, res) => {
+  <span class="keyword">const</span> user = <span class="keyword">await</span> User.findById(req.params.id);
+  res.json(<span class="string">UserResponseDTO(user)</span>);  <span class="comment">// ← Only safe fields</span>
+});
+    </div>
+</div>
+
+<!-- ═══════════════ CODE SAMPLES PAGE 2 ═══════════════ -->
+<div class="page">
+    <h4 style="color: var(--red); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px;">❌ NO RATE LIMITING — Unlimited Enumeration (API4)</h4>
+    <div class="code-block">
+<span class="comment">// VULNERABLE: No rate limit on login — brute-force trivial</span>
+app.post(<span class="string">'/api/auth/login'</span>, async (req, res) => {
+  <span class="keyword">const</span> user = <span class="keyword">await</span> User.findOne({ email: req.body.email });
+  <span class="keyword">if</span> (!user || !bcrypt.compareSync(req.body.password, user.hash))
+    <span class="keyword">return</span> res.status(401).json({ error: <span class="danger">'Invalid email'</span> });  <span class="danger">// ← Leaks valid emails</span>
+  <span class="comment">// No rate limit, no account lockout, no CAPTCHA</span>
+  res.json({ token: generateToken(user) });
+});
+    </div>
+
+    <h4 style="color: var(--green); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; margin-top: 16px;">✅ SECURE: Rate limited + generic error + lockout</h4>
+    <div class="code-block">
+<span class="keyword">const</span> loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,  <span class="comment">// 15 minutes</span>
+  max: 5,                     <span class="comment">// 5 attempts per window</span>
+  keyGenerator: (req) => req.body.email || req.ip,
+});
+
+app.post(<span class="string">'/api/auth/login'</span>, loginLimiter, async (req, res) => {
+  <span class="keyword">const</span> user = <span class="keyword">await</span> User.findOne({ email: req.body.email });
+  <span class="keyword">if</span> (!user || !<span class="keyword">await</span> bcrypt.compare(req.body.password, user.hash))
+    <span class="keyword">return</span> res.status(401).json({ error: <span class="string">'Invalid credentials'</span> });
+    <span class="comment">                               // ↑ Generic — no email enumeration</span>
+  res.json({ token: generateToken(user) });
+});
+    </div>
+
+    <div style="height: 20px;"></div>
+
+    <h4 style="color: var(--red); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px;">❌ TENANT ISOLATION FAILURE — SaaS-Specific</h4>
+    <div class="code-block">
+<span class="comment">// VULNERABLE: Tenant filter only in application code — easily missed</span>
+app.get(<span class="string">'/api/invoices'</span>, auth, async (req, res) => {
+  <span class="keyword">const</span> invoices = <span class="keyword">await</span> db.query(
+    <span class="string">'SELECT * FROM invoices WHERE tenant_id = $1'</span>,
+    [req.user.tenant_id]
+  );  <span class="danger">// ← Works here, but what about the 200 other queries?</span>
+  res.json(invoices);
+});
+    </div>
+
+    <h4 style="color: var(--green); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; margin-top: 16px;">✅ SECURE: Row-Level Security enforced at database level</h4>
+    <div class="code-block">
+<span class="comment">-- PostgreSQL RLS: enforced on EVERY query, regardless of app code</span>
+<span class="keyword">ALTER TABLE</span> invoices <span class="keyword">ENABLE ROW LEVEL SECURITY</span>;
+
+<span class="keyword">CREATE POLICY</span> tenant_isolation <span class="keyword">ON</span> invoices
+  <span class="keyword">USING</span> (tenant_id = current_setting(<span class="string">'app.tenant_id'</span>)::<span class="keyword">uuid</span>);
+
+<span class="comment">-- Set tenant context at connection level (middleware)</span>
+<span class="keyword">await</span> db.query(<span class="string">`SET app.tenant_id = '${req.user.tenant_id}'`</span>);
+<span class="comment">// Now ALL queries are automatically scoped — even JOINs, subqueries</span>
+    </div>
+
+    <div class="callout callout-teal" style="margin-top: 24px;">
+        <h4>💡 Use These as a Codebase Grep Checklist</h4>
+        <p>Search your codebase right now for these vulnerable patterns:</p>
+        <ul class="bullet-list">
+            <li><code>findById(req.params</code> — without ownership check = BOLA</li>
+            <li><code>jwt.verify(token, 'secret'</code> — hardcoded JWT secret = auth bypass</li>
+            <li><code>res.json(user)</code> or <code>res.json(model)</code> — raw model in response = data exposure</li>
+            <li><code>.findOne({email: req.body</code> — without rate limiting = enumeration</li>
+            <li><code>SELECT * FROM</code> without RLS — tenant isolation depends on every developer</li>
+        </ul>
+    </div>
+
+    <div class="callout callout-orange" style="margin-top: 16px;">
+        <h4>⚡ Quick Security Headers Check</h4>
+        <p>Run this curl against your production API and check for missing headers:</p>
+        <div class="code-block" style="margin-top: 8px; margin-bottom: 0;">
+<span class="keyword">curl</span> -I https://api.yourapp.com/health | grep -iE <span class="string">\</span>
+  <span class="string">'strict-transport|content-security|x-frame|x-content-type|referrer'</span>
+
+<span class="comment"># You should see ALL of these:</span>
+<span class="string">Strict-Transport-Security:</span> max-age=31536000; includeSubDomains
+<span class="string">Content-Security-Policy:</span>    default-src 'self'
+<span class="string">X-Frame-Options:</span>            DENY
+<span class="string">X-Content-Type-Options:</span>     nosniff
+<span class="string">Referrer-Policy:</span>            strict-origin-when-cross-origin
+        </div>
+    </div>
+</div>
+
 <!-- ═══════════════ NZ COMPLIANCE + PRIVACY ACT ═══════════════ -->
 <div class="page">
     <div class="section-label">NZ COMPLIANCE</div>
@@ -1154,69 +1320,156 @@
     </div>
 </div>
 
-<!-- ═══════════════ CTA ═══════════════ -->
+<!-- ═══════════════ WHAT YOU GET + CTA ═══════════════ -->
 <div class="page">
     <div class="section-label">NEXT STEPS</div>
-    <h2 class="section-title">Ready to Find What<br>Scanners Miss?</h2>
-    <p class="section-intro">Automated scanners catch the obvious. We find the business logic flaws, the BOLA vulnerabilities, the tenant isolation failures, and the auth bypasses that only manual testing reveals. That's what matters for SaaS.</p>
+    <h2 class="section-title">What a WeHack SaaS<br>Assessment Covers</h2>
+    <p class="section-intro">Automated scanners catch the obvious. We find the business logic flaws, the BOLA vulnerabilities, the tenant isolation failures, and the auth bypasses that only manual testing reveals. Here's exactly what you get.</p>
     <hr class="gradient-line">
 
-    <div class="cta-box">
-        <h3>Get Your SaaS Pen Tested — Properly</h3>
-        <p>Manual API &amp; web application penetration testing by an offensive security specialist who finds real vulnerabilities in production SaaS products. OWASP methodology. Plain-English report. Actionable remediation steps.</p>
+    <div class="phase-header">
+        <span class="phase-icon">🔍</span>
+        <div>
+            <h3>API Penetration Testing</h3>
+            <div class="phase-sub">Every endpoint, every parameter, every auth flow</div>
+        </div>
+    </div>
+
+    <div class="step-card">
+        <div class="step-num" style="background: var(--cyan);">✓</div>
+        <div class="step-content">
+            <h3>OWASP API Top 10 Full Coverage</h3>
+            <p>Manual testing for all 10 OWASP API risks: BOLA, broken auth, excessive data exposure, rate limit abuse, BFLA, SSRF, business logic flaws, and unsafe third-party API consumption. Not a checkbox scan — real exploitation attempts.</p>
+        </div>
+    </div>
+    <div class="step-card">
+        <div class="step-num" style="background: var(--cyan);">✓</div>
+        <div class="step-content">
+            <h3>Tenant Isolation Testing</h3>
+            <p>We create two test accounts in different tenants and systematically try to access each other's data across every endpoint, every cache layer, every background job, and every file path. The test most SaaS companies never run.</p>
+        </div>
+    </div>
+    <div class="step-card">
+        <div class="step-num" style="background: var(--cyan);">✓</div>
+        <div class="step-content">
+            <h3>Authentication &amp; Session Deep-Dive</h3>
+            <p>JWT validation bypasses, token lifecycle testing, OAuth flow abuse, password reset flaws, session fixation, privilege escalation from free-tier to admin. We test every path to unauthorised access.</p>
+        </div>
+    </div>
+
+    <div class="phase-header" style="margin-top: 20px;">
+        <span class="phase-icon">📋</span>
+        <div>
+            <h3>What You Receive</h3>
+            <div class="phase-sub">Actionable deliverables, not 200-page scanner dumps</div>
+        </div>
+    </div>
+
+    <div class="step-card">
+        <div class="step-num" style="background: var(--green); color: var(--black);">1</div>
+        <div class="step-content">
+            <h3>Executive Summary</h3>
+            <p>One-page overview for founders and board — risk rating, key findings, business impact, and what to fix first. Written in plain English, not CVE numbers.</p>
+        </div>
+    </div>
+    <div class="step-card">
+        <div class="step-num" style="background: var(--green); color: var(--black);">2</div>
+        <div class="step-content">
+            <h3>Technical Report with Proof-of-Concept</h3>
+            <p>Every finding includes: the vulnerable endpoint, exact reproduction steps, screenshots/HTTP traces, severity rating, and specific remediation code. Your developers can fix issues the same day.</p>
+        </div>
+    </div>
+    <div class="step-card">
+        <div class="step-num" style="background: var(--green); color: var(--black);">3</div>
+        <div class="step-content">
+            <h3>90-Day Remediation Roadmap</h3>
+            <p>Prioritised fix plan: critical items first, then high, then medium. Includes estimated developer effort per fix and recommended security architecture improvements for your specific stack.</p>
+        </div>
+    </div>
+    <div class="step-card">
+        <div class="step-num" style="background: var(--green); color: var(--black);">4</div>
+        <div class="step-content">
+            <h3>Free Retest on Critical Findings</h3>
+            <p>After you've fixed the critical and high findings, we retest them at no extra cost to verify the fixes are solid. You get a clean report you can share with customers and investors.</p>
+        </div>
+    </div>
+
+    <div class="cta-box" style="margin-top: 24px;">
+        <h3>Start With Your Free Security Scorecard</h3>
+        <p>2-minute assessment that benchmarks your security posture against NZ industry standards. Get your risk score, priority actions, and see where you stand — before an attacker does.</p>
         <a href="https://mkd3434.github.io/wehack-site/security-score.html" class="cta-btn">Take Free Security Scorecard →</a>
+    </div>
+</div>
 
-        <div class="pricing-row">
-            <div class="pricing-card">
-                <h4>API Pen Test</h4>
-                <div class="price">From $5K</div>
-                <div class="desc">Per API / microservice</div>
+<!-- ═══════════════ SAMPLE FINDINGS + FINAL CTA ═══════════════ -->
+<div class="page">
+    <div class="section-label">SAMPLE FINDINGS</div>
+    <h2 class="section-title">What We Actually Find<br>in SaaS Pen Tests</h2>
+    <p class="section-intro">These are anonymised examples from real WeHack engagements. Every SaaS product we've tested has had at least one critical finding. Here's what they look like.</p>
+    <hr class="gradient-line">
+
+    <div class="vuln-card" style="border-left: 4px solid var(--red);">
+        <div class="vuln-header">
+            <div class="vuln-rank" style="background: var(--red);">C</div>
+            <div>
+                <h3>BOLA: Any User Can Download Any Invoice PDF</h3>
+                <span class="vuln-id">Critical • B2B SaaS Platform • Found in 2 hours</span>
             </div>
-            <div class="pricing-card">
-                <h4>Web App Test</h4>
-                <div class="price">From $8K</div>
-                <div class="desc">Full-scope SaaS application</div>
-            </div>
-            <div class="pricing-card">
-                <h4>Full Stack</h4>
-                <div class="price">From $15K</div>
-                <div class="desc">API + Web + Infrastructure</div>
-            </div>
+        </div>
+        <p><code>GET /api/invoices/INV-4521/pdf</code> returned the PDF for invoice 4521 regardless of which user made the request. By incrementing the invoice number, an attacker could download every customer invoice in the system — including billing amounts, company names, and contact details.</p>
+        <div class="example">
+            <strong>Fix applied:</strong> Added <code>WHERE tenant_id = req.user.tenant_id</code> ownership check. Switched invoice IDs from sequential numbers to UUIDs to prevent enumeration.
         </div>
     </div>
 
-    <div class="stat-row">
-        <div class="stat-card">
-            <div class="number" style="color: var(--green);">$2.2M</div>
-            <div class="label">saved per breach with<br>regular pen testing</div>
-            <div class="source">IBM / Cobalt</div>
+    <div class="vuln-card" style="border-left: 4px solid var(--red);">
+        <div class="vuln-header">
+            <div class="vuln-rank" style="background: var(--red);">C</div>
+            <div>
+                <h3>Auth Bypass: Admin API Accessible to Free Users</h3>
+                <span class="vuln-id">Critical • Project Management SaaS • Found in 30 minutes</span>
+            </div>
         </div>
-        <div class="stat-card">
-            <div class="number" style="color: var(--cyan);">277→&lt;200</div>
-            <div class="label">days to detect breach<br>with proper testing</div>
-            <div class="source">IBM 2024</div>
-        </div>
-        <div class="stat-card">
-            <div class="number" style="color: var(--green-bright);">20%+</div>
-            <div class="label">of breaches via vuln<br>exploitation (preventable)</div>
-            <div class="source">Verizon DBIR 2025</div>
+        <p>The <code>/api/admin/users</code> endpoint checked for a valid JWT but didn't verify the user's role. Any authenticated user — including free-tier accounts — could list all users, change permissions, and delete accounts across the entire platform.</p>
+        <div class="example">
+            <strong>Fix applied:</strong> Added role-based middleware (<code>requireRole('admin')</code>) to all <code>/api/admin/*</code> routes. Moved admin endpoints behind a separate subdomain with stricter auth.
         </div>
     </div>
 
-    <div class="callout callout-teal">
-        <h4>Why WeHack for SaaS</h4>
-        <ul class="bullet-list">
-            <li><strong>Offensive security specialist</strong> — not a scanning service. Manual testing that thinks like a real attacker targeting your SaaS product.</li>
-            <li><strong>API-first methodology</strong> — OWASP API Security Top 10 coverage, business logic testing, auth bypass, BOLA/BFLA, tenant isolation verification.</li>
-            <li><strong>NZ-based</strong> — understands Privacy Act 2020 obligations, NZ business context, and timezone-friendly engagement.</li>
-            <li><strong>Startup-friendly</strong> — scoped engagements that fit startup budgets. We test what matters most, not everything at once.</li>
-        </ul>
+    <div class="vuln-card" style="border-left: 4px solid var(--orange);">
+        <div class="vuln-header">
+            <div class="vuln-rank" style="background: var(--orange);">H</div>
+            <div>
+                <h3>Data Exposure: API Returns Stripe Customer IDs</h3>
+                <span class="vuln-id">High • E-commerce SaaS • Found in 1 hour</span>
+            </div>
+        </div>
+        <p>The user profile endpoint returned the raw database model, which included <code>stripe_customer_id</code>, <code>internal_notes</code>, and <code>password_reset_token</code>. The Stripe ID alone could be used to look up payment methods via Stripe's API if combined with a leaked Stripe key.</p>
+        <div class="example">
+            <strong>Fix applied:</strong> Implemented Response DTO layer — only <code>id</code>, <code>name</code>, <code>email</code>, and <code>avatar_url</code> returned. Added automated tests that fail if response contains unexpected fields.
+        </div>
     </div>
 
-    <div style="text-align: center; margin-top: 30px;">
-        <p style="color: #888; font-size: 14px; margin-bottom: 8px;">Start with a free assessment of your current security posture:</p>
+    <div class="vuln-card" style="border-left: 4px solid var(--yellow);">
+        <div class="vuln-header">
+            <div class="vuln-rank" style="background: var(--yellow); color: var(--black);">M</div>
+            <div>
+                <h3>Tenant Bleed: Cached Dashboard Served to Wrong User</h3>
+                <span class="vuln-id">Medium • Analytics SaaS • Found in 3 hours</span>
+            </div>
+        </div>
+        <p>Dashboard data was cached by endpoint URL but not by tenant. When Tenant A loaded <code>/api/dashboard/overview</code>, the response was cached. Tenant B requesting the same URL received Tenant A's analytics data — revenue figures, customer counts, and usage metrics.</p>
+        <div class="example">
+            <strong>Fix applied:</strong> Added <code>tenant_id</code> to all cache keys. Implemented cache-busting middleware that includes tenant context. Added automated cross-tenant tests to CI pipeline.
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 30px; padding: 40px 20px; background: var(--card); border: 1px solid var(--border); border-radius: 16px;">
+        <p style="color: var(--cyan); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px;">Free • 2 Minutes • No Sales Spam</p>
+        <h3 style="color: white; font-size: 26px; margin-bottom: 8px;">How Secure Is Your SaaS?</h3>
+        <p style="color: #888; font-size: 14px; margin-bottom: 20px; max-width: 420px; margin-left: auto; margin-right: auto;">Take the free security scorecard. Get your risk score benchmarked against NZ industry standards, priority actions, and a radar chart of your security posture.</p>
         <a href="https://mkd3434.github.io/wehack-site/security-score.html" class="cta-btn" style="font-size: 16px; padding: 16px 48px;">Free Security Scorecard →</a>
-        <p style="color: #666; font-size: 12px; margin-top: 12px;">2-minute assessment • No sales spam • Instant results</p>
+        <p style="color: #555; font-size: 11px; margin-top: 12px;">Instant results • Industry-adjusted benchmarks • Priority quick wins</p>
     </div>
 
     <div class="footer">
