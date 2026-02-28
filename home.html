@@ -77,7 +77,7 @@
         /* ============================================================
            EMBED MODE (when loaded inside Wix iframe with ?embed=true)
            ============================================================ */
-        html.embed-mode .nav { display: flex !important; position: sticky; top: 0; left: auto; right: auto; width: 100%; max-width: 100%; overflow: hidden; }
+        html.embed-mode .nav { display: flex !important; position: sticky; top: 0; left: 0; right: 0; width: 100%; max-width: 100%; overflow: hidden; box-sizing: border-box; }
         html.embed-mode .site-footer { display: none !important; }
         html.embed-mode .hero { padding-top: 20px; }
         html.embed-mode body { min-height: auto !important; margin: 0 !important; padding: 0 !important; width: 100% !important; max-width: 100vw !important; overflow-x: hidden !important; }
@@ -1030,13 +1030,38 @@
     (function() {
         if (window.location.search.indexOf('embed=true') !== -1) {
             document.documentElement.classList.add('embed-mode');
+
             // Send height to parent for auto-sizing
             function sendHeight() {
                 var h = document.documentElement.scrollHeight;
                 window.parent.postMessage({ type: 'wehack-height', height: h }, '*');
             }
+
+            // Listen for viewport width from Wix parent page (sent via Velo code)
+            // This fixes the iframe clipping issue where Wix renders the iframe wider than the viewport
+            window.addEventListener('message', function(event) {
+                if (event.data && event.data.type === 'wehack-viewport') {
+                    var viewportWidth = event.data.width;
+                    var iframeWidth = document.documentElement.clientWidth;
+                    if (viewportWidth < iframeWidth) {
+                        var clipPerSide = Math.ceil((iframeWidth - viewportWidth) / 2);
+                        document.body.style.paddingLeft = clipPerSide + 'px';
+                        document.body.style.paddingRight = clipPerSide + 'px';
+                        document.body.style.boxSizing = 'border-box';
+                    } else {
+                        document.body.style.paddingLeft = '';
+                        document.body.style.paddingRight = '';
+                    }
+                    sendHeight(); // Recalculate height after padding change
+                }
+            });
+
+            // Request viewport width from parent on load
+            window.parent.postMessage({ type: 'wehack-request-viewport' }, '*');
+
             window.addEventListener('load', function() {
                 sendHeight();
+                window.parent.postMessage({ type: 'wehack-request-viewport' }, '*');
                 // Make all non-anchor links open in parent window
                 var links = document.querySelectorAll('a[href]');
                 for (var i = 0; i < links.length; i++) {
@@ -1046,7 +1071,10 @@
                     }
                 }
             });
-            window.addEventListener('resize', sendHeight);
+            window.addEventListener('resize', function() {
+                sendHeight();
+                window.parent.postMessage({ type: 'wehack-request-viewport' }, '*');
+            });
             new MutationObserver(sendHeight).observe(document.body, { childList: true, subtree: true });
         }
     })();
