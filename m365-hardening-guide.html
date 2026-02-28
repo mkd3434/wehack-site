@@ -6,7 +6,7 @@
     <title>Microsoft 365 Security Hardening Guide — WeHack</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Questrial&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Questrial&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --cyan: #B8F0F0;
@@ -435,9 +435,58 @@
             color: var(--cyan);
             text-decoration: underline;
         }
+        /* === NAV BAR === */
+        .lm-nav{position:sticky;top:0;z-index:1000;padding:14px 24px;display:flex;justify-content:space-between;align-items:center;background:rgba(15,15,16,0.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,0.06)}
+        .lm-nav-left{display:flex;align-items:center;gap:48px}
+        .lm-nav-logo{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:20px;color:#fff;letter-spacing:-0.5px;text-decoration:none}
+        .lm-nav-logo:hover{text-decoration:none}
+        .lm-nav-logo span{color:var(--green)}
+        .lm-nav-links{display:flex;gap:28px}
+        .lm-nav-links a{color:#999;font-size:14px;text-decoration:none;transition:color 0.2s;font-family:'Questrial',sans-serif}
+        .lm-nav-links a:hover{color:#fff;text-decoration:none}
+        .lm-nav-right{display:flex;align-items:center;gap:16px}
+        .lm-nav-cta{display:inline-block;padding:8px 20px;background:var(--green);color:var(--black);border-radius:6px;font-weight:700;font-size:14px;text-decoration:none;transition:all 0.2s;font-family:'Questrial',sans-serif}
+        .lm-nav-cta:hover{background:#A9FF8F;text-decoration:none;transform:translateY(-1px)}
+        .lm-nav-hamburger{display:none;background:none;border:none;cursor:pointer;width:28px;height:20px;position:relative;padding:0}
+        .lm-nav-hamburger span{display:block;width:100%;height:2px;background:#fff;position:absolute;left:0;transition:all 0.3s}
+        .lm-nav-hamburger span:nth-child(1){top:0}
+        .lm-nav-hamburger span:nth-child(2){top:9px}
+        .lm-nav-hamburger span:nth-child(3){top:18px}
+        .lm-nav-open .lm-nav-hamburger span:nth-child(1){top:9px;transform:rotate(45deg)}
+        .lm-nav-open .lm-nav-hamburger span:nth-child(2){opacity:0}
+        .lm-nav-open .lm-nav-hamburger span:nth-child(3){top:9px;transform:rotate(-45deg)}
+        @media(max-width:900px){
+            .lm-nav-hamburger{display:block}
+            .lm-nav-cta{display:none}
+            .lm-nav-links{display:none;position:fixed;top:50px;left:0;right:0;background:rgba(15,15,16,0.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);flex-direction:column;padding:20px 24px;gap:0;border-bottom:1px solid rgba(255,255,255,0.08);z-index:999}
+            .lm-nav-open .lm-nav-links{display:flex}
+            .lm-nav-links a{padding:14px 0;font-size:16px;border-bottom:1px solid rgba(255,255,255,0.06)}
+            .lm-nav-links a:last-child{border-bottom:none}
+        }
+        @media print{.lm-nav{display:none!important}}
     </style>
 </head>
 <body>
+
+<!-- ============ NAV BAR ============ -->
+<nav class="lm-nav">
+    <div class="lm-nav-left">
+        <a href="https://wehack.co.nz/" class="lm-nav-logo">We<span>Hack</span></a>
+        <div class="lm-nav-links">
+            <a href="https://wehack.co.nz/">Home</a>
+            <a href="https://wehack.co.nz/#services">Services</a>
+            <a href="https://wehack.co.nz/#assessment">Free Assessment</a>
+            <a href="https://wehack.co.nz/#resources">Resources</a>
+            <a href="https://wehack.co.nz/#contact">Contact</a>
+        </div>
+    </div>
+    <div class="lm-nav-right">
+        <a href="https://wehack.co.nz/security-score" class="lm-nav-cta">Free Security Check &rarr;</a>
+        <button class="lm-nav-hamburger" aria-label="Menu" onclick="this.closest('.lm-nav').classList.toggle('lm-nav-open')">
+            <span></span><span></span><span></span>
+        </button>
+    </div>
+</nav>
 
 <!-- ═══════════════ COVER ═══════════════ -->
 <div class="page cover">
