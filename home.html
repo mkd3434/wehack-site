@@ -80,7 +80,8 @@
         html.embed-mode .nav { display: none !important; }
         html.embed-mode .site-footer { display: none !important; }
         html.embed-mode .hero { padding-top: 40px; }
-        html.embed-mode body { min-height: auto !important; }
+        html.embed-mode body { min-height: auto !important; margin: 0 !important; padding: 0 !important; width: 100% !important; }
+        html.embed-mode html { margin: 0 !important; padding: 0 !important; width: 100% !important; overflow-x: hidden; }
         html.embed-mode .hero::before { width: 500px; height: 500px; top: -60px; }
 
         /* ============================================================
@@ -918,8 +919,78 @@
 
         /* Embed mode mobile overrides */
         @media (max-width: 600px) {
-            html.embed-mode .hero { padding-top: 24px; }
+            html.embed-mode .hero {
+                padding: 20px 10px 36px;
+            }
             html.embed-mode .hero::before { width: 300px; height: 300px; top: -40px; }
+            html.embed-mode .hero h1 { font-size: 30px; }
+            html.embed-mode .hero-sub { font-size: 14px; margin-bottom: 24px; }
+            html.embed-mode .hero-tagline { font-size: 9px; letter-spacing: 1.5px; }
+            html.embed-mode .hero-ctas { gap: 10px; }
+            html.embed-mode .btn-primary,
+            html.embed-mode .btn-secondary { padding: 12px 20px; font-size: 14px; }
+            html.embed-mode .hero-proof { gap: 16px; margin-top: 28px; }
+            html.embed-mode .hero-proof-item .val { font-size: 20px; }
+            html.embed-mode .hero-proof-item .label { font-size: 10px; }
+
+            /* Edge-to-edge sections */
+            html.embed-mode .section { padding: 36px 10px; }
+            html.embed-mode .trust-bar { padding: 14px 10px; }
+            html.embed-mode .trust-bar-inner { gap: 10px 16px; }
+            html.embed-mode .trust-item { font-size: 9px; letter-spacing: 0.3px; }
+            html.embed-mode .stats-banner { padding: 32px 10px; }
+            html.embed-mode .stats-grid { gap: 10px; }
+            html.embed-mode .stat-card { padding: 18px 8px; }
+            html.embed-mode .stat-card .num { font-size: 24px; }
+            html.embed-mode .stat-card .desc { font-size: 12px; }
+
+            /* Cards tighter */
+            html.embed-mode .service-card { padding: 22px 14px; }
+            html.embed-mode .service-card h3 { font-size: 17px; }
+            html.embed-mode .services-grid { gap: 12px; margin-top: 28px; }
+
+            /* Assessment section */
+            html.embed-mode .assess-section { padding: 36px 10px; }
+            html.embed-mode .assess-inner { gap: 28px; }
+            html.embed-mode .radar-mock { padding: 20px 10px; }
+
+            /* Resources */
+            html.embed-mode .resources-grid { gap: 10px; margin-top: 24px; }
+            html.embed-mode .resource-card { padding: 20px 14px; }
+
+            /* Why section */
+            html.embed-mode .why-grid { gap: 24px; margin-top: 24px; }
+            html.embed-mode .terminal-body { padding: 12px; font-size: 10px; }
+            html.embed-mode .cred-badge { font-size: 9px; padding: 4px 8px; }
+
+            /* Steps */
+            html.embed-mode .steps-grid { gap: 10px; margin-top: 24px; }
+            html.embed-mode .step-card { padding: 22px 14px; }
+            html.embed-mode .step-num { font-size: 32px; }
+
+            /* Contact */
+            html.embed-mode .contact-section { padding: 36px 10px; }
+            html.embed-mode .contact-form { padding: 20px 14px; }
+
+            /* Final CTA */
+            html.embed-mode .final-cta { padding: 40px 10px; }
+
+            /* Section titles tighter */
+            html.embed-mode .section-title { font-size: 24px; margin-bottom: 10px; }
+            html.embed-mode .section-sub { font-size: 14px; }
+            html.embed-mode .section-label { font-size: 10px; letter-spacing: 2px; }
+
+            /* Hero orbit smaller on mobile embed */
+            html.embed-mode .hero-orbit { width: 240px; height: 240px; margin: -120px 0 0 -120px; }
+        }
+
+        /* Extra small embed overrides */
+        @media (max-width: 400px) {
+            html.embed-mode .hero h1 { font-size: 26px; }
+            html.embed-mode .hero-proof { flex-direction: column; gap: 12px; }
+            html.embed-mode .trust-bar-inner { flex-direction: column; gap: 6px; }
+            html.embed-mode .stat-card .num { font-size: 20px; }
+            html.embed-mode .section-title { font-size: 22px; }
         }
     </style>
 </head>
