@@ -849,7 +849,17 @@
                 var h = document.documentElement.scrollHeight;
                 window.parent.postMessage({ type: 'wehack-height', height: h }, '*');
             }
-            window.addEventListener('load', sendHeight);
+            window.addEventListener('load', function() {
+                sendHeight();
+                // Make all non-anchor links open in parent window
+                var links = document.querySelectorAll('a[href]');
+                for (var i = 0; i < links.length; i++) {
+                    var href = links[i].getAttribute('href');
+                    if (href && href.charAt(0) !== '#') {
+                        links[i].setAttribute('target', '_top');
+                    }
+                }
+            });
             window.addEventListener('resize', sendHeight);
             new MutationObserver(sendHeight).observe(document.body, { childList: true, subtree: true });
         }
