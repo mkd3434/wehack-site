@@ -80,6 +80,8 @@
         html.embed-mode .nav { display: none !important; }
         html.embed-mode .site-footer { display: none !important; }
         html.embed-mode .hero { padding-top: 40px; }
+        html.embed-mode body { min-height: auto !important; }
+        html.embed-mode .hero::before { width: 500px; height: 500px; top: -60px; }
 
         /* ============================================================
            NAV
@@ -842,6 +844,14 @@
     (function() {
         if (window.location.search.indexOf('embed=true') !== -1) {
             document.documentElement.classList.add('embed-mode');
+            // Send height to parent for auto-sizing
+            function sendHeight() {
+                var h = document.documentElement.scrollHeight;
+                window.parent.postMessage({ type: 'wehack-height', height: h }, '*');
+            }
+            window.addEventListener('load', sendHeight);
+            window.addEventListener('resize', sendHeight);
+            new MutationObserver(sendHeight).observe(document.body, { childList: true, subtree: true });
         }
     })();
     </script>
