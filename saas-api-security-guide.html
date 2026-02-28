@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SaaS API &amp; Web Security Guide — WeHack</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Questrial&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cyan: #B8F0F0;
+            --green: #C4FF9E;
+            --green-bright: #A9FF8F;
+            --black: #0F0F10;
+            --card: #1A1A1C;
+            --border: #2A2A2E;
+            --teal: #0E99AB;
+            --dark-teal: #133C41;
+            --red: #FF4444;
+            --orange: #FF8C00;
+            --yellow: #FFD700;
+            --blue: #4A9EFF;
+            --purple: #A78BFA;
+        }
+
+        @page { size: A4; margin: 0; }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Questrial', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: var(--black);
+            color: #E0E0E0;
+            line-height: 1.6;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
+            padding: 50px 60px;
+            page-break-after: always;
+            position: relative;
+        }
+
+        /* ── COVER ── */
+        .cover {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            min-height: 297mm;
+            padding: 60px;
+        }
+        .cover-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--teal), #0BBD8B);
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            padding: 8px 24px;
+            border-radius: 20px;
+            margin-bottom: 40px;
+        }
+        .cover h1 {
+            font-size: 42px;
+            line-height: 1.15;
+            margin-bottom: 16px;
+            color: white;
+        }
+        .cover h1 span {
+            background: linear-gradient(135deg, var(--cyan), var(--green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .cover .subtitle {
+            font-size: 18px;
+            color: #999;
+            margin-bottom: 50px;
+            max-width: 520px;
+        }
+        .cover-stats {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 50px;
+        }
+        .cover-stat {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px 24px;
+            text-align: center;
+            min-width: 130px;
+        }
+        .cover-stat .number {
+            font-size: 30px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .cover-stat .label {
+            font-size: 11px;
+            color: #888;
+            line-height: 1.4;
+        }
+        .cover-stat .source {
+            font-size: 9px;
+            color: #555;
+            margin-top: 4px;
+        }
+        .cover-footer {
+            margin-top: auto;
+            padding-top: 40px;
+        }
+        .cover-footer .brand {
+            font-size: 20px;
+            color: var(--cyan);
+            letter-spacing: 2px;
+        }
+        .cover-footer .tagline {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        /* ── SECTIONS ── */
+        .section-label {
+            font-size: 11px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--cyan);
+            margin-bottom: 8px;
+        }
+        .section-title {
+            font-size: 32px;
+            color: white;
+            margin-bottom: 12px;
+            line-height: 1.2;
+        }
+        .section-intro {
+            color: #999;
+            font-size: 14px;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+        .gradient-line {
+            height: 3px;
+            background: linear-gradient(90deg, var(--cyan), var(--green), transparent);
+            border: none;
+            margin: 20px 0 30px;
+            border-radius: 2px;
+        }
+
+        /* ── STEP CARDS ── */
+        .step-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 12px;
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+        .step-num {
+            width: 36px;
+            height: 36px;
+            min-width: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--cyan), var(--green));
+            color: var(--black);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+        .step-content h3 {
+            font-size: 16px;
+            color: white;
+            margin-bottom: 4px;
+        }
+        .step-content p {
+            font-size: 13px;
+            color: #AAA;
+            line-height: 1.5;
+        }
+        .step-content .source {
+            font-size: 11px;
+            color: var(--teal);
+            margin-top: 2px;
+        }
+        .step-tag {
+            display: inline-block;
+            font-size: 10px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-bottom: 6px;
+        }
+        .tag-critical { background: rgba(255,68,68,0.15); color: var(--red); }
+        .tag-high { background: rgba(255,140,0,0.15); color: var(--orange); }
+        .tag-medium { background: rgba(255,215,0,0.15); color: var(--yellow); }
+        .tag-recommended { background: rgba(74,158,255,0.15); color: var(--blue); }
+        .tag-api { background: rgba(167,139,250,0.15); color: var(--purple); }
+
+        /* ── STAT CARDS ── */
+        .stat-row {
+            display: flex;
+            gap: 16px;
+            margin: 24px 0;
+        }
+        .stat-card {
+            flex: 1;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+        .stat-card .number {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .stat-card .label {
+            font-size: 11px;
+            color: #888;
+            line-height: 1.4;
+        }
+        .stat-card .source {
+            font-size: 9px;
+            color: #555;
+            margin-top: 4px;
+        }
+
+        /* ── CALLOUT BOXES ── */
+        .callout {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin: 20px 0;
+        }
+        .callout h4 {
+            color: var(--cyan);
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        .callout p, .callout li {
+            font-size: 13px;
+            color: #AAA;
+            line-height: 1.6;
+        }
+        .callout-red { border-left: 4px solid var(--red); }
+        .callout-red h4 { color: var(--red); }
+        .callout-teal { border-left: 4px solid var(--teal); }
+        .callout-orange { border-left: 4px solid var(--orange); }
+        .callout-orange h4 { color: var(--orange); }
+        .callout-purple { border-left: 4px solid var(--purple); }
+        .callout-purple h4 { color: var(--purple); }
+
+        /* ── BULLET LISTS ── */
+        .bullet-list {
+            list-style: none;
+            padding: 0;
+        }
+        .bullet-list li {
+            padding: 6px 0 6px 20px;
+            position: relative;
+            font-size: 13px;
+            color: #AAA;
+            line-height: 1.5;
+        }
+        .bullet-list li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 13px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--cyan);
+        }
+
+        /* ── PHASE HEADER ── */
+        .phase-header {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 24px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .phase-icon {
+            font-size: 28px;
+        }
+        .phase-header h3 {
+            font-size: 18px;
+            color: white;
+        }
+        .phase-header .phase-sub {
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--teal);
+        }
+
+        /* ── ATTACK FLOW ── */
+        .attack-flow {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 20px 0;
+        }
+        .attack-flow h4 {
+            text-align: center;
+            color: #888;
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        /* ── VULN CARD ── */
+        .vuln-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 14px;
+        }
+        .vuln-card .vuln-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+        .vuln-rank {
+            width: 32px;
+            height: 32px;
+            min-width: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--black);
+        }
+        .vuln-card h3 {
+            font-size: 15px;
+            color: white;
+        }
+        .vuln-card .vuln-id {
+            font-size: 10px;
+            color: #666;
+            font-family: monospace;
+        }
+        .vuln-card p {
+            font-size: 13px;
+            color: #AAA;
+            line-height: 1.5;
+        }
+        .vuln-card .example {
+            background: rgba(14,153,171,0.08);
+            border: 1px solid rgba(14,153,171,0.2);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-top: 10px;
+            font-size: 12px;
+            color: #AAA;
+        }
+        .vuln-card .example strong {
+            color: var(--cyan);
+        }
+
+        /* ── CODE BLOCK ── */
+        .code-block {
+            background: #111;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin: 12px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #CCC;
+            overflow-x: auto;
+            line-height: 1.7;
+        }
+        .code-block .comment { color: #555; }
+        .code-block .keyword { color: var(--cyan); }
+        .code-block .string { color: var(--green); }
+        .code-block .danger { color: var(--red); }
+
+        /* ── AUDIT CHECKLIST ── */
+        .audit-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .audit-item:last-child { border-bottom: none; }
+        .audit-check {
+            width: 22px;
+            height: 22px;
+            min-width: 22px;
+            border: 2px solid var(--cyan);
+            border-radius: 4px;
+            margin-top: 1px;
+        }
+        .audit-item .label {
+            font-size: 13px;
+            color: white;
+        }
+        .audit-item .desc {
+            font-size: 12px;
+            color: #888;
+        }
+        .audit-item .nav {
+            font-size: 11px;
+            color: var(--teal);
+            font-family: monospace;
+        }
+
+        /* ── COMPARISON TABLE ── */
+        .compare-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: 12px;
+        }
+        .compare-table th {
+            background: var(--card);
+            color: var(--cyan);
+            font-size: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 10px 14px;
+            text-align: left;
+            border-bottom: 2px solid var(--border);
+        }
+        .compare-table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+            color: #AAA;
+        }
+        .compare-table tr:hover td {
+            background: rgba(184,240,240,0.03);
+        }
+
+        /* ── CTA ── */
+        .cta-box {
+            background: linear-gradient(135deg, var(--teal), #0BBD8B);
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            margin: 30px 0;
+        }
+        .cta-box h3 {
+            font-size: 24px;
+            color: white;
+            margin-bottom: 12px;
+        }
+        .cta-box p {
+            color: rgba(255,255,255,0.85);
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        .cta-btn {
+            display: inline-block;
+            background: var(--green-bright);
+            color: var(--black);
+            font-size: 15px;
+            font-weight: 700;
+            padding: 14px 36px;
+            border-radius: 8px;
+            text-decoration: none;
+        }
+        .pricing-row {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        .pricing-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px 32px;
+            text-align: center;
+            min-width: 160px;
+        }
+        .pricing-card h4 {
+            font-size: 13px;
+            color: #999;
+            margin-bottom: 4px;
+        }
+        .pricing-card .price {
+            font-size: 22px;
+            color: var(--green);
+            font-weight: 700;
+        }
+        .pricing-card .desc {
+            font-size: 11px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        /* ── FOOTER ── */
+        .footer {
+            text-align: center;
+            padding: 30px 0;
+            color: #555;
+            font-size: 12px;
+        }
+        .footer a {
+            color: var(--cyan);
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ═══════════════ COVER ═══════════════ -->
+<div class="page cover">
+    <div class="cover-badge">SaaS Security Guide • 2026</div>
+    <h1>API &amp; Web App<br><span>Security Playbook</span><br>for SaaS Founders</h1>
+    <p class="subtitle">Your APIs are your product's attack surface. This guide covers the top vulnerabilities, real-world breaches, and the hardening playbook every NZ SaaS company needs — before attackers find what your scanners missed.</p>
+
+    <div class="cover-stats">
+        <div class="cover-stat">
+            <div class="number" style="color: var(--red);">52%</div>
+            <div class="label">of API breaches involve<br>broken authentication</div>
+            <div class="source">Wallarm 2026</div>
+        </div>
+        <div class="cover-stat">
+            <div class="number" style="color: var(--orange);">95%</div>
+            <div class="label">of organisations had<br>API security incidents</div>
+            <div class="source">Salt Security 2025</div>
+        </div>
+        <div class="cover-stat">
+            <div class="number" style="color: var(--green);">$4.88M</div>
+            <div class="label">average cost<br>per data breach</div>
+            <div class="source">IBM 2024</div>
+        </div>
+    </div>
+
+    <div class="cover-footer">
+        <div class="brand">WEHACK</div>
+        <div class="tagline">We hack you before they do.</div>
+    </div>
+</div>
+
+<!-- ═══════════════ THE API THREAT LANDSCAPE ═══════════════ -->
+<div class="page">
+    <div class="section-label">THE THREAT</div>
+    <h2 class="section-title">Your APIs Are Your<br>Biggest Attack Surface</h2>
+    <p class="section-intro">APIs are no longer behind the scenes — they <em>are</em> the product. Every endpoint you expose is a door. In 2025, APIs accounted for 17% of all published vulnerabilities. Attackers aren't scanning ports anymore — they're reading your API docs.</p>
+    <hr class="gradient-line">
+
+    <div class="stat-row">
+        <div class="stat-card">
+            <div class="number" style="color: var(--red);">17%</div>
+            <div class="label">of all 2025 CVEs<br>were API-related</div>
+            <div class="source">Wallarm 2026 ThreatStats</div>
+        </div>
+        <div class="stat-card">
+            <div class="number" style="color: var(--orange);">58%</div>
+            <div class="label">of orgs had a SaaS<br>security incident</div>
+            <div class="source">CSA 2025</div>
+        </div>
+        <div class="stat-card">
+            <div class="number" style="color: var(--yellow);">40%</div>
+            <div class="label">of all API attacks<br>are BOLA</div>
+            <div class="source">Salt Security / OWASP</div>
+        </div>
+    </div>
+
+    <div class="attack-flow">
+        <h4>Anatomy of a SaaS API Attack (2026)</h4>
+        <svg viewBox="0 0 620 180" xmlns="http://www.w3.org/2000/svg" style="width:100%;">
+            <line x1="110" y1="60" x2="155" y2="60" stroke="#444" stroke-width="2" marker-end="url(#arrow)"/>
+            <line x1="245" y1="60" x2="290" y2="60" stroke="#444" stroke-width="2" marker-end="url(#arrow)"/>
+            <line x1="380" y1="60" x2="425" y2="60" stroke="#444" stroke-width="2" marker-end="url(#arrow)"/>
+            <line x1="515" y1="60" x2="555" y2="60" stroke="#444" stroke-width="2" marker-end="url(#arrow)"/>
+            <defs>
+                <marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+                    <path d="M0,0 L8,3 L0,6" fill="#666"/>
+                </marker>
+            </defs>
+            <!-- Step 1: Recon -->
+            <rect x="10" y="30" width="100" height="60" rx="8" fill="#1A1A1C" stroke="#FF4444" stroke-width="2"/>
+            <text x="60" y="52" text-anchor="middle" fill="#FF4444" font-size="11" font-weight="600">API Recon</text>
+            <text x="60" y="68" text-anchor="middle" fill="#888" font-size="9">Docs, Swagger,</text>
+            <text x="60" y="80" text-anchor="middle" fill="#888" font-size="9">exposed schemas</text>
+            <!-- Step 2: Auth Bypass -->
+            <rect x="155" y="30" width="90" height="60" rx="8" fill="#1A1A1C" stroke="#FF8C00" stroke-width="2"/>
+            <text x="200" y="52" text-anchor="middle" fill="#FF8C00" font-size="11" font-weight="600">Auth Bypass</text>
+            <text x="200" y="68" text-anchor="middle" fill="#888" font-size="9">Broken JWT,</text>
+            <text x="200" y="80" text-anchor="middle" fill="#888" font-size="9">missing checks</text>
+            <!-- Step 3: BOLA -->
+            <rect x="290" y="30" width="90" height="60" rx="8" fill="#1A1A1C" stroke="#FFD700" stroke-width="2"/>
+            <text x="335" y="52" text-anchor="middle" fill="#FFD700" font-size="11" font-weight="600">BOLA / IDOR</text>
+            <text x="335" y="68" text-anchor="middle" fill="#888" font-size="9">Enumerate IDs,</text>
+            <text x="335" y="80" text-anchor="middle" fill="#888" font-size="9">access other users</text>
+            <!-- Step 4: Data Exfil -->
+            <rect x="425" y="30" width="90" height="60" rx="8" fill="#1A1A1C" stroke="#4A9EFF" stroke-width="2"/>
+            <text x="470" y="52" text-anchor="middle" fill="#4A9EFF" font-size="11" font-weight="600">Data Harvest</text>
+            <text x="470" y="68" text-anchor="middle" fill="#888" font-size="9">Mass scrape PII,</text>
+            <text x="470" y="80" text-anchor="middle" fill="#888" font-size="9">export via API</text>
+            <!-- Step 5: Impact -->
+            <rect x="555" y="30" width="60" height="60" rx="8" fill="#1A1A1C" stroke="#FF4444" stroke-width="2"/>
+            <text x="585" y="55" text-anchor="middle" fill="#FF4444" font-size="11" font-weight="600">Breach</text>
+            <text x="585" y="72" text-anchor="middle" fill="#888" font-size="9">NDB + Fines</text>
+            <!-- Bottom labels -->
+            <text x="60" y="118" text-anchor="middle" fill="#555" font-size="9">Attacker finds public</text>
+            <text x="60" y="130" text-anchor="middle" fill="#555" font-size="9">API docs or /swagger</text>
+            <text x="200" y="118" text-anchor="middle" fill="#555" font-size="9">Weak token, no rate</text>
+            <text x="200" y="130" text-anchor="middle" fill="#555" font-size="9">limit, broken session</text>
+            <text x="335" y="118" text-anchor="middle" fill="#555" font-size="9">Change user_id in</text>
+            <text x="335" y="130" text-anchor="middle" fill="#555" font-size="9">request = other's data</text>
+            <text x="470" y="118" text-anchor="middle" fill="#555" font-size="9">Automated scraping</text>
+            <text x="470" y="130" text-anchor="middle" fill="#555" font-size="9">of all user records</text>
+            <text x="585" y="118" text-anchor="middle" fill="#555" font-size="9">Privacy Act</text>
+            <text x="585" y="130" text-anchor="middle" fill="#555" font-size="9">notification</text>
+            <!-- Timeline bar -->
+            <rect x="10" y="150" width="605" height="4" rx="2" fill="#2A2A2E"/>
+            <rect x="10" y="150" width="200" height="4" rx="2" fill="var(--red)"/>
+            <text x="10" y="170" fill="#FF4444" font-size="9" font-weight="600">Often automated</text>
+            <text x="150" y="170" fill="#888" font-size="9">— full data exfiltration in hours, not weeks</text>
+        </svg>
+    </div>
+
+    <div class="callout callout-red">
+        <h4>Software &amp; SaaS: The Top Targets</h4>
+        <p>Wallarm's 2026 analysis of 60 API breaches found Software (15%), AI platforms (15%), cybersecurity vendors (13%), and SaaS (8%) are the most-targeted sectors. The pattern is clear: if your product has APIs, you're in the crosshairs. Real-world examples include Postman workspaces leaking 30,000 production secrets, and Spoutible's API exposing bcrypt password hashes via simple ID enumeration.</p>
+        <p style="margin-top:6px;"><span style="color:var(--teal);">Sources: Wallarm 2026, APISecurity.io, Equixly 2025</span></p>
+    </div>
+
+    <ul class="bullet-list" style="margin-top:16px;">
+        <li><strong>36% of AI vulnerabilities involve APIs.</strong> If you're building AI features, your API surface just expanded — and attackers are already mapping it. <span style="color:var(--teal);">Wallarm 2026</span></li>
+        <li><strong>Supply-chain breaches surged to 20% of all incidents</strong> — up from 15%. Your third-party APIs and SaaS integrations are attack vectors into your customers. <span style="color:var(--teal);">Verizon DBIR 2025</span></li>
+        <li><strong>Cross-Site Issues became the #1 API weakness by volume</strong> in 2025, overtaking injection attacks for the first time. <span style="color:var(--teal);">Wallarm 2026 ThreatStats</span></li>
+    </ul>
+</div>
+
+<!-- ═══════════════ OWASP API TOP 5 ═══════════════ -->
+<div class="page">
+    <div class="section-label">OWASP API SECURITY TOP 10</div>
+    <h2 class="section-title">The 5 API Vulnerabilities<br>That Cause Most Breaches</h2>
+    <p class="section-intro">Based on OWASP's 2023 API Security Top 10 and mapped to real-world incidents from 2024–2026. These five alone account for the vast majority of API-related data breaches.</p>
+    <hr class="gradient-line">
+
+    <div class="vuln-card">
+        <div class="vuln-header">
+            <div class="vuln-rank" style="background: linear-gradient(135deg, var(--red), #FF6B6B);">1</div>
+            <div>
+                <h3>Broken Object Level Authorisation (BOLA)</h3>
+                <span class="vuln-id">API1:2023 — 40% of all API attacks</span>
+            </div>
+        </div>
+        <p>The attacker changes an object ID in the request (user_id, order_id, file_id) and gets another user's data. This is the #1 API vulnerability because most frameworks don't enforce object-level permissions by default — developers have to implement it manually on every single endpoint.</p>
+        <div class="example">
+            <strong>Real-world:</strong> Spoutible's API let attackers increment user IDs to harvest account data including bcrypt password hashes. The API checked <em>if</em> you were logged in — but not <em>whose</em> data you were requesting.
+        </div>
+    </div>
+
+    <div class="vuln-card">
+        <div class="vuln-header">
+            <div class="vuln-rank" style="background: linear-gradient(135deg, var(--orange), #FFB347);">2</div>
+            <div>
+                <h3>Broken Authentication</h3>
+                <span class="vuln-id">API2:2023 — 52% of incidents (Wallarm)</span>
+            </div>
+        </div>
+        <p>Weak JWTs, missing token expiry, predictable API keys, or authentication that's only enforced on some endpoints. In 2025, "Missing Authentication" was the single most frequent API vulnerability at 17% of all incidents. Many SaaS apps protect the frontend but leave internal/admin APIs wide open.</p>
+        <div class="example">
+            <strong>Real-world:</strong> Cisco ISE allowed unauthenticated attackers to execute code with a single crafted API request. No credentials needed — the endpoint simply had no auth check.
+        </div>
+    </div>
+
+    <div class="vuln-card">
+        <div class="vuln-header">
+            <div class="vuln-rank" style="background: linear-gradient(135deg, var(--yellow), #FFE066);">3</div>
+            <div>
+                <h3>Broken Object Property Level Auth</h3>
+                <span class="vuln-id">API3:2023 — Excessive Data Exposure + Mass Assignment</span>
+            </div>
+        </div>
+        <p>Your API returns more data than the frontend needs (exposing internal fields, tokens, PII), or accepts fields it shouldn't (letting users set their own role or permissions). This merged two former OWASP entries because the root cause is the same: the API trusts whatever comes in and sends everything back out.</p>
+        <div class="example">
+            <strong>Real-world:</strong> Intel India's partner portal APIs returned entire JSON objects including plaintext credentials — Salesforce CRM passwords, payment processor tokens, and session keys for backend services — none of which the frontend ever displayed.
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════ OWASP API TOP 5 (continued) ═══════════════ -->
+<div class="page">
+    <div class="vuln-card">
+        <div class="vuln-header">
+            <div class="vuln-rank" style="background: linear-gradient(135deg, var(--blue), #7BB8FF);">4</div>
+            <div>
+                <h3>Unrestricted Resource Consumption</h3>
+                <span class="vuln-id">API4:2023 — No Rate Limits = Unlimited Abuse</span>
+            </div>
+        </div>
+        <p>Without rate limiting, attackers can brute-force credentials, enumerate users, scrape your entire database, or run up your cloud bill. This replaced "Lack of Resources and Rate Limiting" in the 2023 update because the impact goes beyond availability — it enables data theft at scale.</p>
+        <div class="example">
+            <strong>Pattern:</strong> Attacker writes a script that calls <code>/api/users/{id}</code> for IDs 1 through 10,000,000. Without rate limits, they dump your entire user table in hours. Your cloud bill spikes. Your users get breached.
+        </div>
+    </div>
+
+    <div class="vuln-card">
+        <div class="vuln-header">
+            <div class="vuln-rank" style="background: linear-gradient(135deg, var(--purple), #C4A8FF);">5</div>
+            <div>
+                <h3>Broken Function Level Authorisation (BFLA)</h3>
+                <span class="vuln-id">API5:2023 — Privilege Escalation via API</span>
+            </div>
+        </div>
+        <p>A regular user can access admin endpoints by guessing or discovering them. Often the frontend hides admin buttons — but the API endpoints still exist and respond to any authenticated user. This is especially dangerous in SaaS with tiered pricing: free users accessing premium API features, or users escalating to admin.</p>
+        <div class="example">
+            <strong>Pattern:</strong> Frontend only shows the "Delete User" button to admins. But <code>DELETE /api/admin/users/123</code> works for any authenticated user because authorisation only exists in the UI, not the API.
+        </div>
+    </div>
+
+    <div class="callout callout-purple">
+        <h4>New in OWASP API Top 10 2023</h4>
+        <p>Three risks were added: <strong>Unrestricted Access to Sensitive Business Flows</strong> (API6 — automated abuse of legitimate functions like ticket scalping or credential stuffing), <strong>Server-Side Request Forgery</strong> (API7 — SSRF via API parameters), and <strong>Unsafe Consumption of APIs</strong> (API10 — trusting data from third-party APIs without validation). The last one is critical for SaaS: if your app integrates with Stripe, Twilio, or any external API, you need to validate their responses too.</p>
+    </div>
+
+    <div class="stat-row">
+        <div class="stat-card">
+            <div class="number" style="color: var(--red);">11,053</div>
+            <div class="label">API-related CVEs<br>published in 2025</div>
+            <div class="source">Wallarm 2026</div>
+        </div>
+        <div class="stat-card">
+            <div class="number" style="color: var(--orange);">34%</div>
+            <div class="label">rise in vulnerability<br>exploitation attacks</div>
+            <div class="source">Verizon DBIR 2025</div>
+        </div>
+        <div class="stat-card">
+            <div class="number" style="color: var(--purple);">786</div>
+            <div class="label">AI + API overlap<br>vulnerabilities</div>
+            <div class="source">Wallarm 2026</div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════ WEB APP ATTACK VECTORS ═══════════════ -->
+<div class="page">
+    <div class="section-label">WEB APPLICATION SECURITY</div>
+    <h2 class="section-title">SaaS Web App Attack Vectors<br>Beyond the API Layer</h2>
+    <p class="section-intro">APIs aren't your only surface. Your web frontend, authentication flows, client-side code, and deployment infrastructure are all targets. Here's what attackers look for in SaaS applications.</p>
+    <hr class="gradient-line">
+
+    <div class="phase-header">
+        <span class="phase-icon">🎯</span>
+        <div>
+            <h3>Client-Side &amp; Session Attacks</h3>
+            <div class="phase-sub">Your frontend is an attacker's playground</div>
+        </div>
+    </div>
+
+    <div class="step-card">
+        <div class="step-num" style="background: linear-gradient(135deg, var(--red), #FF6B6B);">!</div>
+        <div class="step-content">
+            <span class="step-tag tag-critical">Critical</span>
+            <h3>Cross-Site Scripting (XSS) in SaaS</h3>
+            <p>Cross-site issues became the #1 API weakness by attack volume in 2025. In SaaS, XSS is especially dangerous because your app handles multi-tenant data. A stored XSS in a shared workspace feature (comments, file names, custom fields) can steal session tokens from every user who views that content — across different tenant accounts.</p>
+        </div>
+    </div>
+
+    <div class="step-card">
+        <div class="step-num" style="background: linear-gradient(135deg, var(--orange), #FFB347);">!</div>
+        <div class="step-content">
+            <span class="step-tag tag-high">High</span>
+            <h3>Authentication Flow Attacks</h3>
+            <p>OAuth misconfiguration, weak session management, and insecure password reset flows. Common SaaS patterns: open redirect after login (used for phishing), JWT with "none" algorithm accepted, refresh tokens that never expire, password reset tokens sent in URL query strings. If you offer SSO, your SAML/OIDC implementation is an attack surface.</p>
+        </div>
+    </div>
+
+    <div class="step-card">
+        <div class="step-num" style="background: linear-gradient(135deg, var(--yellow), #FFE066);">!</div>
+        <div class="step-content">
+            <span class="step-tag tag-high">High</span>
+            <h3>Tenant Isolation Failures</h3>
+            <p>The #1 SaaS-specific risk. If your multi-tenancy relies on application-level filtering (WHERE tenant_id = X) rather than infrastructure isolation, a single bug can expose every customer's data. This includes: shared database queries missing tenant filters, cached responses served to wrong tenants, file storage paths without tenant scoping, and background jobs processing cross-tenant data.</p>
+        </div>
+    </div>
+
+    <div class="phase-header" style="margin-top: 20px;">
+        <span class="phase-icon">🏗️</span>
+        <div>
+            <h3>Infrastructure &amp; Supply Chain</h3>
+            <div class="phase-sub">Your deployment is part of your attack surface</div>
+        </div>
+    </div>
+
+    <div class="step-card">
+        <div class="step-num" style="background: linear-gradient(135deg, var(--blue), #7BB8FF);">!</div>
+        <div class="step-content">
+            <span class="step-tag tag-high">High</span>
+            <h3>Server-Side Request Forgery (SSRF)</h3>
+            <p>If your SaaS lets users provide URLs (webhooks, import from URL, profile picture from URL), attackers can make your server request internal resources — cloud metadata endpoints, internal services, admin panels. In AWS, <code>http://169.254.169.254</code> returns instance credentials. SSRF is now in the OWASP API Top 10 because API-driven architectures expose more URL-accepting endpoints.</p>
+        </div>
+    </div>
+
+    <div class="step-card">
+        <div class="step-num" style="background: linear-gradient(135deg, var(--purple), #C4A8FF);">!</div>
+        <div class="step-content">
+            <span class="step-tag tag-medium">Medium</span>
+            <h3>Dependency &amp; Supply Chain Risks</h3>
+            <p>Supply-chain breaches accounted for 20% of all incidents in 2025. Your SaaS depends on hundreds of npm/pip packages, third-party APIs, and cloud services. Each one is a potential entry point. The Postman workspace breach exposed 30,000 production secrets because developers saved API keys in public workspaces without realising they were accessible.</p>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════ HARDENING PLAYBOOK ═══════════════ -->
+<div class="page">
+    <div class="section-label">THE HARDENING PLAYBOOK</div>
+    <h2 class="section-title">10 Controls Every SaaS<br>Must Implement</h2>
+    <p class="section-intro">Prioritised by impact. Controls 1–4 address the vulnerabilities behind the majority of SaaS breaches. Based on OWASP guidelines, real-world incident data, and what we find during penetration tests.</p>
+    <hr class="gradient-line">
+
+    <div class="phase-header">
+        <span class="phase-icon">🔐</span>
+        <div>
+            <h3>Authentication &amp; Authorisation</h3>
+            <div class="phase-sub">Controls 1–4 • Highest Impact</div>
+        </div>
+    </div>
+
+    <div class="step-card">
+        <div class="step-num">1</div>
+        <div class="step-content">
+            <span class="step-tag tag-critical">Critical</span>
+            <h3>Enforce Object-Level Authorisation on Every Endpoint</h3>
+            <p>Don't rely on framework-level auth alone. Every API endpoint that accesses a resource must verify that the authenticated user owns or has permission to access that specific object. Centralise this in middleware or a policy engine — don't trust individual developers to add checks on every route. This single control prevents BOLA, the #1 API vulnerability.</p>
+            <p class="source">Pattern: middleware.authorize(req.user, resource.owner_id)</p>
+        </div>
+    </div>
+
+    <div class="step-card">
+        <div class="step-num">2</div>
+        <div class="step-content">
+            <span class="step-tag tag-critical">Critical</span>
+            <h3>Implement Proper JWT/Session Management</h3>
+            <p>Short-lived access tokens (15 min), secure refresh token rotation, proper audience and issuer validation, and never use "none" algorithm. Store tokens in httpOnly secure cookies, not localStorage. Implement token revocation for logout and password changes. 52% of API breaches involve broken authentication — this is where most SaaS products fail.</p>
+            <p class="source">Tools: Auth0, Clerk, Supabase Auth, or custom with jose/jsonwebtoken</p>
+        </div>
+    </div>
+
+    <div class="step-card">
+        <div class="step-num">3</div>
+        <div class="step-content">
+            <span class="step-tag tag-critical">Critical</span>
+            <h3>Rate Limit Everything</h3>
+            <p>Apply rate limits at multiple layers: per-user, per-IP, per-endpoint, and globally. Authentication endpoints need aggressive limits (5 attempts/min). Public APIs need quota enforcement. Without rate limiting, BOLA becomes mass data exfiltration, brute-force becomes trivial, and your cloud bill becomes a weapon (denial-of-wallet).</p>
+            <p class="source">Tools: express-rate-limit, Kong, AWS WAF, Cloudflare Rate Limiting</p>
+        </div>
+    </div>
+
+    <div class="step-card">
+        <div class="step-num">4</div>
+        <div class="step-content">
+            <span class="step-tag tag-high">High</span>
+            <h3>Enforce Tenant Isolation at the Data Layer</h3>
+            <p>Never rely solely on application-level WHERE clauses for multi-tenancy. Use Row-Level Security (RLS) in PostgreSQL, separate schemas per tenant, or dedicated databases for high-value customers. Every database query, cache key, file path, and background job must be tenant-scoped. Test this: can Tenant A's admin ever see Tenant B's data?</p>
+            <p class="source">Pattern: PostgreSQL RLS + tenant_id enforced at connection level</p>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════ HARDENING PLAYBOOK (continued) ═══════════════ -->
+<div class="page">
+    <div class="phase-header">
+        <span class="phase-icon">🛡️</span>
+        <div>
+            <h3>API Hygiene &amp; Defence in Depth</h3>
+            <div class="phase-sub">Controls 5–7 • Reduce Your Surface</div>
+        </div>
+    </div>
+
+    <div class="step-card">
+        <div class="step-num">5</div>
+        <div class="step-content">
+            <span class="step-tag tag-high">High</span>
+            <h3>Validate Input, Sanitise Output — Everywhere</h3>
+            <p>Use schema validation (Zod, Joi, Pydantic) on every API input. Reject unexpected fields. Encode all output to prevent XSS. Parameterise all database queries — no string concatenation. Validate file uploads by content, not just extension. With cross-site issues now the #1 API attack by volume, input/output hygiene is non-negotiable.</p>
+            <p class="source">Pattern: Zod schema per endpoint + DOMPurify for user-generated HTML</p>
+        </div>
+    </div>
+
+    <div class="step-card">
+        <div class="step-num">6</div>
+        <div class="step-content">
+            <span class="step-tag tag-high">High</span>
+            <h3>Minimise API Response Data</h3>
+            <p>Only return the fields the client needs. Never expose internal IDs, server paths, stack traces, or metadata. Use separate response DTOs — don't serialise your database models directly. The Intel breach happened because APIs returned full JSON objects with fields the frontend never used, including plaintext credentials for other services.</p>
+            <p class="source">Pattern: ResponseDTO layer between database models and API responses</p>
+        </div>
+    </div>
+
+    <div class="step-card">
+        <div class="step-num">7</div>
+        <div class="step-content">
+            <span class="step-tag tag-medium">Medium</span>
+            <h3>Secure Your API Documentation</h3>
+            <p>Don't expose Swagger UI, OpenAPI specs, or GraphQL introspection in production. If you must have public API docs, ensure they don't reveal internal endpoints, admin routes, or deprecated endpoints that still work. Attackers use your API docs as a roadmap — every endpoint documented is an endpoint tested.</p>
+            <p class="source">Check: /swagger, /api-docs, /graphql (with introspection query)</p>
+        </div>
+    </div>
+
+    <div class="phase-header" style="margin-top: 20px;">
+        <span class="phase-icon">📊</span>
+        <div>
+            <h3>Monitoring &amp; Response</h3>
+            <div class="phase-sub">Controls 8–10 • Detect and Respond</div>
+        </div>
+    </div>
+
+    <div class="step-card">
+        <div class="step-num">8</div>
+        <div class="step-content">
+            <span class="step-tag tag-high">High</span>
+            <h3>Log Every API Action with Context</h3>
+            <p>Log who (user_id, tenant_id, IP), what (endpoint, method, params), when (timestamp), and outcome (status, error). Structured logging (JSON) with correlation IDs. Store logs for at least 180 days. Without logs, you can't investigate breaches, prove NZ Privacy Act compliance, or support cyber insurance claims.</p>
+            <p class="source">Tools: Datadog, Sentry, AWS CloudWatch, ELK Stack</p>
+        </div>
+    </div>
+
+    <div class="step-card">
+        <div class="step-num">9</div>
+        <div class="step-content">
+            <span class="step-tag tag-medium">Medium</span>
+            <h3>Implement API Anomaly Detection</h3>
+            <p>Alert on unusual patterns: sudden spikes in requests, sequential ID enumeration, requests from unexpected geolocations, or a user accessing far more resources than normal. Most SaaS breaches involve automated scraping that's trivially detectable — if you're watching. The average breach takes 277 days to detect without monitoring.</p>
+            <p class="source">Tools: AWS GuardDuty, Cloudflare Bot Management, custom alerts</p>
+        </div>
+    </div>
+
+    <div class="step-card">
+        <div class="step-num">10</div>
+        <div class="step-content">
+            <span class="step-tag tag-recommended">Recommended</span>
+            <h3>Dependency Scanning &amp; Secrets Management</h3>
+            <p>Run Dependabot/Snyk on every PR. Never hardcode API keys, database credentials, or secrets in code. Use a secrets manager (AWS Secrets Manager, Vault, Doppler). Rotate keys regularly. Scan git history for accidentally committed secrets — the Postman breach exposed 30,000 production secrets sitting in public workspaces.</p>
+            <p class="source">Tools: GitHub Advanced Security, Snyk, TruffleHog, GitLeaks</p>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════ API SECURITY AUDIT ═══════════════ -->
+<div class="page">
+    <div class="section-label">SELF-ASSESSMENT</div>
+    <h2 class="section-title">The SaaS API &amp; Web<br>Security Audit</h2>
+    <p class="section-intro">Print this page and work through each item. If you can't tick more than half, your SaaS product needs a professional security assessment before an attacker finds what you've missed.</p>
+    <hr class="gradient-line">
+
+    <div class="audit-item">
+        <div class="audit-check"></div>
+        <div>
+            <div class="label"><strong>Object-level authorisation on every endpoint</strong></div>
+            <div class="desc">Test: Can User A's token access User B's resources by changing the ID?</div>
+        </div>
+    </div>
+    <div class="audit-item">
+        <div class="audit-check"></div>
+        <div>
+            <div class="label"><strong>No endpoint missing authentication</strong></div>
+            <div class="desc">Test: Hit every endpoint with no auth header — does anything respond with data?</div>
+        </div>
+    </div>
+    <div class="audit-item">
+        <div class="audit-check"></div>
+        <div>
+            <div class="label"><strong>JWT/tokens have short expiry + rotation</strong></div>
+            <div class="desc">Access tokens ≤15 min, refresh tokens rotate on use, revoked on logout</div>
+        </div>
+    </div>
+    <div class="audit-item">
+        <div class="audit-check"></div>
+        <div>
+            <div class="label"><strong>Rate limiting on all endpoints</strong></div>
+            <div class="desc">Auth endpoints: ≤5/min. Public API: quota enforced. No unlimited scraping possible</div>
+        </div>
+    </div>
+    <div class="audit-item">
+        <div class="audit-check"></div>
+        <div>
+            <div class="label"><strong>Tenant isolation verified at data layer</strong></div>
+            <div class="desc">RLS enabled, or tenant_id enforced at DB/ORM level — not just application code</div>
+        </div>
+    </div>
+    <div class="audit-item">
+        <div class="audit-check"></div>
+        <div>
+            <div class="label"><strong>Input validation on every API endpoint</strong></div>
+            <div class="desc">Schema validation (Zod/Joi/Pydantic), parameterised queries, no raw SQL</div>
+        </div>
+    </div>
+    <div class="audit-item">
+        <div class="audit-check"></div>
+        <div>
+            <div class="label"><strong>API responses don't leak internal data</strong></div>
+            <div class="desc">No internal IDs, stack traces, DB schemas, or unused fields in responses</div>
+        </div>
+    </div>
+    <div class="audit-item">
+        <div class="audit-check"></div>
+        <div>
+            <div class="label"><strong>No Swagger/API docs exposed in production</strong></div>
+            <div class="desc">Check: /swagger, /api-docs, /graphql?query={__schema{types{name}}}</div>
+        </div>
+    </div>
+    <div class="audit-item">
+        <div class="audit-check"></div>
+        <div>
+            <div class="label"><strong>Security headers configured</strong></div>
+            <div class="desc">CSP, HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy</div>
+        </div>
+    </div>
+    <div class="audit-item">
+        <div class="audit-check"></div>
+        <div>
+            <div class="label"><strong>No secrets in code or git history</strong></div>
+            <div class="desc">Run: trufflehog git file://. --only-verified — zero results expected</div>
+        </div>
+    </div>
+    <div class="audit-item">
+        <div class="audit-check"></div>
+        <div>
+            <div class="label"><strong>Dependency vulnerabilities patched</strong></div>
+            <div class="desc">Dependabot/Snyk enabled, no critical CVEs in production dependencies</div>
+        </div>
+    </div>
+    <div class="audit-item">
+        <div class="audit-check"></div>
+        <div>
+            <div class="label"><strong>API actions logged with full context</strong></div>
+            <div class="desc">Who, what, when, outcome — structured JSON, retained ≥180 days</div>
+        </div>
+    </div>
+
+    <div class="callout callout-teal" style="margin-top: 24px;">
+        <h4>💡 Scoring Your Audit</h4>
+        <p><strong>10–12 ticks:</strong> Solid foundation — regular pen testing will catch the edge cases.<br>
+        <strong>6–9 ticks:</strong> Significant gaps — you're exposed to the most common attack patterns.<br>
+        <strong>0–5 ticks:</strong> Critical risk — an automated scanner would find issues. A manual pen test would find far more.</p>
+    </div>
+</div>
+
+<!-- ═══════════════ NZ COMPLIANCE + PRIVACY ACT ═══════════════ -->
+<div class="page">
+    <div class="section-label">NZ COMPLIANCE</div>
+    <h2 class="section-title">Privacy Act 2020 &amp;<br>API Security for NZ SaaS</h2>
+    <p class="section-intro">If your SaaS handles personal information of New Zealanders, the Privacy Act 2020 applies — regardless of where your company is based. API vulnerabilities don't just cause breaches; they trigger mandatory legal obligations.</p>
+    <hr class="gradient-line">
+
+    <div class="stat-row">
+        <div class="stat-card">
+            <div class="number" style="color: var(--red);">$7.8M</div>
+            <div class="label">average NZ<br>breach cost</div>
+            <div class="source">IBM / CERT NZ</div>
+        </div>
+        <div class="stat-card">
+            <div class="number" style="color: var(--orange);">72hrs</div>
+            <div class="label">to notify the Privacy<br>Commissioner</div>
+            <div class="source">Privacy Act 2020</div>
+        </div>
+        <div class="stat-card">
+            <div class="number" style="color: var(--cyan);">13</div>
+            <div class="label">Information Privacy<br>Principles (IPPs)</div>
+            <div class="source">Privacy Act 2020</div>
+        </div>
+    </div>
+
+    <div class="callout callout-red">
+        <h4>Mandatory Breach Notification (Part 6A)</h4>
+        <p>If a privacy breach has caused, or is likely to cause, serious harm to affected individuals, you <strong>must</strong> notify the Privacy Commissioner and affected individuals "as soon as practicable." For SaaS companies, API breaches that expose customer PII — names, emails, billing data, usage data — almost always meet this threshold. Failure to notify is an interference with privacy and can result in investigation, compliance orders, and reputational damage.</p>
+    </div>
+
+    <div class="step-card">
+        <div class="step-num" style="background: var(--cyan);">5</div>
+        <div class="step-content">
+            <h3>IPP 5 — Security Safeguards</h3>
+            <p>Agencies must protect personal information "by such security safeguards as it is reasonable in the circumstances to take" against loss, unauthorised access, use, modification, or disclosure. For SaaS, this means: proper API authentication and authorisation, encryption in transit and at rest, access controls, logging, and regular security testing. A BOLA vulnerability exposing customer data would likely be considered a failure of "reasonable safeguards."</p>
+        </div>
+    </div>
+
+    <div class="step-card">
+        <div class="step-num" style="background: var(--green); color: var(--black);">11</div>
+        <div class="step-content">
+            <h3>IPP 11 — Limits on Disclosure</h3>
+            <p>Personal information can only be disclosed for the purpose it was collected. An API that over-returns data (Excessive Data Exposure, OWASP API3) technically discloses information beyond its intended purpose. If your API returns a user's full profile (including internal fields) when the request only needed their name, that's an IPP 11 issue — even without an attacker exploiting it.</p>
+        </div>
+    </div>
+
+    <table class="compare-table">
+        <thead>
+            <tr>
+                <th>SaaS Scenario</th>
+                <th>OWASP Risk</th>
+                <th>Privacy Act Impact</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>User A accesses User B's data via BOLA</td>
+                <td style="color:var(--red);">API1 — BOLA</td>
+                <td>Notifiable breach (Part 6A)</td>
+            </tr>
+            <tr>
+                <td>API returns internal fields with PII</td>
+                <td style="color:var(--orange);">API3 — Property Auth</td>
+                <td>IPP 5 + IPP 11 violation</td>
+            </tr>
+            <tr>
+                <td>No rate limit enables mass scraping</td>
+                <td style="color:var(--yellow);">API4 — Resource</td>
+                <td>Notifiable if PII exposed</td>
+            </tr>
+            <tr>
+                <td>Unauthenticated endpoint leaks data</td>
+                <td style="color:var(--blue);">API2 — Auth</td>
+                <td>IPP 5 failure + notification</td>
+            </tr>
+            <tr>
+                <td>Third-party API integration leaks data</td>
+                <td style="color:var(--purple);">API10 — Unsafe</td>
+                <td>IPP 5 + IPP 11 (disclosure)</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="callout callout-teal">
+        <h4>💡 For NZ Startups Targeting Overseas Markets</h4>
+        <p>If you handle data from EU residents, GDPR applies (fines up to 4% of global revenue). If you handle US health data, HIPAA applies. If you're SOC 2 certified (increasingly required by enterprise customers), API security testing is a core control. Getting your API security right isn't just about protecting data — it's about winning enterprise deals and entering regulated markets.</p>
+    </div>
+</div>
+
+<!-- ═══════════════ CTA ═══════════════ -->
+<div class="page">
+    <div class="section-label">NEXT STEPS</div>
+    <h2 class="section-title">Ready to Find What<br>Scanners Miss?</h2>
+    <p class="section-intro">Automated scanners catch the obvious. We find the business logic flaws, the BOLA vulnerabilities, the tenant isolation failures, and the auth bypasses that only manual testing reveals. That's what matters for SaaS.</p>
+    <hr class="gradient-line">
+
+    <div class="cta-box">
+        <h3>Get Your SaaS Pen Tested — Properly</h3>
+        <p>Manual API &amp; web application penetration testing by an offensive security specialist who finds real vulnerabilities in production SaaS products. OWASP methodology. Plain-English report. Actionable remediation steps.</p>
+        <a href="https://mkd3434.github.io/wehack-site/security-score.html" class="cta-btn">Take Free Security Scorecard →</a>
+
+        <div class="pricing-row">
+            <div class="pricing-card">
+                <h4>API Pen Test</h4>
+                <div class="price">From $5K</div>
+                <div class="desc">Per API / microservice</div>
+            </div>
+            <div class="pricing-card">
+                <h4>Web App Test</h4>
+                <div class="price">From $8K</div>
+                <div class="desc">Full-scope SaaS application</div>
+            </div>
+            <div class="pricing-card">
+                <h4>Full Stack</h4>
+                <div class="price">From $15K</div>
+                <div class="desc">API + Web + Infrastructure</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="stat-row">
+        <div class="stat-card">
+            <div class="number" style="color: var(--green);">$2.2M</div>
+            <div class="label">saved per breach with<br>regular pen testing</div>
+            <div class="source">IBM / Cobalt</div>
+        </div>
+        <div class="stat-card">
+            <div class="number" style="color: var(--cyan);">277→&lt;200</div>
+            <div class="label">days to detect breach<br>with proper testing</div>
+            <div class="source">IBM 2024</div>
+        </div>
+        <div class="stat-card">
+            <div class="number" style="color: var(--green-bright);">20%+</div>
+            <div class="label">of breaches via vuln<br>exploitation (preventable)</div>
+            <div class="source">Verizon DBIR 2025</div>
+        </div>
+    </div>
+
+    <div class="callout callout-teal">
+        <h4>Why WeHack for SaaS</h4>
+        <ul class="bullet-list">
+            <li><strong>Offensive security specialist</strong> — not a scanning service. Manual testing that thinks like a real attacker targeting your SaaS product.</li>
+            <li><strong>API-first methodology</strong> — OWASP API Security Top 10 coverage, business logic testing, auth bypass, BOLA/BFLA, tenant isolation verification.</li>
+            <li><strong>NZ-based</strong> — understands Privacy Act 2020 obligations, NZ business context, and timezone-friendly engagement.</li>
+            <li><strong>Startup-friendly</strong> — scoped engagements that fit startup budgets. We test what matters most, not everything at once.</li>
+        </ul>
+    </div>
+
+    <div style="text-align: center; margin-top: 30px;">
+        <p style="color: #888; font-size: 14px; margin-bottom: 8px;">Start with a free assessment of your current security posture:</p>
+        <a href="https://mkd3434.github.io/wehack-site/security-score.html" class="cta-btn" style="font-size: 16px; padding: 16px 48px;">Free Security Scorecard →</a>
+        <p style="color: #666; font-size: 12px; margin-top: 12px;">2-minute assessment • No sales spam • Instant results</p>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2026 WeHack — <a href="https://wehack.co.nz">wehack.co.nz</a> — hello@wehack.co.nz</p>
+        <p style="margin-top: 4px;">Tauranga, New Zealand &bull; Offensive Cybersecurity for NZ Businesses</p>
+        <p style="margin-top: 12px; font-size: 10px; color: #444;">
+            Sources: Wallarm 2026 API ThreatStats Report, OWASP API Security Top 10 (2023), Salt Security State of API Security,
+            Verizon 2025 DBIR, IBM Cost of a Data Breach 2024, Cloud Security Alliance 2025, Equixly 2025,
+            NZ Privacy Act 2020, CybelAngel API Threat Report 2025, APISecurity.io
+        </p>
+    </div>
+</div>
+
+</body>
+</html>
