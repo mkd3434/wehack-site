@@ -1032,7 +1032,10 @@
     <!-- EMBED MODE -->
     <script>
     (function() {
-        if (window.location.search.indexOf('embed=true') !== -1) {
+        // Detect embed mode: either via URL param OR by being inside an iframe (Wix CDN strips query params)
+        var isInIframe = false;
+        try { isInIframe = window.self !== window.top; } catch(e) { isInIframe = true; }
+        if (window.location.search.indexOf('embed=true') !== -1 || isInIframe) {
             document.documentElement.classList.add('embed-mode');
 
             // Send height to parent for auto-sizing
