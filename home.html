@@ -77,9 +77,9 @@
         /* ============================================================
            EMBED MODE (when loaded inside Wix iframe with ?embed=true)
            ============================================================ */
-        html.embed-mode .nav { display: none !important; }
+        html.embed-mode .nav { display: flex !important; position: sticky; top: 0; }
         html.embed-mode .site-footer { display: none !important; }
-        html.embed-mode .hero { padding-top: 40px; }
+        html.embed-mode .hero { padding-top: 20px; }
         html.embed-mode body { min-height: auto !important; margin: 0 !important; padding: 0 !important; width: 100% !important; }
         html.embed-mode html { margin: 0 !important; padding: 0 !important; width: 100% !important; overflow-x: hidden; }
         html.embed-mode .hero::before { width: 500px; height: 500px; top: -60px; }
@@ -120,6 +120,21 @@
             text-decoration: none; transition: all 0.2s;
         }
         .nav-cta:hover { background: var(--green-bright); text-decoration: none; transform: translateY(-1px); }
+        .nav-right { display: flex; align-items: center; gap: 16px; }
+        .nav-hamburger {
+            display: none; background: none; border: none; cursor: pointer;
+            width: 28px; height: 20px; position: relative; padding: 0;
+        }
+        .nav-hamburger span {
+            display: block; width: 100%; height: 2px; background: var(--text);
+            position: absolute; left: 0; transition: all 0.3s;
+        }
+        .nav-hamburger span:nth-child(1) { top: 0; }
+        .nav-hamburger span:nth-child(2) { top: 9px; }
+        .nav-hamburger span:nth-child(3) { top: 18px; }
+        .nav-open .nav-hamburger span:nth-child(1) { top: 9px; transform: rotate(45deg); }
+        .nav-open .nav-hamburger span:nth-child(2) { opacity: 0; }
+        .nav-open .nav-hamburger span:nth-child(3) { top: 9px; transform: rotate(-45deg); }
 
         /* ============================================================
            SECTION COMMON
@@ -665,7 +680,18 @@
            RESPONSIVE
            ============================================================ */
         @media (max-width: 900px) {
-            .nav-links { display: none; }
+            .nav-hamburger { display: block; }
+            .nav-cta { display: none; }
+            .nav-links {
+                display: none; position: fixed; top: 50px; left: 0; right: 0;
+                background: rgba(15,15,16,0.96); backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                flex-direction: column; padding: 20px 24px; gap: 0;
+                border-bottom: 1px solid rgba(255,255,255,0.08);
+            }
+            .nav-open .nav-links { display: flex; }
+            .nav-links a { padding: 14px 0; font-size: 16px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+            .nav-links a:last-child { border-bottom: none; }
             .services-grid, .resources-grid, .steps-grid { grid-template-columns: 1fr; }
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
             .assess-inner, .why-grid, .contact-inner { grid-template-columns: 1fr; }
@@ -919,8 +945,10 @@
 
         /* Embed mode mobile overrides */
         @media (max-width: 600px) {
+            html.embed-mode .nav { padding: 10px 12px; }
+            html.embed-mode .nav-logo { font-size: 17px; }
             html.embed-mode .hero {
-                padding: 20px 10px 36px;
+                padding: 16px 10px 36px;
             }
             html.embed-mode .hero::before { width: 300px; height: 300px; top: -40px; }
             html.embed-mode .hero h1 { font-size: 30px; }
@@ -1037,7 +1065,12 @@
                 <a href="#contact">Contact</a>
             </div>
         </div>
-        <a href="#assessment" class="nav-cta">Free Security Check &rarr;</a>
+        <div class="nav-right">
+            <a href="#assessment" class="nav-cta">Free Security Check &rarr;</a>
+            <button class="nav-hamburger" aria-label="Menu" onclick="document.querySelector('.nav').classList.toggle('nav-open')">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
     </nav>
 
     <!-- ============================================================
