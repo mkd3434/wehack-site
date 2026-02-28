@@ -671,6 +671,15 @@
             .footer-inner { grid-template-columns: 1fr 1fr; }
             .hero { padding: 120px 20px 60px; }
             .section { padding: 64px 20px; }
+            .trust-bar-inner { gap: 24px; }
+            .trust-item { font-size: 11px; letter-spacing: 0.5px; }
+            .stats-banner { padding: 48px 20px; }
+            .assess-section { padding: 64px 20px; }
+            .assess-inner { gap: 40px; }
+            .contact-section { padding: 64px 20px; }
+            .contact-inner { gap: 40px; }
+            .final-cta { padding: 64px 20px; }
+            .hero-orbit { width: 350px; height: 350px; margin: -175px 0 0 -175px; }
         }
         /* ============================================================
            ANIMATIONS
@@ -830,10 +839,87 @@
 
         @media (max-width: 600px) {
             .stats-grid { grid-template-columns: 1fr; }
-            .hero-proof { gap: 24px; }
+            .hero-proof { gap: 20px; }
             .form-row { grid-template-columns: 1fr; }
             .footer-inner { grid-template-columns: 1fr; }
             .footer-bottom { flex-direction: column; gap: 8px; }
+
+            /* Hero mobile */
+            .hero { padding: 80px 16px 48px; }
+            .hero h1 { font-size: 32px; letter-spacing: -0.5px; }
+            .hero-sub { font-size: 15px; margin-bottom: 28px; }
+            .hero-tagline { font-size: 10px; letter-spacing: 2px; }
+            .hero-ctas { flex-direction: column; align-items: center; }
+            .btn-primary, .btn-secondary { width: 100%; max-width: 300px; justify-content: center; }
+            .hero-proof-item .val { font-size: 22px; }
+            .hero-proof-item .label { font-size: 11px; }
+            .hero-orbit { width: 280px; height: 280px; margin: -140px 0 0 -140px; }
+            .hero-wave { margin-top: 20px; }
+
+            /* Trust bar mobile */
+            .trust-bar { padding: 16px; }
+            .trust-bar-inner { gap: 12px 20px; justify-content: center; }
+            .trust-item { font-size: 10px; letter-spacing: 0.5px; }
+
+            /* Stats mobile */
+            .stats-banner { padding: 40px 16px; }
+            .stats-grid { gap: 16px; }
+            .stat-card { padding: 24px 12px; }
+            .stat-card .num { font-size: 28px; }
+            .stat-card .desc { font-size: 13px; }
+
+            /* Services mobile */
+            .service-card { padding: 28px 20px; }
+            .service-card h3 { font-size: 18px; }
+
+            /* Assessment mobile */
+            .assess-section { padding: 48px 16px; }
+            .radar-mock { padding: 24px 16px; }
+
+            /* Resources mobile */
+            .resources-grid { gap: 16px; margin-top: 32px; }
+            .resource-card { padding: 24px 20px; }
+
+            /* Why section mobile */
+            .why-grid { gap: 32px; margin-top: 32px; }
+            .terminal-mock { font-size: 11px; }
+            .terminal-body { padding: 14px; line-height: 1.6; }
+            .cred-badges { gap: 8px; }
+            .cred-badge { font-size: 10px; padding: 5px 10px; }
+
+            /* Steps mobile */
+            .steps-grid { gap: 16px; margin-top: 32px; }
+            .step-card { padding: 28px 20px; }
+            .step-num { font-size: 36px; }
+
+            /* Contact mobile */
+            .contact-section { padding: 48px 16px; }
+            .contact-form { padding: 24px 20px; }
+            .contact-form h3 { font-size: 18px; }
+
+            /* Final CTA mobile */
+            .final-cta { padding: 56px 16px; }
+
+            /* Section common mobile */
+            .section { padding: 48px 16px; }
+            .section-title { margin-bottom: 12px; }
+            .section-sub { font-size: 15px; }
+        }
+
+        /* Extra small screens */
+        @media (max-width: 400px) {
+            .hero h1 { font-size: 28px; }
+            .hero-proof { flex-direction: column; gap: 16px; align-items: center; }
+            .hero-proof-item .val { font-size: 20px; }
+            .trust-bar-inner { flex-direction: column; gap: 8px; }
+            .stat-card .num { font-size: 24px; }
+            .contact-form { padding: 20px 16px; }
+        }
+
+        /* Embed mode mobile overrides */
+        @media (max-width: 600px) {
+            html.embed-mode .hero { padding-top: 24px; }
+            html.embed-mode .hero::before { width: 300px; height: 300px; top: -40px; }
         }
     </style>
 </head>
