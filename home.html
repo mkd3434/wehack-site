@@ -1032,10 +1032,7 @@
     <!-- EMBED MODE -->
     <script>
     (function() {
-        // Detect embed mode: either via URL param OR by being inside an iframe (Wix CDN strips query params)
-        var isInIframe = false;
-        try { isInIframe = window.self !== window.top; } catch(e) { isInIframe = true; }
-        if (window.location.search.indexOf('embed=true') !== -1 || isInIframe) {
+        if (window.location.search.indexOf('embed=true') !== -1) {
             document.documentElement.classList.add('embed-mode');
 
             // Send height to parent for auto-sizing
@@ -1069,27 +1066,11 @@
             window.addEventListener('load', function() {
                 sendHeight();
                 window.parent.postMessage({ type: 'wehack-request-viewport' }, '*');
+                // Make all non-anchor links open in parent window
                 var links = document.querySelectorAll('a[href]');
                 for (var i = 0; i < links.length; i++) {
                     var href = links[i].getAttribute('href');
-                    if (href && href.charAt(0) === '#') {
-                        // Anchor links: smooth scroll within iframe + tell parent to scroll
-                        (function(link, anchor) {
-                            link.addEventListener('click', function(e) {
-                                e.preventDefault();
-                                var target = document.querySelector(anchor);
-                                if (target) {
-                                    var y = target.getBoundingClientRect().top + window.scrollY;
-                                    window.parent.postMessage({ type: 'wehack-scroll', y: y }, '*');
-                                    target.scrollIntoView({ behavior: 'smooth' });
-                                }
-                                // Close mobile menu if open
-                                var nav = document.querySelector('.nav');
-                                if (nav) nav.classList.remove('nav-open');
-                            });
-                        })(links[i], href);
-                    } else {
-                        // External links: open in parent window
+                    if (href && href.charAt(0) !== '#') {
                         links[i].setAttribute('target', '_top');
                     }
                 }
@@ -1129,11 +1110,7 @@
          HERO
          ============================================================ -->
     <section class="hero">
-        <div class="hero-orbit">
-            <div class="orbit-ring"><div class="orbit-dot"></div></div>
-        </div>
         <div class="hero-inner">
-            <div class="hero-tagline reveal">Offensive Cybersecurity &bull; Tauranga, NZ</div>
             <h1 class="reveal reveal-delay-1">
                 We <span class="grad">hack you</span><br>before they do.
             </h1>
@@ -1163,13 +1140,6 @@
                 </div>
             </div>
 
-            <!-- Animated waveform -->
-            <div class="hero-wave reveal reveal-delay-4">
-                <div class="bar"></div><div class="bar"></div><div class="bar"></div>
-                <div class="bar"></div><div class="bar"></div><div class="bar"></div>
-                <div class="bar"></div><div class="bar"></div><div class="bar"></div>
-                <div class="bar"></div>
-            </div>
         </div>
     </section>
 
@@ -1301,7 +1271,7 @@
                     </div>
                 </div>
 
-                <a href="https://mkd3434.github.io/wehack-site/security-score.html" class="btn-primary reveal reveal-delay-3">Take Free Assessment &rarr;</a>
+                <a href="security-score.html" class="btn-primary reveal reveal-delay-3">Take Free Assessment &rarr;</a>
             </div>
 
             <div class="assess-visual reveal">
@@ -1351,43 +1321,37 @@
         <p class="section-sub reveal">Built for NZ businesses with 2026 threat intelligence. Download, read, and implement today.</p>
 
         <div class="resources-grid">
-            <a href="https://mkd3434.github.io/wehack-site/nz-smb-threat-report-2026.html" class="resource-card reveal" style="text-decoration:none;color:inherit;">
+            <a href="nz-smb-threat-report-2026.html" class="resource-card reveal" style="text-decoration:none;color:inherit;">
                 <div class="r-icon">&#128200;</div>
                 <h4>NZ SMB Threat Report 2026</h4>
                 <p>100+ stats, 11 sources. The threat landscape for New Zealand businesses right now.</p>
                 <span class="r-link">Read Report &rarr;</span>
             </a>
-            <a href="https://mkd3434.github.io/wehack-site/ai-social-engineering-defence.html" class="resource-card reveal reveal-delay-1" style="text-decoration:none;color:inherit;">
+            <a href="ai-social-engineering-defence.html" class="resource-card reveal reveal-delay-1" style="text-decoration:none;color:inherit;">
                 <div class="r-icon">&#129302;</div>
                 <h4>AI Social Engineering Defence</h4>
                 <p>5 attack vectors, verification protocols, and an 8-step framework for AI-powered threats.</p>
                 <span class="r-link">Read Guide &rarr;</span>
             </a>
-            <a href="https://mkd3434.github.io/wehack-site/deepfake-defence-playbook.html" class="resource-card reveal reveal-delay-2" style="text-decoration:none;color:inherit;">
+            <a href="deepfake-defence-playbook.html" class="resource-card reveal reveal-delay-2" style="text-decoration:none;color:inherit;">
                 <div class="r-icon">&#127917;</div>
                 <h4>Deepfake Defence Playbook</h4>
                 <p>How attackers clone voices and video. Detection techniques and organisational policies.</p>
                 <span class="r-link">Read Guide &rarr;</span>
             </a>
-            <a href="https://mkd3434.github.io/wehack-site/m365-hardening-guide.html" class="resource-card reveal reveal-delay-1" style="text-decoration:none;color:inherit;">
+            <a href="m365-hardening-guide.html" class="resource-card reveal reveal-delay-1" style="text-decoration:none;color:inherit;">
                 <div class="r-icon">&#128274;</div>
                 <h4>M365 Hardening Guide</h4>
                 <p>10 controls to lock down Microsoft 365. CISA SCuBA aligned. 5-minute self-audit included.</p>
                 <span class="r-link">Read Guide &rarr;</span>
             </a>
-            <a href="https://mkd3434.github.io/wehack-site/breach-response-checklist.html" class="resource-card reveal reveal-delay-2" style="text-decoration:none;color:inherit;">
+            <a href="breach-response-checklist.html" class="resource-card reveal reveal-delay-2" style="text-decoration:none;color:inherit;">
                 <div class="r-icon">&#128680;</div>
                 <h4>Breach Response Checklist</h4>
                 <p>72-hour incident response guide. 18 steps, NZ Privacy Act requirements, real case study.</p>
                 <span class="r-link">Read Guide &rarr;</span>
             </a>
-            <a href="https://mkd3434.github.io/wehack-site/saas-api-security-guide.html" class="resource-card reveal" style="text-decoration:none;color:inherit;">
-                <div class="r-icon">&#128187;</div>
-                <h4>SaaS API Security Playbook</h4>
-                <p>OWASP API Top 5, 10-control hardening playbook, NZ Privacy Act mapping for SaaS founders.</p>
-                <span class="r-link">Read Guide &rarr;</span>
-            </a>
-            <a href="https://mkd3434.github.io/wehack-site/security-score.html" class="resource-card reveal reveal-delay-1" style="text-decoration:none;color:inherit;">
+            <a href="security-score.html" class="resource-card reveal reveal-delay-3" style="text-decoration:none;color:inherit;">
                 <div class="r-icon">&#128737;</div>
                 <h4>Security Scorecard</h4>
                 <p>20-question assessment with radar chart, industry benchmarks, and priority actions.</p>
@@ -1558,7 +1522,7 @@
         <h2 class="reveal">Find out what's broken <span class="green">before someone else does</span></h2>
         <p class="reveal reveal-delay-1">Takes 2 minutes. No email wall. Just your score and a plan.</p>
         <div class="reveal reveal-delay-2">
-            <a href="https://mkd3434.github.io/wehack-site/security-score.html" class="btn-primary">Take Free Security Scorecard &rarr;</a>
+            <a href="security-score.html" class="btn-primary">Take Free Security Scorecard &rarr;</a>
         </div>
     </section>
 
@@ -1579,11 +1543,10 @@
             </div>
             <div class="footer-col">
                 <h4>Resources</h4>
-                <a href="https://mkd3434.github.io/wehack-site/security-score.html">Security Scorecard</a>
-                <a href="https://mkd3434.github.io/wehack-site/nz-smb-threat-report-2026.html">NZ Threat Report</a>
-                <a href="https://mkd3434.github.io/wehack-site/ai-social-engineering-defence.html">AI Defence Guide</a>
-                <a href="https://mkd3434.github.io/wehack-site/m365-hardening-guide.html">M365 Hardening</a>
-                <a href="https://mkd3434.github.io/wehack-site/saas-api-security-guide.html">SaaS API Security</a>
+                <a href="security-score.html">Security Scorecard</a>
+                <a href="nz-smb-threat-report-2026.html">NZ Threat Report</a>
+                <a href="ai-social-engineering-defence.html">AI Defence Guide</a>
+                <a href="m365-hardening-guide.html">M365 Hardening</a>
             </div>
             <div class="footer-col">
                 <h4>Company</h4>
