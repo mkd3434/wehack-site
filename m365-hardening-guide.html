@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microsoft 365 Security Hardening Guide — WeHack</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Questrial&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cyan: #B8F0F0;
+            --green: #C4FF9E;
+            --green-bright: #A9FF8F;
+            --black: #0F0F10;
+            --card: #1A1A1C;
+            --border: #2A2A2E;
+            --teal: #0E99AB;
+            --dark-teal: #133C41;
+            --red: #FF4444;
+            --orange: #FF8C00;
+            --yellow: #FFD700;
+            --blue: #4A9EFF;
+        }
+
+        @page { size: A4; margin: 0; }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Questrial', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: var(--black);
+            color: #E0E0E0;
+            line-height: 1.6;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
+            padding: 50px 60px;
+            page-break-after: always;
+            position: relative;
+        }
+
+        /* ── COVER ── */
+        .cover {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            min-height: 297mm;
+            padding: 60px;
+        }
+        .cover-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--teal), #0BBD8B);
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            padding: 8px 24px;
+            border-radius: 20px;
+            margin-bottom: 40px;
+        }
+        .cover h1 {
+            font-size: 44px;
+            line-height: 1.15;
+            margin-bottom: 16px;
+            color: white;
+        }
+        .cover h1 span {
+            background: linear-gradient(135deg, var(--cyan), var(--green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .cover .subtitle {
+            font-size: 18px;
+            color: #999;
+            margin-bottom: 50px;
+            max-width: 480px;
+        }
+        .cover-stats {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+        .cover-stat {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px 28px;
+            text-align: center;
+            min-width: 140px;
+        }
+        .cover-stat .number {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .cover-stat .label {
+            font-size: 11px;
+            color: #888;
+            line-height: 1.4;
+        }
+        .cover-stat .source {
+            font-size: 9px;
+            color: #555;
+            margin-top: 4px;
+        }
+        .cover-footer {
+            margin-top: auto;
+            padding-top: 40px;
+        }
+        .cover-footer .brand {
+            font-size: 20px;
+            color: var(--cyan);
+            letter-spacing: 2px;
+        }
+        .cover-footer .tagline {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        /* ── SECTIONS ── */
+        .section-label {
+            font-size: 11px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--cyan);
+            margin-bottom: 8px;
+        }
+        .section-title {
+            font-size: 32px;
+            color: white;
+            margin-bottom: 12px;
+            line-height: 1.2;
+        }
+        .section-intro {
+            color: #999;
+            font-size: 14px;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+        .gradient-line {
+            height: 3px;
+            background: linear-gradient(90deg, var(--cyan), var(--green), transparent);
+            border: none;
+            margin: 20px 0 30px;
+            border-radius: 2px;
+        }
+
+        /* ── STEP CARDS ── */
+        .step-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 12px;
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+        .step-num {
+            width: 36px;
+            height: 36px;
+            min-width: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--cyan), var(--green));
+            color: var(--black);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+        .step-content h3 {
+            font-size: 16px;
+            color: white;
+            margin-bottom: 4px;
+        }
+        .step-content p {
+            font-size: 13px;
+            color: #AAA;
+            line-height: 1.5;
+        }
+        .step-content .source {
+            font-size: 11px;
+            color: var(--teal);
+            margin-top: 2px;
+        }
+        .step-tag {
+            display: inline-block;
+            font-size: 10px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-bottom: 6px;
+        }
+        .tag-critical { background: rgba(255,68,68,0.15); color: var(--red); }
+        .tag-high { background: rgba(255,140,0,0.15); color: var(--orange); }
+        .tag-medium { background: rgba(255,215,0,0.15); color: var(--yellow); }
+        .tag-recommended { background: rgba(74,158,255,0.15); color: var(--blue); }
+
+        /* ── STAT CARDS ── */
+        .stat-row {
+            display: flex;
+            gap: 16px;
+            margin: 24px 0;
+        }
+        .stat-card {
+            flex: 1;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+        .stat-card .number {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .stat-card .label {
+            font-size: 11px;
+            color: #888;
+            line-height: 1.4;
+        }
+        .stat-card .source {
+            font-size: 9px;
+            color: #555;
+            margin-top: 4px;
+        }
+
+        /* ── CALLOUT BOXES ── */
+        .callout {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin: 20px 0;
+        }
+        .callout h4 {
+            color: var(--cyan);
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        .callout p, .callout li {
+            font-size: 13px;
+            color: #AAA;
+            line-height: 1.6;
+        }
+        .callout-red {
+            border-left: 4px solid var(--red);
+        }
+        .callout-red h4 {
+            color: var(--red);
+        }
+        .callout-teal {
+            border-left: 4px solid var(--teal);
+        }
+
+        /* ── BULLET LISTS ── */
+        .bullet-list {
+            list-style: none;
+            padding: 0;
+        }
+        .bullet-list li {
+            padding: 6px 0 6px 20px;
+            position: relative;
+            font-size: 13px;
+            color: #AAA;
+            line-height: 1.5;
+        }
+        .bullet-list li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 13px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--cyan);
+        }
+
+        /* ── PHASE HEADER ── */
+        .phase-header {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 24px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .phase-icon {
+            font-size: 28px;
+        }
+        .phase-header h3 {
+            font-size: 18px;
+            color: white;
+        }
+        .phase-header .phase-sub {
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--teal);
+        }
+
+        /* ── ATTACK FLOW ── */
+        .attack-flow {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 20px 0;
+        }
+        .attack-flow h4 {
+            text-align: center;
+            color: #888;
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        /* ── QUICK AUDIT ── */
+        .audit-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .audit-item:last-child {
+            border-bottom: none;
+        }
+        .audit-check {
+            width: 22px;
+            height: 22px;
+            min-width: 22px;
+            border: 2px solid var(--cyan);
+            border-radius: 4px;
+            margin-top: 1px;
+        }
+        .audit-item .label {
+            font-size: 13px;
+            color: white;
+        }
+        .audit-item .desc {
+            font-size: 12px;
+            color: #888;
+        }
+        .audit-item .nav {
+            font-size: 11px;
+            color: var(--teal);
+            font-family: monospace;
+        }
+
+        /* ── CTA ── */
+        .cta-box {
+            background: linear-gradient(135deg, var(--teal), #0BBD8B);
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            margin: 30px 0;
+        }
+        .cta-box h3 {
+            font-size: 24px;
+            color: white;
+            margin-bottom: 12px;
+        }
+        .cta-box p {
+            color: rgba(255,255,255,0.85);
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        .cta-btn {
+            display: inline-block;
+            background: var(--green-bright);
+            color: var(--black);
+            font-size: 15px;
+            font-weight: 700;
+            padding: 14px 36px;
+            border-radius: 8px;
+            text-decoration: none;
+        }
+        .pricing-row {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        .pricing-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px 32px;
+            text-align: center;
+            min-width: 160px;
+        }
+        .pricing-card h4 {
+            font-size: 13px;
+            color: #999;
+            margin-bottom: 4px;
+        }
+        .pricing-card .price {
+            font-size: 22px;
+            color: var(--green);
+            font-weight: 700;
+        }
+        .pricing-card .desc {
+            font-size: 11px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        /* ── FOOTER ── */
+        .footer {
+            text-align: center;
+            padding: 30px 0;
+            color: #555;
+            font-size: 12px;
+        }
+        .footer a {
+            color: var(--cyan);
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ═══════════════ COVER ═══════════════ -->
+<div class="page cover">
+    <div class="cover-badge">M365 Security Guide</div>
+    <h1>Microsoft 365<br><span>Security Hardening</span><br>Guide</h1>
+    <p class="subtitle">10 critical controls to lock down your M365 tenant — based on CISA SCuBA baselines, CrowdStrike 2026 GTR, and real-world breach data.</p>
+
+    <div class="cover-stats">
+        <div class="cover-stat">
+            <div class="number" style="color: var(--red);">80%+</div>
+            <div class="label">of breaches involve<br>stolen credentials</div>
+            <div class="source">Verizon DBIR 2025</div>
+        </div>
+        <div class="cover-stat">
+            <div class="number" style="color: var(--orange);">82%</div>
+            <div class="label">of detections are<br>malware-free</div>
+            <div class="source">CrowdStrike 2026 GTR</div>
+        </div>
+        <div class="cover-stat">
+            <div class="number" style="color: var(--green);">99%+</div>
+            <div class="label">of automated attacks<br>blocked by MFA</div>
+            <div class="source">Microsoft</div>
+        </div>
+    </div>
+
+    <div class="cover-footer">
+        <div class="brand">WEHACK</div>
+        <div class="tagline">We hack you before they do.</div>
+    </div>
+</div>
+
+<!-- ═══════════════ WHY YOUR TENANT IS A TARGET ═══════════════ -->
+<div class="page">
+    <div class="section-label">THE THREAT</div>
+    <h2 class="section-title">Why Your M365 Tenant<br>Is Already a Target</h2>
+    <p class="section-intro">Attackers don't need malware anymore. They log in with stolen credentials, abuse legitimate tools, and move laterally through your cloud — all without triggering traditional alerts.</p>
+    <hr class="gradient-line">
+
+    <div class="stat-row">
+        <div class="stat-card">
+            <div class="number" style="color: var(--red);">35%</div>
+            <div class="label">of cloud incidents used<br>valid account abuse</div>
+            <div class="source">CrowdStrike 2026 GTR</div>
+        </div>
+        <div class="stat-card">
+            <div class="number" style="color: var(--orange);">37%</div>
+            <div class="label">increase in cloud-<br>conscious intrusions</div>
+            <div class="source">CrowdStrike 2026 GTR</div>
+        </div>
+        <div class="stat-card">
+            <div class="number" style="color: var(--yellow);">90%+</div>
+            <div class="label">of incidents had<br>misconfigs enabling attack</div>
+            <div class="source">Unit 42 2026</div>
+        </div>
+    </div>
+
+    <div class="attack-flow">
+        <h4>How Attackers Compromise M365 in 2026</h4>
+        <svg viewBox="0 0 620 180" xmlns="http://www.w3.org/2000/svg" style="width:100%;">
+            <!-- Flow arrows -->
+            <line x1="110" y1="60" x2="155" y2="60" stroke="#444" stroke-width="2" marker-end="url(#arrow)"/>
+            <line x1="245" y1="60" x2="290" y2="60" stroke="#444" stroke-width="2" marker-end="url(#arrow)"/>
+            <line x1="380" y1="60" x2="425" y2="60" stroke="#444" stroke-width="2" marker-end="url(#arrow)"/>
+            <line x1="515" y1="60" x2="555" y2="60" stroke="#444" stroke-width="2" marker-end="url(#arrow)"/>
+            <defs>
+                <marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+                    <path d="M0,0 L8,3 L0,6" fill="#666"/>
+                </marker>
+            </defs>
+            <!-- Step 1 -->
+            <rect x="10" y="30" width="100" height="60" rx="8" fill="#1A1A1C" stroke="#FF4444" stroke-width="2"/>
+            <text x="60" y="55" text-anchor="middle" fill="#FF4444" font-size="11" font-weight="600">AiTM Phish</text>
+            <text x="60" y="72" text-anchor="middle" fill="#888" font-size="9">or OAuth Abuse</text>
+            <!-- Step 2 -->
+            <rect x="155" y="30" width="90" height="60" rx="8" fill="#1A1A1C" stroke="#FF8C00" stroke-width="2"/>
+            <text x="200" y="55" text-anchor="middle" fill="#FF8C00" font-size="11" font-weight="600">Token Theft</text>
+            <text x="200" y="72" text-anchor="middle" fill="#888" font-size="9">Bypasses MFA</text>
+            <!-- Step 3 -->
+            <rect x="290" y="30" width="90" height="60" rx="8" fill="#1A1A1C" stroke="#FFD700" stroke-width="2"/>
+            <text x="335" y="55" text-anchor="middle" fill="#FFD700" font-size="11" font-weight="600">Mailbox</text>
+            <text x="335" y="72" text-anchor="middle" fill="#888" font-size="9">Rules + BEC</text>
+            <!-- Step 4 -->
+            <rect x="425" y="30" width="90" height="60" rx="8" fill="#1A1A1C" stroke="#4A9EFF" stroke-width="2"/>
+            <text x="470" y="55" text-anchor="middle" fill="#4A9EFF" font-size="11" font-weight="600">Lateral Move</text>
+            <text x="470" y="72" text-anchor="middle" fill="#888" font-size="9">SharePoint/Teams</text>
+            <!-- Step 5 -->
+            <rect x="555" y="30" width="60" height="60" rx="8" fill="#1A1A1C" stroke="#FF4444" stroke-width="2"/>
+            <text x="585" y="55" text-anchor="middle" fill="#FF4444" font-size="11" font-weight="600">Exfil</text>
+            <text x="585" y="72" text-anchor="middle" fill="#888" font-size="9">Data Out</text>
+            <!-- Bottom labels -->
+            <text x="60" y="120" text-anchor="middle" fill="#555" font-size="9">Fake login page</text>
+            <text x="60" y="132" text-anchor="middle" fill="#555" font-size="9">proxies real M365</text>
+            <text x="200" y="120" text-anchor="middle" fill="#555" font-size="9">Session cookie</text>
+            <text x="200" y="132" text-anchor="middle" fill="#555" font-size="9">captured post-MFA</text>
+            <text x="335" y="120" text-anchor="middle" fill="#555" font-size="9">Inbox rules forward</text>
+            <text x="335" y="132" text-anchor="middle" fill="#555" font-size="9">invoices to attacker</text>
+            <text x="470" y="120" text-anchor="middle" fill="#555" font-size="9">Access OneDrive,</text>
+            <text x="470" y="132" text-anchor="middle" fill="#555" font-size="9">Teams, SharePoint</text>
+            <text x="585" y="120" text-anchor="middle" fill="#555" font-size="9">Data stolen</text>
+            <text x="585" y="132" text-anchor="middle" fill="#555" font-size="9">silently</text>
+            <!-- Timeline bar -->
+            <rect x="10" y="155" width="605" height="4" rx="2" fill="#2A2A2E"/>
+            <rect x="10" y="155" width="120" height="4" rx="2" fill="var(--red)"/>
+            <text x="10" y="175" fill="#FF4444" font-size="9" font-weight="600">27 seconds</text>
+            <text x="130" y="175" fill="#888" font-size="9">to full account takeover (fastest recorded)</text>
+        </svg>
+    </div>
+
+    <div class="callout callout-red">
+        <h4>The AiTM Problem (December 2025 — Ongoing)</h4>
+        <p>A sophisticated Adversary-in-the-Middle phishing campaign targeting M365 and Okta has been active since December 2025. The attack success rate exceeds 50%. Attackers impersonated 50+ applications and attempted to compromise nearly 3,000 M365 accounts across 900+ environments. Standard MFA doesn't stop it — only phishing-resistant methods (FIDO2 keys, certificate-based auth) and Conditional Access policies can.</p>
+        <p style="margin-top:6px;"><span style="color:var(--teal);">Sources: KnowBe4, Proofpoint, ThreatLocker 2025</span></p>
+    </div>
+
+    <ul class="bullet-list" style="margin-top:16px;">
+        <li><strong>Identity weaknesses found in 90% of investigations.</strong> Overprivileged accounts, weak passwords, lack of MFA, and shared credentials are how attackers escalate. <span style="color:var(--teal);">Unit 42 2026</span></li>
+        <li><strong>23% of incidents leveraged third-party SaaS apps</strong> connected to your M365 tenant. Every OAuth app consent is a potential backdoor. <span style="color:var(--teal);">Unit 42 2026</span></li>
+        <li><strong>266% increase in state-nexus actors targeting cloud.</strong> This isn't just criminal gangs — nation-state groups are actively targeting cloud tenants. <span style="color:var(--teal);">CrowdStrike 2026 GTR</span></li>
+    </ul>
+</div>
+
+<!-- ═══════════════ 10 CONTROLS (Part 1: 1-5) ═══════════════ -->
+<div class="page">
+    <div class="section-label">THE 10 CONTROLS</div>
+    <h2 class="section-title">Critical M365 Hardening Steps</h2>
+    <p class="section-intro">Prioritised by impact. Controls 1-3 alone block the majority of M365 attacks. Based on CISA SCuBA baselines and real-world incident response data.</p>
+    <hr class="gradient-line">
+
+    <div class="phase-header">
+        <span class="phase-icon">🔐</span>
+        <div>
+            <h3>Identity & Authentication</h3>
+            <div class="phase-sub">Controls 1–4 • Highest Impact</div>
+        </div>
+    </div>
+
+    <div class="step-card">
+        <div class="step-num">1</div>
+        <div class="step-content">
+            <span class="step-tag tag-critical">Critical</span>
+            <h3>Enforce MFA on Every Account</h3>
+            <p>MFA blocks 99%+ of automated credential attacks. But basic SMS/app-push MFA is now bypassable via AiTM phishing (50%+ success rate in 2025 campaigns). Upgrade admin accounts to phishing-resistant MFA: FIDO2 security keys or certificate-based authentication. At minimum, deploy Microsoft Authenticator with number matching and additional context enabled.</p>
+            <p class="source">Navigate: Entra ID → Security → Authentication methods</p>
+        </div>
+    </div>
+
+    <div class="step-card">
+        <div class="step-num">2</div>
+        <div class="step-content">
+            <span class="step-tag tag-critical">Critical</span>
+            <h3>Block Legacy Authentication</h3>
+            <p>Legacy protocols (POP3, IMAP, SMTP basic auth) don't support MFA at all — they're a direct bypass. CISA calls this the single most important hardening step besides MFA. Microsoft has been deprecating basic auth since 2022, but many tenants still have it enabled for "compatibility." Check your sign-in logs — if you see legacy auth, kill it.</p>
+            <p class="source">Navigate: Entra ID → Security → Conditional Access → New policy → Block legacy auth</p>
+        </div>
+    </div>
+
+    <div class="step-card">
+        <div class="step-num">3</div>
+        <div class="step-content">
+            <span class="step-tag tag-critical">Critical</span>
+            <h3>Deploy Conditional Access Policies</h3>
+            <p>Conditional Access is the Zero Trust policy engine for Entra ID. It evaluates every sign-in against conditions (location, device, risk level) and enforces actions (require MFA, block access, limit session). CISA SCuBA mandates baseline policies covering: block legacy auth, require MFA for all users, require compliant devices for admins, and block sign-ins from high-risk locations.</p>
+            <p class="source">Navigate: Entra ID → Security → Conditional Access → Policies</p>
+        </div>
+    </div>
+
+    <div class="step-card">
+        <div class="step-num">4</div>
+        <div class="step-content">
+            <span class="step-tag tag-high">High</span>
+            <h3>Implement Privileged Identity Management (PIM)</h3>
+            <p>Organisations using PIM experience 64% fewer security incidents. Global Admin should be assigned to no more than 2-4 accounts. Use just-in-time (JIT) activation so admin rights are only active when needed, with approval workflows and time limits. Audit all existing admin accounts — most tenants have 3-5x more admins than necessary.</p>
+            <p class="source">Navigate: Entra ID → Identity Governance → Privileged Identity Management</p>
+        </div>
+    </div>
+
+    <div class="callout callout-teal">
+        <h4>💡 Quick Win: Security Defaults</h4>
+        <p>If you're on Microsoft 365 Business Basic/Standard and don't have Entra ID P1/P2 for Conditional Access, at minimum enable Security Defaults. This forces MFA registration for all users and blocks legacy authentication. It's free and takes 30 seconds.</p>
+        <p style="margin-top:6px;font-size:12px;color:var(--teal);">Navigate: Entra ID → Properties → Manage Security Defaults → Enable</p>
+    </div>
+</div>
+
+<!-- ═══════════════ 10 CONTROLS (Part 2: 5-7) ═══════════════ -->
+<div class="page">
+    <div class="phase-header">
+        <span class="phase-icon">📧</span>
+        <div>
+            <h3>Email & Threat Protection</h3>
+            <div class="phase-sub">Controls 5–7 • Email Is Ground Zero</div>
+        </div>
+    </div>
+
+    <div class="step-card">
+        <div class="step-num">5</div>
+        <div class="step-content">
+            <span class="step-tag tag-critical">Critical</span>
+            <h3>Configure Email Authentication (SPF, DKIM, DMARC)</h3>
+            <p>Without proper email authentication, attackers can send emails that appear to come from your domain. SPF declares which servers can send as you. DKIM cryptographically signs your emails. DMARC tells receiving servers what to do with failures. Most NZ businesses have SPF but no DKIM or DMARC — leaving them wide open to impersonation. AI-generated phishing already has 4x the click-through rate of human-crafted emails.</p>
+            <p class="source">Check yours: nslookup -type=txt _dmarc.yourdomain.co.nz</p>
+        </div>
+    </div>
+
+    <div class="step-card">
+        <div class="step-num">6</div>
+        <div class="step-content">
+            <span class="step-tag tag-high">High</span>
+            <h3>Enable Safe Links & Safe Attachments</h3>
+            <p>Part of Microsoft Defender for Office 365 (Plan 1 or 2). Safe Links rewrites URLs and checks them at click-time — protecting against delayed weaponisation where attackers send clean links that turn malicious hours later. Safe Attachments detonates files in a sandbox before delivery. With 141% increase in spam volume and 563% increase in fake CAPTCHA lures, this is essential.</p>
+            <p class="source">Navigate: Security → Policies → Threat Policies → Safe Links / Safe Attachments</p>
+        </div>
+    </div>
+
+    <div class="step-card">
+        <div class="step-num">7</div>
+        <div class="step-content">
+            <span class="step-tag tag-high">High</span>
+            <h3>Configure Anti-Phishing Policies</h3>
+            <p>M365 Defender's anti-phishing policies include impersonation protection — it can flag emails where the sender's name matches your executives or domains but comes from an external address. Enable mailbox intelligence, spoof intelligence, and first-contact safety tips. With 56% of businesses experiencing phishing attacks and AI making them far more convincing, default policies aren't enough.</p>
+            <p class="source">Navigate: Security → Policies → Threat Policies → Anti-phishing</p>
+        </div>
+    </div>
+
+    <div class="stat-row">
+        <div class="stat-card">
+            <div class="number" style="color: var(--red);">4x</div>
+            <div class="label">higher click rate for<br>AI-generated phishing</div>
+            <div class="source">Programs.com</div>
+        </div>
+        <div class="stat-card">
+            <div class="number" style="color: var(--orange);">563%</div>
+            <div class="label">increase in fake<br>CAPTCHA lures</div>
+            <div class="source">CrowdStrike 2026 GTR</div>
+        </div>
+        <div class="stat-card">
+            <div class="number" style="color: var(--yellow);">141%</div>
+            <div class="label">increase in<br>spam volume</div>
+            <div class="source">CrowdStrike 2026 GTR</div>
+        </div>
+    </div>
+
+    <div class="callout callout-red">
+        <h4>Mailbox Rule Abuse — The Silent Backdoor</h4>
+        <p>After compromising an M365 account, attackers create inbox rules that forward copies of all emails (especially invoices and financial messages) to an external address. They also create rules to move security alerts to deleted items. These rules persist even after password reset. After any compromise: check Outlook rules, check mail flow rules in Exchange admin, and check delegated access permissions.</p>
+    </div>
+</div>
+
+<!-- ═══════════════ 10 CONTROLS (Part 3: 8-10) ═══════════════ -->
+<div class="page">
+    <div class="phase-header">
+        <span class="phase-icon">🛡️</span>
+        <div>
+            <h3>Data Protection & Visibility</h3>
+            <div class="phase-sub">Controls 8–10 • Know What's Happening</div>
+        </div>
+    </div>
+
+    <div class="step-card">
+        <div class="step-num">8</div>
+        <div class="step-content">
+            <span class="step-tag tag-high">High</span>
+            <h3>Audit External Sharing & OAuth App Consents</h3>
+            <p>23% of incidents leveraged third-party SaaS applications. Review all OAuth app consents in your tenant — every app a user approved has some level of access to your data. Restrict who can consent to apps (admin consent workflow). Audit SharePoint/OneDrive external sharing settings — most tenants default to "anyone with a link" which means any file shared externally is accessible to the entire internet.</p>
+            <p class="source">Navigate: Entra ID → Enterprise Applications → Consent and permissions</p>
+        </div>
+    </div>
+
+    <div class="step-card">
+        <div class="step-num">9</div>
+        <div class="step-content">
+            <span class="step-tag tag-high">High</span>
+            <h3>Enable Unified Audit Logging</h3>
+            <p>If audit logging isn't enabled, you have zero visibility into who accessed what, when. This is the first thing incident responders check — and it's often not turned on. Enable unified audit log in Microsoft Purview. Set retention to at least 180 days (default is 90 for E3, 365 for E5). Without logs, you cannot investigate a breach, cannot prove compliance to the Privacy Commissioner, and cannot support insurance claims.</p>
+            <p class="source">Navigate: Purview → Audit → Start recording user and admin activity</p>
+        </div>
+    </div>
+
+    <div class="step-card">
+        <div class="step-num">10</div>
+        <div class="step-content">
+            <span class="step-tag tag-recommended">Recommended</span>
+            <h3>Run the CISA SCuBA Assessment</h3>
+            <p>CISA's ScubaGear is a free, open-source PowerShell tool that scans your M365 tenant against their Secure Configuration Baselines. It checks Entra ID, Exchange Online, SharePoint, OneDrive, Teams, Defender, and Power Platform. Produces an HTML report showing every misconfiguration with severity ratings. CISA BOD 25-01 now mandates this for US federal agencies — it's becoming the de facto M365 security standard globally.</p>
+            <p class="source">Download: github.com/cisagov/ScubaGear</p>
+        </div>
+    </div>
+
+    <div class="callout callout-teal">
+        <h4>💡 Data Loss Prevention (DLP) — Bonus Control</h4>
+        <p>If you have M365 E3/E5 or Business Premium, enable DLP policies in Microsoft Purview. Set rules to detect and block sensitive data (credit card numbers, NZ IRD numbers, health information) from being shared externally via email, Teams, or SharePoint. With NZ Privacy Act 2020 mandatory breach reporting, preventing data leakage is better than reporting it.</p>
+        <p style="margin-top:6px;font-size:12px;color:var(--teal);">Navigate: Purview → Data Loss Prevention → Policies → Create</p>
+    </div>
+
+    <div class="stat-row">
+        <div class="stat-card">
+            <div class="number" style="color: var(--green);">64%</div>
+            <div class="label">fewer incidents with<br>PIM deployed</div>
+            <div class="source">Microsoft</div>
+        </div>
+        <div class="stat-card">
+            <div class="number" style="color: var(--red);">23%</div>
+            <div class="label">of incidents via<br>third-party SaaS apps</div>
+            <div class="source">Unit 42 2026</div>
+        </div>
+        <div class="stat-card">
+            <div class="number" style="color: var(--cyan);">$900K</div>
+            <div class="label">saved by internal<br>breach detection</div>
+            <div class="source">Cobalt</div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════ 5-MINUTE SECURITY AUDIT ═══════════════ -->
+<div class="page">
+    <div class="section-label">SELF-ASSESSMENT</div>
+    <h2 class="section-title">The 5-Minute M365<br>Security Audit</h2>
+    <p class="section-intro">Print this page, work through each item, and tick it off. If you can't tick more than half — your tenant needs professional hardening.</p>
+    <hr class="gradient-line">
+
+    <div class="audit-item">
+        <div class="audit-check"></div>
+        <div>
+            <div class="label"><strong>MFA enabled for all users</strong> (not just admins)</div>
+            <div class="nav">Entra ID → Users → Per-user MFA — or check Conditional Access</div>
+        </div>
+    </div>
+    <div class="audit-item">
+        <div class="audit-check"></div>
+        <div>
+            <div class="label"><strong>Legacy authentication blocked</strong></div>
+            <div class="nav">Entra ID → Sign-in logs → filter "Client app" for legacy protocols</div>
+        </div>
+    </div>
+    <div class="audit-item">
+        <div class="audit-check"></div>
+        <div>
+            <div class="label"><strong>Global Admin limited to ≤4 accounts</strong></div>
+            <div class="nav">Entra ID → Roles and administrators → Global administrator</div>
+        </div>
+    </div>
+    <div class="audit-item">
+        <div class="audit-check"></div>
+        <div>
+            <div class="label"><strong>No shared admin passwords</strong> (each admin has unique credentials)</div>
+            <div class="desc">If you have a "shared IT account" — that's a breach waiting to happen</div>
+        </div>
+    </div>
+    <div class="audit-item">
+        <div class="audit-check"></div>
+        <div>
+            <div class="label"><strong>SPF, DKIM, and DMARC all configured</strong></div>
+            <div class="nav">Run: nslookup -type=txt _dmarc.yourdomain.co.nz</div>
+        </div>
+    </div>
+    <div class="audit-item">
+        <div class="audit-check"></div>
+        <div>
+            <div class="label"><strong>Safe Links and Safe Attachments enabled</strong></div>
+            <div class="nav">Security → Policies → Threat Policies → verify policies exist and are ON</div>
+        </div>
+    </div>
+    <div class="audit-item">
+        <div class="audit-check"></div>
+        <div>
+            <div class="label"><strong>External sharing restricted</strong> (not "Anyone with a link")</div>
+            <div class="nav">SharePoint admin → Policies → Sharing — should be "New and existing guests" or stricter</div>
+        </div>
+    </div>
+    <div class="audit-item">
+        <div class="audit-check"></div>
+        <div>
+            <div class="label"><strong>OAuth app consent restricted to admins</strong></div>
+            <div class="nav">Entra ID → Enterprise apps → Consent settings → "Do not allow user consent"</div>
+        </div>
+    </div>
+    <div class="audit-item">
+        <div class="audit-check"></div>
+        <div>
+            <div class="label"><strong>Unified audit log enabled</strong></div>
+            <div class="nav">Purview → Audit → verify "Start recording" is active</div>
+        </div>
+    </div>
+    <div class="audit-item">
+        <div class="audit-check"></div>
+        <div>
+            <div class="label"><strong>No suspicious mailbox forwarding rules</strong></div>
+            <div class="nav">Exchange admin → Mail flow → Rules — also check per-user Outlook rules</div>
+        </div>
+    </div>
+
+    <div style="margin-top:24px; text-align:center; padding:16px; border:1px solid var(--border); border-radius:12px; background:var(--card);">
+        <p style="font-size:14px; color:white; margin-bottom:4px;"><strong>Your Score: ____ / 10</strong></p>
+        <p style="font-size:12px; color:#888;">
+            <span style="color:var(--green);">8-10:</span> Strong foundation — consider a pentest to validate.
+            <span style="color:var(--yellow);">5-7:</span> Gaps exist that attackers will find.
+            <span style="color:var(--red);">0-4:</span> Your tenant is likely already compromised or trivially exploitable.
+        </p>
+    </div>
+</div>
+
+<!-- ═══════════════ NZ CONTEXT ═══════════════ -->
+<div class="page">
+    <div class="section-label">NZ THREAT LANDSCAPE</div>
+    <h2 class="section-title">Why This Matters<br>for NZ Businesses</h2>
+    <p class="section-intro">New Zealand isn't a backwater for cybercrime. It's a soft target with valuable data and underspent defences.</p>
+    <hr class="gradient-line">
+
+    <div class="stat-row">
+        <div class="stat-card">
+            <div class="number" style="color: var(--red);">$7.8M</div>
+            <div class="label">lost in Q1 2025 alone<br>(14.7% increase)</div>
+            <div class="source">CERT NZ / NCSC</div>
+        </div>
+        <div class="stat-card">
+            <div class="number" style="color: var(--orange);">26K</div>
+            <div class="label">NZers contacted about<br>Lumma Stealer malware</div>
+            <div class="source">NCSC</div>
+        </div>
+        <div class="stat-card">
+            <div class="number" style="color: var(--yellow);">92</div>
+            <div class="label">NZ/AU business credentials<br>sold on dark web in 2025</div>
+            <div class="source">NCSC</div>
+        </div>
+    </div>
+
+    <ul class="bullet-list">
+        <li><strong>~1 nationally significant cyber incident per day</strong> handled by NCSC. 300+ required specialist investigation in 2024/25. <span style="color:var(--teal);">NCSC</span></li>
+        <li><strong>25% of nationally significant incidents linked to state-sponsored actors.</strong> NZ is part of Five Eyes — which makes Kiwi businesses targets for Chinese and Russian APTs. <span style="color:var(--teal);">NCSC Q1 2025</span></li>
+        <li><strong>Phishing/credential harvesting up 15% to 440 reports in Q1 2025.</strong> Most of these target M365 accounts — it's the single most common attack vector for NZ businesses. <span style="color:var(--teal);">CERT NZ</span></li>
+        <li><strong>40% of NZ SMBs say a $100K attack would shut them down.</strong> Yet most haven't reviewed their M365 security settings since initial setup. <span style="color:var(--teal);">VikingCloud 2026</span></li>
+        <li><strong>Privacy Act 2020 mandatory breach reporting.</strong> If personal data is compromised because your M365 wasn't properly secured, you must notify the Privacy Commissioner. Fines up to $10,000 plus enforcement action. Negligent security configuration will not be a good look. <span style="color:var(--teal);">Privacy Act 2020</span></li>
+    </ul>
+
+    <div class="callout callout-red" style="margin-top: 20px;">
+        <h4>ManageMyHealth — What Happens When Cloud Security Fails</h4>
+        <p>In January 2026, the "Kazu" threat group breached ManageMyHealth, exfiltrating 108GB of sensitive health data — 400,000+ documents including clinical notes, lab results, and medical photographs for 120,000+ patients. The Privacy Commissioner launched a formal inquiry. The $60K ransom demanded was insignificant compared to the regulatory, legal, and reputational damage. The attack vector? Inadequate access controls and cloud security configuration.</p>
+    </div>
+
+    <div class="callout callout-teal" style="margin-top:12px;">
+        <h4>M365 Is Ground Zero for NZ SMBs</h4>
+        <p>Microsoft 365 is the default productivity platform for New Zealand businesses. Your email, files, contacts, Teams conversations, and SharePoint sites all live there. When an attacker compromises your M365 tenant, they don't just get email — they get everything. And with 82% of detections being malware-free (attackers just log in), your antivirus won't save you. Only proper configuration will.</p>
+    </div>
+</div>
+
+<!-- ═══════════════ ATTACKER'S PERSPECTIVE ═══════════════ -->
+<div class="page">
+    <div class="section-label">FROM THE ATTACKER'S PERSPECTIVE</div>
+    <h2 class="section-title">What We Find When<br>We Test M365 Tenants</h2>
+    <p class="section-intro">As ethical hackers who test M365 environments for a living, these are the misconfigurations we exploit most often. Every item below is something we've successfully used in real penetration tests — and something attackers are using right now.</p>
+    <hr class="gradient-line">
+
+    <div class="callout callout-red">
+        <h4>🔓 #1 Finding: Overprivileged Service Accounts with No MFA</h4>
+        <p>Almost every tenant has service accounts (backup tools, scanners, CRM integrations) that are Global Admin or Exchange Admin with basic passwords and no MFA. These are the first accounts we target. Attackers use credential stuffing and password spraying against these because they know service accounts are rarely monitored.</p>
+        <p style="margin-top:8px;font-size:12px;color:var(--teal);">Fix: Audit all accounts with admin roles. Convert service accounts to managed identities where possible. Enforce MFA on ALL admin accounts with zero exceptions. Use Entra ID PIM for just-in-time access.</p>
+    </div>
+
+    <div class="callout callout-orange">
+        <h4>📬 #2 Finding: Mailbox Forwarding Rules to External Addresses</h4>
+        <p>We frequently find mailbox rules forwarding email to external addresses — often left behind from a previous compromise that was never fully remediated. Attackers create rules that forward copies of invoices and financial emails to their own inbox, then wait for the right moment to inject a payment redirect.</p>
+        <p style="margin-top:8px;font-size:12px;color:var(--teal);">Detection command: Get-TransportRule | Where-Object {$_.RedirectMessageTo -ne $null} — and check per-user Outlook rules via Get-InboxRule for all users. Look for rules that delete or move messages to unusual folders.</p>
+    </div>
+
+    <div class="callout" style="border-left:4px solid var(--yellow);">
+        <h4 style="color:var(--yellow);">🔑 #3 Finding: OAuth App Consent Grants to Unknown Applications</h4>
+        <p>Users click "Allow" on OAuth consent prompts without reading them. We've found apps with Mail.ReadWrite, Files.ReadWrite.All, and User.Read.All permissions granted by regular users — giving third-party apps full access to email, files, and directory data. This is how the "OAuth device code phishing" campaigns work — Russia-linked actors used this exact technique against M365 tenants in late 2025.</p>
+        <p style="margin-top:8px;font-size:12px;color:var(--teal);">Audit: Entra ID → Enterprise Applications → filter by "User consent" → review permissions. Restrict consent to admin-only. Review all apps with Graph API: GET /servicePrincipals?$select=displayName,appId,oauth2PermissionGrants</p>
+    </div>
+
+    <div class="callout" style="border-left:4px solid var(--blue);">
+        <h4 style="color:var(--blue);">📊 #4 Finding: Audit Logs Disabled or Insufficient Retention</h4>
+        <p>When we ask clients to provide audit logs for our testing period, ~30% discover their unified audit log was never enabled. Without logs, you cannot detect lateral movement, data exfiltration, or identify which accounts were compromised during an incident. E3 tenants default to 90-day retention — barely enough for investigation. Many breaches aren't discovered for months.</p>
+        <p style="margin-top:8px;font-size:12px;color:var(--teal);">Verify: Search-UnifiedAuditLog -StartDate (Get-Date).AddDays(-1) -EndDate (Get-Date) — if this returns nothing, logging is disabled. Enable immediately in Purview and increase retention to maximum (365 days for E5, consider log export for E3).</p>
+    </div>
+
+    <div class="callout" style="border-left:4px solid var(--green);">
+        <h4 style="color:var(--green);">🌐 #5 Finding: SharePoint/OneDrive "Anyone with a Link" Sharing</h4>
+        <p>Default sharing is often set to "Anyone" — meaning a shared link works for anyone on the internet, no authentication required. We've found client contracts, employee records, financial spreadsheets, and technical architecture documents accessible via public links. Combine this with AI OSINT scraping and an attacker can harvest sensitive documents before launching their social engineering campaign.</p>
+        <p style="margin-top:8px;font-size:12px;color:var(--teal);">Fix: SharePoint admin → Policies → Sharing → set to "New and existing guests" at minimum. Review existing links: Get-SPOSite | Select Url, SharingCapability — and audit active sharing links.</p>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-top:16px;text-align:center;">
+        <p style="font-size:14px;color:white;margin-bottom:8px;"><strong>Our M365 Security Assessment Checks 47 Configuration Points</strong></p>
+        <p style="font-size:12px;color:#888;">Including: Conditional Access gaps, stale admin accounts, mail flow rules, external forwarding, DLP policy coverage, eDiscovery permissions, Teams guest access, Power Platform data connectors, sensitivity labelling gaps, and tenant-wide sharing defaults.</p>
+    </div>
+</div>
+
+<!-- ═══════════════ CTA PAGE ═══════════════ -->
+<div class="page" style="display:flex; flex-direction:column; justify-content:center; text-align:center;">
+    <div class="section-label" style="text-align:center;">WHAT'S NEXT</div>
+    <h2 class="section-title" style="text-align:center;">
+        Don't Guess.<br><span style="background:linear-gradient(135deg,var(--cyan),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Get Tested.</span>
+    </h2>
+    <p class="section-intro" style="text-align:center; max-width:500px; margin:0 auto 30px;">
+        This guide shows you what to check. A penetration test shows you what attackers actually find. We test your M365 configuration the same way real adversaries would.
+    </p>
+
+    <div class="cta-box">
+        <h3>Get Your M365 Tenant Assessed</h3>
+        <p>We run CISA SCuBA scans, test your Conditional Access policies, check for AiTM vulnerability, audit OAuth app consents, and verify your email authentication — then give you a prioritised remediation report.</p>
+        <a href="https://wehack.co.nz" class="cta-btn">Take Your Free Security Score →</a>
+    </div>
+
+    <p style="color:#888; font-size:13px; margin-top:30px;">
+        Every business has different security challenges. Book a free 15-minute chat and we'll recommend the right approach &mdash; no obligation.
+    </p>
+
+    <div style="margin-top:30px;">
+        <p style="color:#999; font-size:13px;">Mustafa Demirsoy</p>
+        <p style="color:#888; font-size:12px;">Founder &amp; Hacker, WeHack</p>
+    </div>
+
+    <div class="footer">
+        <a href="https://wehack.co.nz">wehack.co.nz</a> &nbsp;|&nbsp; info@wehack.co.nz &nbsp;|&nbsp; 022 091 7242<br>
+        148 Durham Street, Tauranga 3110
+    </div>
+</div>
+
+</body>
+</html>

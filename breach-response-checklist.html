@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>72-Hour Breach Response Checklist — WeHack</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Questrial&display=swap" rel="stylesheet">
+    <style>
+        @page { size: A4; margin: 0; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --cyan: #B8F0F0;
+            --green: #C4FF9E;
+            --green-bright: #A9FF8F;
+            --teal: #0E99AB;
+            --teal-dark: #133C41;
+            --black: #0F0F10;
+            --dark: #141416;
+            --card: #1A1A1C;
+            --border: #2A2A2E;
+            --white: #FFFFFF;
+            --gray-100: #F0F0F0;
+            --gray-300: #AAAAAA;
+            --gray-500: #777777;
+            --red: #FF4444;
+            --orange: #FF8C00;
+            --yellow: #FFD700;
+            --blue: #4A9EFF;
+        }
+        body { font-family: 'Questrial', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; background: var(--black); color: var(--white); line-height: 1.6; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+        /* === COVER === */
+        .cover { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 60px 40px; background: linear-gradient(160deg, #0F0F10 0%, #0F1618 30%, #0F1A1A 60%, #0F0F10 100%); position: relative; overflow: hidden; page-break-after: always; }
+        .cover::before { content: ''; position: absolute; top: -150px; right: -150px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(184,240,240,0.08) 0%, transparent 70%); pointer-events: none; }
+        .cover::after { content: ''; position: absolute; bottom: -150px; left: -100px; width: 400px; height: 400px; background: radial-gradient(circle, rgba(196,255,158,0.05) 0%, transparent 70%); pointer-events: none; }
+        .cover-logo { font-size: 24px; font-weight: 700; letter-spacing: -1px; color: var(--white); margin-bottom: 48px; z-index: 1; }
+        .cover-badge { display: inline-block; background: rgba(255,68,68,0.12); border: 1px solid rgba(255,68,68,0.25); color: var(--red); padding: 8px 20px; border-radius: 24px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 32px; z-index: 1; }
+        .cover h1 { font-size: clamp(32px, 5vw, 48px); font-weight: 800; line-height: 1.08; letter-spacing: -2px; max-width: 720px; margin-bottom: 20px; z-index: 1; }
+        .cover h1 span { background: linear-gradient(135deg, var(--cyan), var(--green)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .cover-sub { font-size: 17px; color: var(--gray-300); max-width: 540px; line-height: 1.5; margin-bottom: 48px; z-index: 1; }
+        .cover-stats { display: flex; gap: 40px; z-index: 1; }
+        .cover-stat { text-align: center; }
+        .cover-stat-num { font-size: 34px; font-weight: 800; }
+        .cover-stat-num.gradient { background: linear-gradient(135deg, var(--cyan), var(--green)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .cover-stat-num.red { color: var(--red); }
+        .cover-stat-label { font-size: 11px; color: var(--gray-500); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+        .cover-footer { position: absolute; bottom: 40px; font-size: 13px; color: var(--gray-500); z-index: 1; }
+
+        /* === PAGE === */
+        .page { max-width: 900px; margin: 0 auto; padding: 60px 48px; page-break-after: always; }
+        .page:last-child { page-break-after: avoid; }
+
+        /* === SECTIONS === */
+        .section-num { font-size: 12px; font-weight: 700; color: var(--cyan); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 8px; }
+        .section-title { font-size: 30px; font-weight: 800; letter-spacing: -1px; line-height: 1.15; margin-bottom: 8px; }
+        .section-subtitle { font-size: 15px; color: var(--gray-300); margin-bottom: 28px; line-height: 1.5; }
+        .divider { height: 2px; background: linear-gradient(90deg, var(--cyan), var(--green), transparent); margin-bottom: 28px; border-radius: 1px; }
+
+        /* === STAT CARDS === */
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 28px; }
+        .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 22px 18px; text-align: center; }
+        .stat-card-num { font-size: 30px; font-weight: 800; line-height: 1; margin-bottom: 6px; }
+        .stat-card-num.red { color: var(--red); }
+        .stat-card-num.orange { color: var(--orange); }
+        .stat-card-num.yellow { color: var(--yellow); }
+        .stat-card-num.cyan { color: var(--cyan); }
+        .stat-card-num.teal { color: var(--teal); }
+        .stat-card-num.green { color: var(--green); }
+        .stat-card-num.blue { color: var(--blue); }
+        .stat-card-label { font-size: 12px; color: var(--gray-300); line-height: 1.4; }
+        .stat-card-source { font-size: 10px; color: var(--gray-500); margin-top: 5px; }
+
+        /* === HIGHLIGHTS === */
+        .highlight { background: linear-gradient(135deg, rgba(184,240,240,0.08), rgba(196,255,158,0.04)); border: 1px solid rgba(184,240,240,0.15); border-radius: 12px; padding: 22px 26px; margin-bottom: 22px; }
+        .highlight-red { background: rgba(255,68,68,0.06); border-color: rgba(255,68,68,0.2); }
+        .highlight-orange { background: rgba(255,140,0,0.06); border-color: rgba(255,140,0,0.2); }
+        .highlight h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+        .highlight p { font-size: 14px; color: var(--gray-300); line-height: 1.6; }
+        .highlight .big-num { font-size: 44px; font-weight: 800; line-height: 1; margin-bottom: 4px; }
+
+        /* === CONTENT === */
+        .content-block { margin-bottom: 24px; }
+        .content-block h3 { font-size: 19px; font-weight: 700; margin-bottom: 10px; }
+        .content-block p { font-size: 14px; color: var(--gray-300); line-height: 1.65; margin-bottom: 10px; }
+        .content-block ul { list-style: none; padding: 0; }
+        .content-block ul li { font-size: 14px; color: var(--gray-300); padding: 5px 0 5px 20px; position: relative; line-height: 1.5; }
+        .content-block ul li::before { content: ''; position: absolute; left: 0; top: 13px; width: 8px; height: 8px; border-radius: 50%; background: var(--cyan); }
+
+        /* === TIMELINE STEPS === */
+        .step-grid { display: grid; gap: 12px; margin-bottom: 24px; }
+        .step-item { display: flex; gap: 16px; padding: 16px 20px; background: var(--card); border: 1px solid var(--border); border-radius: 10px; }
+        .step-num { min-width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--cyan), var(--green)); color: var(--black); font-size: 16px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .step-num.red { background: var(--red); color: var(--white); }
+        .step-content h4 { font-size: 15px; font-weight: 700; margin-bottom: 3px; }
+        .step-content p { font-size: 13px; color: var(--gray-300); line-height: 1.5; }
+
+        /* === PHASE HEADER === */
+        .phase-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; padding: 16px 20px; border-radius: 12px; }
+        .phase-header.urgent { background: rgba(255,68,68,0.08); border: 1px solid rgba(255,68,68,0.2); }
+        .phase-header.assess { background: rgba(255,140,0,0.08); border: 1px solid rgba(255,140,0,0.2); }
+        .phase-header.comply { background: rgba(184,240,240,0.08); border: 1px solid rgba(184,240,240,0.15); }
+        .phase-icon { font-size: 32px; flex-shrink: 0; }
+        .phase-title { font-size: 20px; font-weight: 800; }
+        .phase-time { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; margin-top: 2px; }
+        .phase-time.red { color: var(--red); }
+        .phase-time.orange { color: var(--orange); }
+        .phase-time.cyan { color: var(--cyan); }
+
+        /* === DO NOT LIST === */
+        .donot-item { display: flex; gap: 14px; padding: 14px 20px; background: rgba(255,68,68,0.04); border: 1px solid rgba(255,68,68,0.12); border-radius: 10px; margin-bottom: 10px; }
+        .donot-x { min-width: 32px; height: 32px; background: var(--red); border-radius: 50%; color: var(--white); font-size: 18px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .donot-content h4 { font-size: 14px; font-weight: 700; color: var(--red); margin-bottom: 2px; }
+        .donot-content p { font-size: 13px; color: var(--gray-300); line-height: 1.5; }
+
+        /* === CHECKLIST === */
+        .checklist { margin-bottom: 24px; }
+        .check-item { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+        .check-item:last-child { border-bottom: none; }
+        .check-box { width: 22px; height: 22px; border: 2px solid var(--cyan); border-radius: 4px; flex-shrink: 0; margin-top: 2px; }
+        .check-text { font-size: 14px; color: var(--gray-300); line-height: 1.5; }
+        .check-text strong { color: var(--white); }
+
+        /* === TWO COL === */
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+
+        /* === SVG CHARTS === */
+        .chart-container { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 24px; text-align: center; }
+        .chart-container h4 { font-size: 14px; font-weight: 700; margin-bottom: 16px; color: var(--gray-300); text-transform: uppercase; letter-spacing: 1px; }
+
+        /* === CTA === */
+        .cta-page { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 60px 40px; }
+        .cta-page h2 { font-size: 36px; font-weight: 800; letter-spacing: -1.5px; margin-bottom: 16px; }
+        .cta-page h2 span { background: linear-gradient(135deg, var(--cyan), var(--green)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .cta-page p { font-size: 16px; color: var(--gray-300); max-width: 500px; line-height: 1.6; margin-bottom: 32px; }
+        .cta-box { background: linear-gradient(135deg, var(--teal), #0BBD8B); color: var(--white); padding: 32px 48px; border-radius: 16px; margin-bottom: 40px; }
+        .cta-box h3 { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+        .cta-box p { color: rgba(255,255,255,0.85); margin-bottom: 16px; font-size: 15px; }
+        .cta-btn { display: inline-block; background: var(--green-bright); color: var(--black); padding: 14px 36px; border-radius: 8px; font-size: 16px; font-weight: 700; text-decoration: none; }
+        .report-footer { text-align: center; padding: 40px; color: var(--gray-500); font-size: 12px; }
+        .report-footer a { color: var(--cyan); text-decoration: none; }
+
+        /* === PRINT === */
+        @media print { body { background: var(--black) !important; } .page { padding: 40px 36px; } }
+        @media (max-width: 700px) { .stat-grid { grid-template-columns: 1fr 1fr; } .cover-stats { flex-direction: column; gap: 16px; } .two-col { grid-template-columns: 1fr; } .page { padding: 32px 20px; } }
+    </style>
+</head>
+<body>
+
+<!-- ============ COVER ============ -->
+<div class="cover">
+    <div class="cover-logo">WeHack</div>
+    <div class="cover-badge">Emergency Response Guide &bull; 2026</div>
+    <h1>The 72-Hour<br><span>Breach Response Checklist</span></h1>
+    <p class="cover-sub">Exactly what to do in the first 72 hours after a cyber breach. Step-by-step. No panic. No guesswork. Includes NZ Privacy Act obligations.</p>
+    <div class="cover-stats">
+        <div class="cover-stat">
+            <div class="cover-stat-num red">29 min</div>
+            <div class="cover-stat-label">Avg time attackers need</div>
+        </div>
+        <div class="cover-stat">
+            <div class="cover-stat-num gradient">$5.08M</div>
+            <div class="cover-stat-label">Avg ransomware cost</div>
+        </div>
+        <div class="cover-stat">
+            <div class="cover-stat-num red">83%</div>
+            <div class="cover-stat-label">Who pay get hit again</div>
+        </div>
+    </div>
+    <div class="cover-footer">wehack.co.nz &nbsp;|&nbsp; Prepared by Mustafa Demirsoy, Founder &amp; Hacker &nbsp;|&nbsp; Sources: NCSC NZ, IBM X-Force, CrowdStrike, Cobalt</div>
+</div>
+
+<!-- ============ THE FIRST 60 MINUTES ============ -->
+<div class="page">
+    <div class="section-num">Phase 01</div>
+    <div class="section-title">The First 60 Minutes</div>
+    <div class="section-subtitle">The decisions you make in the first hour determine whether you lose thousands or millions.</div>
+    <div class="divider"></div>
+
+    <div class="phase-header urgent">
+        <div class="phase-icon">&#9888;&#65039;</div>
+        <div>
+            <div class="phase-title">Contain &amp; Isolate</div>
+            <div class="phase-time red">Minutes 0 &ndash; 60 &bull; Critical Window</div>
+        </div>
+    </div>
+
+    <div class="step-grid">
+        <div class="step-item">
+            <div class="step-num">1</div>
+            <div class="step-content">
+                <h4>Don't Panic &mdash; Activate Your Incident Lead</h4>
+                <p>Designate one person to coordinate. This person makes all decisions for the next 72 hours. If you don't have an incident lead, the most senior available person takes this role. <strong>Write down the time of discovery.</strong></p>
+            </div>
+        </div>
+        <div class="step-item">
+            <div class="step-num">2</div>
+            <div class="step-content">
+                <h4>Disconnect Affected Systems from the Network</h4>
+                <p>Unplug ethernet cables. Disable Wi-Fi. Do NOT power off machines (forensic evidence is in RAM). Isolate affected devices but <strong>keep them turned on</strong>. If you power off, you lose critical evidence.</p>
+            </div>
+        </div>
+        <div class="step-item">
+            <div class="step-num">3</div>
+            <div class="step-content">
+                <h4>Change All Admin Passwords Immediately</h4>
+                <p>Domain admin, cloud admin (Azure/AWS/GCP), email admin, firewall admin, VPN. Use a <strong>clean device</strong> to make these changes, not a potentially compromised one. Enable MFA if not already active.</p>
+            </div>
+        </div>
+        <div class="step-item">
+            <div class="step-num">4</div>
+            <div class="step-content">
+                <h4>Preserve Evidence</h4>
+                <p>Screenshot everything: error messages, ransom notes, unusual files, running processes. Photograph screens if needed. <strong>Do NOT delete anything.</strong> Do NOT run antivirus yet &mdash; it can destroy forensic artefacts.</p>
+            </div>
+        </div>
+        <div class="step-item">
+            <div class="step-num">5</div>
+            <div class="step-content">
+                <h4>Document the Timeline</h4>
+                <p>Start a log: when was the breach discovered? Who noticed it? What systems are affected? What's the current status? This timeline becomes critical for Privacy Commissioner reporting and insurance claims.</p>
+            </div>
+        </div>
+        <div class="step-item">
+            <div class="step-num">6</div>
+            <div class="step-content">
+                <h4>Call Your Incident Response Support</h4>
+                <p>Contact your IT provider, cybersecurity partner, or insurer's IR hotline. If you have nobody: call <strong>CERT NZ on 0800 CERT NZ (0800 2378 69)</strong>. They provide free guidance to NZ businesses.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="highlight-red highlight">
+        <h3 style="color: var(--red);">Why Speed Matters</h3>
+        <p>The average eCrime breakout time is <strong>29 minutes</strong>. That's how fast attackers move from initial access to lateral movement across your network. The fastest recorded breakout: <strong>27 seconds</strong>. Internal detection saves an average of <strong>$900,000</strong> compared to external notification. <span style="color: var(--gray-500);">Sources: CrowdStrike 2026 GTR, Cobalt</span></p>
+    </div>
+</div>
+
+<!-- ============ HOW ATTACKERS ACTUALLY MOVE ============ -->
+<div class="page">
+    <div class="section-num">Inside the Attack</div>
+    <div class="section-title">What Attackers Actually Do (2026 TTPs)</div>
+    <div class="section-subtitle">Based on CrowdStrike's 2026 Global Threat Report and Unit 42's 2026 Incident Response data. This is how real breaches unfold in 2025-2026.</div>
+    <div class="divider"></div>
+
+    <!-- Attack Timeline SVG -->
+    <div class="chart-container">
+        <h4>Real-World Attack Timeline</h4>
+        <svg width="100%" height="200" viewBox="0 0 700 200" xmlns="http://www.w3.org/2000/svg">
+            <!-- Timeline line -->
+            <line x1="50" y1="80" x2="650" y2="80" stroke="#2A2A2E" stroke-width="3"/>
+
+            <!-- T+0: Initial Access -->
+            <circle cx="80" cy="80" r="10" fill="#B8F0F0"/>
+            <text x="80" y="55" fill="#B8F0F0" font-size="11" font-weight="700" text-anchor="middle">T+0</text>
+            <text x="80" y="110" fill="#AAAAAA" font-size="10" text-anchor="middle">Initial</text>
+            <text x="80" y="124" fill="#AAAAAA" font-size="10" text-anchor="middle">Access</text>
+
+            <!-- T+27s: Fastest breakout -->
+            <circle cx="160" cy="80" r="10" fill="#FF4444"/>
+            <text x="160" y="55" fill="#FF4444" font-size="11" font-weight="700" text-anchor="middle">27 sec</text>
+            <text x="160" y="110" fill="#AAAAAA" font-size="10" text-anchor="middle">Fastest</text>
+            <text x="160" y="124" fill="#AAAAAA" font-size="10" text-anchor="middle">Breakout</text>
+
+            <!-- T+29m: Avg breakout -->
+            <circle cx="280" cy="80" r="12" fill="#FF8C00"/>
+            <text x="280" y="55" fill="#FF8C00" font-size="11" font-weight="700" text-anchor="middle">29 min</text>
+            <text x="280" y="110" fill="#AAAAAA" font-size="10" text-anchor="middle">Avg eCrime</text>
+            <text x="280" y="124" fill="#AAAAAA" font-size="10" text-anchor="middle">Breakout</text>
+
+            <!-- T+72m: Data exfil -->
+            <circle cx="420" cy="80" r="12" fill="#FFD700"/>
+            <text x="420" y="55" fill="#FFD700" font-size="11" font-weight="700" text-anchor="middle">72 min</text>
+            <text x="420" y="110" fill="#AAAAAA" font-size="10" text-anchor="middle">Data</text>
+            <text x="420" y="124" fill="#AAAAAA" font-size="10" text-anchor="middle">Exfiltration</text>
+
+            <!-- T+deploy: Ransomware -->
+            <circle cx="560" cy="80" r="12" fill="#FF4444"/>
+            <text x="560" y="55" fill="#FF4444" font-size="11" font-weight="700" text-anchor="middle">Hours&ndash;Days</text>
+            <text x="560" y="110" fill="#AAAAAA" font-size="10" text-anchor="middle">Ransomware</text>
+            <text x="560" y="124" fill="#AAAAAA" font-size="10" text-anchor="middle">Deployed</text>
+
+            <!-- Annotation -->
+            <rect x="140" y="145" width="380" height="40" rx="6" fill="rgba(255,68,68,0.08)" stroke="rgba(255,68,68,0.2)"/>
+            <text x="330" y="170" fill="#FF4444" font-size="12" font-weight="700" text-anchor="middle">Your window to contain = minutes, not hours</text>
+        </svg>
+    </div>
+
+    <div class="content-block">
+        <h3>The 2026 Attack Playbook (From CrowdStrike &amp; Unit 42)</h3>
+        <ul>
+            <li><strong>82% of detections are malware-free.</strong> Attackers use valid credentials, living-off-the-land tools (PowerShell, WMI, PsExec), and legitimate remote access software. Your antivirus won't catch them. <span style="color:var(--gray-500);">CrowdStrike 2026 GTR</span></li>
+            <li><strong>40% of incidents start with vulnerability exploitation</strong> &mdash; the #1 initial access vector in 2025-2026, surpassing phishing. Unpatched VPNs, firewalls, and web apps are the primary entry point. <span style="color:var(--gray-500);">IBM X-Force 2026</span></li>
+            <li><strong>Identity weaknesses found in 90% of investigations.</strong> Overprivileged accounts, weak passwords, lack of MFA, and shared credentials are how attackers escalate from a foothold to full domain admin. <span style="color:var(--gray-500);">Unit 42 2026</span></li>
+            <li><strong>87% of attacks span multiple surfaces.</strong> Attackers pivot from email to endpoint to cloud to SaaS. A breach in one system means every connected system is at risk. <span style="color:var(--gray-500);">Unit 42 2026</span></li>
+            <li><strong>Encryption-based extortion declined 15%.</strong> Modern attackers skip encryption entirely &mdash; they steal your data and threaten to publish it. Faster, quieter, harder to detect. <span style="color:var(--gray-500);">Unit 42 2026</span></li>
+            <li><strong>49% increase in active ransomware groups YoY.</strong> The ransomware ecosystem is fragmenting &mdash; more groups, smaller operations, more unpredictable. 7,000+ victims named on leak sites in 2025. <span style="color:var(--gray-500);">IBM X-Force 2026, Cobalt</span></li>
+        </ul>
+    </div>
+
+    <div class="highlight">
+        <h3>Why This Matters for Your Response</h3>
+        <p>If you're reading this during a breach, understand: the attacker likely <strong>already has your data</strong>. Modern attacks exfiltrate before encrypting. Your immediate priority is <strong>containment and credential revocation</strong>, not trying to decrypt files. The data is already gone &mdash; your job is to stop it getting worse and understand what was taken.</p>
+    </div>
+</div>
+
+<!-- ============ NZ CASE STUDY ============ -->
+<div class="page">
+    <div class="section-num">NZ Case Study</div>
+    <div class="section-title">ManageMyHealth Breach &mdash; January 2026</div>
+    <div class="section-subtitle">The largest known NZ health data breach. Here's what happened, what went wrong, and what you can learn from it.</div>
+    <div class="divider"></div>
+
+    <div class="stat-grid">
+        <div class="stat-card">
+            <div class="stat-card-num red">120K+</div>
+            <div class="stat-card-label">patients affected (6-7% of 1.8M users)</div>
+            <div class="stat-card-source">ManageMyHealth</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-num orange">108 GB</div>
+            <div class="stat-card-label">of sensitive health data exfiltrated</div>
+            <div class="stat-card-source">BlackVeil Security</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-num yellow">$60K</div>
+            <div class="stat-card-label">ransom demanded (real cost: millions)</div>
+            <div class="stat-card-source">NZ media</div>
+        </div>
+    </div>
+
+    <div class="content-block">
+        <h3>What Was Stolen</h3>
+        <p>The "Kazu" threat group exfiltrated <strong>400,000+ health documents</strong> including clinical notes, lab results, vaccination records, and medical photographs. Multiple general practices across NZ were affected. The Privacy Commissioner launched a formal inquiry.</p>
+    </div>
+
+    <div class="content-block">
+        <h3>Lessons for Every NZ Business</h3>
+        <ul>
+            <li><strong>Small ransoms mask massive costs.</strong> The $60K ransom was nothing compared to the regulatory investigation, legal liability, patient notification, reputational damage, and system rebuilds.</li>
+            <li><strong>Health data is the highest-value target.</strong> Healthcare breaches cost $7.42M on average globally (2025). In NZ, the Privacy Act treats health information as one of the most sensitive categories.</li>
+            <li><strong>Third-party platforms are YOUR responsibility.</strong> If you use a SaaS provider to store client data, a breach of that provider is still YOUR breach. You must have vendor assessment and incident response plans.</li>
+            <li><strong>Data exfiltration happens before you know.</strong> By the time you discover the breach, 108GB of data may already be on the attacker's servers. Prevention and detection are the only real defences.</li>
+        </ul>
+    </div>
+
+    <div class="content-block">
+        <h3>The Wider NZ Threat Landscape (2025-2026)</h3>
+        <ul>
+            <li><strong>$7.8 million lost in Q1 2025 alone</strong> &mdash; a 14.7% increase and the second-highest quarterly loss ever recorded by NCSC. <span style="color:var(--gray-500);">CERT NZ / NCSC</span></li>
+            <li><strong>~1 nationally significant incident per day</strong> handled by the NCSC. 300+ required specialist investigation. <span style="color:var(--gray-500);">NCSC</span></li>
+            <li><strong>26,000 New Zealanders contacted</strong> about Lumma Stealer malware that was harvesting credentials from NZ devices. <span style="color:var(--gray-500);">NCSC</span></li>
+            <li><strong>92 instances of NZ/AU business access sold on the dark web</strong> in 2025. Attackers are actively trading login credentials to NZ companies. <span style="color:var(--gray-500);">NCSC</span></li>
+            <li><strong>25% of nationally significant incidents linked to state-sponsored actors</strong> who increasingly use AI-powered social engineering. <span style="color:var(--gray-500);">NCSC Q1 2025</span></li>
+        </ul>
+    </div>
+
+    <div class="highlight-red highlight">
+        <h3 style="color: var(--red);">The Hard Truth for NZ SMBs</h3>
+        <p><strong>40% of NZ SMBs say a $100,000 attack would shut them down</strong> (VikingCloud 2026). Yet only 38% of breach victims fix the vulnerability that allowed the initial attack (Cobalt). The ManageMyHealth breach shows it can happen to any NZ organisation &mdash; and the consequences are severe. The best time to prepare your response plan was last year. The second best time is now.</p>
+    </div>
+</div>
+
+<!-- ============ HOURS 2-24 ============ -->
+<div class="page">
+    <div class="section-num">Phase 02</div>
+    <div class="section-title">Hours 2 &ndash; 24</div>
+    <div class="section-subtitle">Now that you've contained the immediate threat, assess the damage and start your investigation.</div>
+    <div class="divider"></div>
+
+    <div class="phase-header assess">
+        <div class="phase-icon">&#128269;</div>
+        <div>
+            <div class="phase-title">Investigate &amp; Assess</div>
+            <div class="phase-time orange">Hours 2 &ndash; 24 &bull; Assessment Window</div>
+        </div>
+    </div>
+
+    <div class="step-grid">
+        <div class="step-item">
+            <div class="step-num">7</div>
+            <div class="step-content">
+                <h4>Determine the Scope of the Breach</h4>
+                <p>What data was accessed? Customer records, financial data, health information, employee details? Which systems were compromised? How many records were potentially affected? This determines your legal obligations.</p>
+            </div>
+        </div>
+        <div class="step-item">
+            <div class="step-num">8</div>
+            <div class="step-content">
+                <h4>Identify the Entry Point</h4>
+                <p>Was it phishing? A stolen credential? An unpatched vulnerability? A misconfiguration? Understanding the entry point is essential to preventing re-entry. <strong>90% of incidents involved misconfigurations</strong> that enabled the attack.</p>
+            </div>
+        </div>
+        <div class="step-item">
+            <div class="step-num">9</div>
+            <div class="step-content">
+                <h4>Check for Data Exfiltration</h4>
+                <p>Review logs for large data transfers, unusual outbound connections, or cloud storage access. Attackers often exfiltrate data <strong>before</strong> deploying ransomware. 93% of ransomware victims who paid still had their data stolen.</p>
+            </div>
+        </div>
+        <div class="step-item">
+            <div class="step-num">10</div>
+            <div class="step-content">
+                <h4>Engage Legal Counsel</h4>
+                <p>Your lawyer can advise on Privacy Act obligations, client communication, and insurance claims. If personal data was breached, you likely have a <strong>mandatory notification obligation</strong> under the NZ Privacy Act 2020.</p>
+            </div>
+        </div>
+        <div class="step-item">
+            <div class="step-num">11</div>
+            <div class="step-content">
+                <h4>Notify Your Cyber Insurance Provider</h4>
+                <p>If you have cyber insurance, notify them within the required window (typically 24-48 hours). Delayed notification can void your coverage. Provide your incident timeline and evidence.</p>
+            </div>
+        </div>
+        <div class="step-item">
+            <div class="step-num">12</div>
+            <div class="step-content">
+                <h4>Prepare Internal Communications</h4>
+                <p>Brief your leadership team. Prepare a holding statement for staff. Instruct employees NOT to discuss the breach externally or on social media until the official response is coordinated.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="stat-grid">
+        <div class="stat-card">
+            <div class="stat-card-num red">90%+</div>
+            <div class="stat-card-label">of incidents had misconfigurations enabling the attack</div>
+            <div class="stat-card-source">Unit 42 2026</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-num orange">93%</div>
+            <div class="stat-card-label">who paid ransom still had their data stolen</div>
+            <div class="stat-card-source">Cobalt</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-num cyan">$900K</div>
+            <div class="stat-card-label">saved by detecting breaches internally vs externally</div>
+            <div class="stat-card-source">Cobalt</div>
+        </div>
+    </div>
+</div>
+
+<!-- ============ HOURS 24-72 ============ -->
+<div class="page">
+    <div class="section-num">Phase 03</div>
+    <div class="section-title">Hours 24 &ndash; 72</div>
+    <div class="section-subtitle">Notification, compliance, and beginning recovery. This is where legal obligations kick in.</div>
+    <div class="divider"></div>
+
+    <div class="phase-header comply">
+        <div class="phase-icon">&#128220;</div>
+        <div>
+            <div class="phase-title">Notify &amp; Comply</div>
+            <div class="phase-time cyan">Hours 24 &ndash; 72 &bull; Compliance Window</div>
+        </div>
+    </div>
+
+    <div class="step-grid">
+        <div class="step-item">
+            <div class="step-num">13</div>
+            <div class="step-content">
+                <h4>Report to the NZ Privacy Commissioner</h4>
+                <p>Under the <strong>Privacy Act 2020</strong>, you must notify the Privacy Commissioner of any breach that has caused, or is likely to cause, serious harm. Use NotifyUs: <strong>privacy.org.nz/notify-us</strong>. Report as soon as practicable.</p>
+            </div>
+        </div>
+        <div class="step-item">
+            <div class="step-num">14</div>
+            <div class="step-content">
+                <h4>Notify Affected Individuals</h4>
+                <p>If the breach is likely to cause serious harm, you must also notify the affected individuals. Be honest, clear, and specific about what data was compromised and what actions they should take (e.g., change passwords, monitor accounts).</p>
+            </div>
+        </div>
+        <div class="step-item">
+            <div class="step-num">15</div>
+            <div class="step-content">
+                <h4>Report to CERT NZ / NCSC</h4>
+                <p>Report the incident at <strong>cert.govt.nz/report</strong> or call <strong>0800 CERT NZ</strong>. For nationally significant incidents, the NCSC can provide specialist investigation support. They handled 300+ specialist cases in 2024/25.</p>
+            </div>
+        </div>
+        <div class="step-item">
+            <div class="step-num">16</div>
+            <div class="step-content">
+                <h4>File a Police Report</h4>
+                <p>Report to NZ Police online at <strong>police.govt.nz</strong>. For significant financial loss, contact the Financial Crime Unit. Keep your incident number &mdash; insurers and the Privacy Commissioner may require it.</p>
+            </div>
+        </div>
+        <div class="step-item">
+            <div class="step-num">17</div>
+            <div class="step-content">
+                <h4>Communicate Externally</h4>
+                <p>Prepare a public statement if needed. Be transparent but controlled. Focus on: what happened, what you're doing about it, and what affected parties should do. Avoid blame and speculation. Customers respect honesty.</p>
+            </div>
+        </div>
+        <div class="step-item">
+            <div class="step-num">18</div>
+            <div class="step-content">
+                <h4>Begin Remediation</h4>
+                <p>Patch the vulnerability that was exploited. Only <strong>38% of breach victims fix the vulnerability</strong> that allowed the initial attack. Rebuild compromised systems from clean backups. Do NOT restore from backups that may also be compromised.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="highlight">
+        <h3>NZ Privacy Act 2020 &mdash; Key Requirements</h3>
+        <p>Since December 2020, NZ businesses have a <strong>mandatory obligation</strong> to report privacy breaches that cause or are likely to cause serious harm. Failure to comply can result in fines up to <strong>$10,000</strong> for individuals or <strong>investigation and enforcement action</strong> by the Privacy Commissioner. The ManageMyHealth breach (January 2026) triggered a formal Privacy Commissioner inquiry after 120,000+ patient records were stolen. <span style="color: var(--gray-500);">Source: Privacy Act 2020, NZ media</span></p>
+    </div>
+</div>
+
+<!-- ============ THE DO NOT LIST ============ -->
+<div class="page">
+    <div class="section-num">Critical Mistakes</div>
+    <div class="section-title">The "Do NOT" List</div>
+    <div class="section-subtitle">These common mistakes can turn a bad situation into a catastrophe. Print this page and tape it to the wall.</div>
+    <div class="divider"></div>
+
+    <div class="donot-item">
+        <div class="donot-x">&#10005;</div>
+        <div class="donot-content">
+            <h4>Do NOT Pay the Ransom</h4>
+            <p><strong>83% of businesses that paid were attacked again.</strong> 93% still had their data stolen. Paying funds criminal operations and marks you as a willing payer for future attacks.</p>
+        </div>
+    </div>
+
+    <div class="donot-item">
+        <div class="donot-x">&#10005;</div>
+        <div class="donot-content">
+            <h4>Do NOT Power Off Compromised Machines</h4>
+            <p>RAM contains forensic evidence (encryption keys, running processes, network connections). Disconnect from the network instead. Powering off destroys evidence your investigators need.</p>
+        </div>
+    </div>
+
+    <div class="donot-item">
+        <div class="donot-x">&#10005;</div>
+        <div class="donot-content">
+            <h4>Do NOT Run Antivirus on Compromised Systems</h4>
+            <p>Antivirus can quarantine or delete malware artefacts that forensic investigators need to understand the attack. Wait for professional guidance before cleaning any systems.</p>
+        </div>
+    </div>
+
+    <div class="donot-item">
+        <div class="donot-x">&#10005;</div>
+        <div class="donot-content">
+            <h4>Do NOT Communicate with the Attacker</h4>
+            <p>Unless directed by law enforcement or a professional negotiator. Responding can reveal information about your organisation, signal willingness to pay, or trigger accelerated data destruction.</p>
+        </div>
+    </div>
+
+    <div class="donot-item">
+        <div class="donot-x">&#10005;</div>
+        <div class="donot-content">
+            <h4>Do NOT Delete Logs or Evidence</h4>
+            <p>You may instinctively want to "clean up." Don't. Logs are your evidence trail for the Privacy Commissioner, insurers, police, and your own investigation. Preserve everything.</p>
+        </div>
+    </div>
+
+    <div class="donot-item">
+        <div class="donot-x">&#10005;</div>
+        <div class="donot-content">
+            <h4>Do NOT Restore from Backup Without Verifying It's Clean</h4>
+            <p>Attackers often compromise backups before deploying ransomware. Restoring an infected backup reinfects your systems. Verify backup integrity before any restoration.</p>
+        </div>
+    </div>
+
+    <div class="donot-item">
+        <div class="donot-x">&#10005;</div>
+        <div class="donot-content">
+            <h4>Do NOT Make Public Statements Without Legal Review</h4>
+            <p>What you say publicly can have legal, regulatory, and reputational consequences. Get legal sign-off before any press releases, social media posts, or customer emails.</p>
+        </div>
+    </div>
+
+    <div class="donot-item">
+        <div class="donot-x">&#10005;</div>
+        <div class="donot-content">
+            <h4>Do NOT Assume It's Over</h4>
+            <p>Attackers frequently maintain persistence (backdoors, new accounts, scheduled tasks). Only <strong>38% of breach victims fix the original vulnerability</strong>. Without thorough investigation, they'll be back.</p>
+        </div>
+    </div>
+</div>
+
+<!-- ============ PRINTABLE CHECKLIST ============ -->
+<div class="page">
+    <div class="section-num">Quick Reference</div>
+    <div class="section-title">Printable Response Checklist</div>
+    <div class="section-subtitle">Print this page and keep it accessible. When a breach happens, you won't have time to search for instructions.</div>
+    <div class="divider"></div>
+
+    <div class="content-block" style="margin-bottom:12px;">
+        <h3 style="color:var(--red);">Phase 1: First 60 Minutes</h3>
+    </div>
+    <div class="checklist" style="margin-bottom:20px;">
+        <div class="check-item"><div class="check-box"></div><div class="check-text"><strong>Incident lead designated.</strong> One person coordinating all decisions.</div></div>
+        <div class="check-item"><div class="check-box"></div><div class="check-text"><strong>Affected systems disconnected</strong> from network (NOT powered off).</div></div>
+        <div class="check-item"><div class="check-box"></div><div class="check-text"><strong>All admin passwords changed</strong> from a clean device. MFA enabled.</div></div>
+        <div class="check-item"><div class="check-box"></div><div class="check-text"><strong>Evidence preserved.</strong> Screenshots taken, nothing deleted.</div></div>
+        <div class="check-item"><div class="check-box"></div><div class="check-text"><strong>Timeline log started.</strong> Discovery time, affected systems, current status.</div></div>
+        <div class="check-item"><div class="check-box"></div><div class="check-text"><strong>IR support contacted.</strong> IT provider, cyber partner, or CERT NZ (0800 2378 69).</div></div>
+    </div>
+
+    <div class="content-block" style="margin-bottom:12px;">
+        <h3 style="color:var(--orange);">Phase 2: Hours 2&ndash;24</h3>
+    </div>
+    <div class="checklist" style="margin-bottom:20px;">
+        <div class="check-item"><div class="check-box"></div><div class="check-text"><strong>Breach scope assessed.</strong> What data, which systems, how many records.</div></div>
+        <div class="check-item"><div class="check-box"></div><div class="check-text"><strong>Entry point identified.</strong> Phishing? Credential theft? Unpatched vuln?</div></div>
+        <div class="check-item"><div class="check-box"></div><div class="check-text"><strong>Data exfiltration checked.</strong> Logs reviewed for outbound transfers.</div></div>
+        <div class="check-item"><div class="check-box"></div><div class="check-text"><strong>Legal counsel engaged.</strong> Privacy Act obligations assessed.</div></div>
+        <div class="check-item"><div class="check-box"></div><div class="check-text"><strong>Cyber insurer notified.</strong> Within required window (typically 24&ndash;48h).</div></div>
+        <div class="check-item"><div class="check-box"></div><div class="check-text"><strong>Internal comms prepared.</strong> Leadership briefed, staff instructed.</div></div>
+    </div>
+
+    <div class="content-block" style="margin-bottom:12px;">
+        <h3 style="color:var(--cyan);">Phase 3: Hours 24&ndash;72</h3>
+    </div>
+    <div class="checklist" style="margin-bottom:20px;">
+        <div class="check-item"><div class="check-box"></div><div class="check-text"><strong>Privacy Commissioner notified</strong> via NotifyUs (privacy.org.nz/notify-us).</div></div>
+        <div class="check-item"><div class="check-box"></div><div class="check-text"><strong>Affected individuals notified</strong> with clear, honest information.</div></div>
+        <div class="check-item"><div class="check-box"></div><div class="check-text"><strong>CERT NZ report filed</strong> at cert.govt.nz/report.</div></div>
+        <div class="check-item"><div class="check-box"></div><div class="check-text"><strong>Police report filed.</strong> Incident number recorded.</div></div>
+        <div class="check-item"><div class="check-box"></div><div class="check-text"><strong>External communications sent.</strong> Legal-reviewed, transparent.</div></div>
+        <div class="check-item"><div class="check-box"></div><div class="check-text"><strong>Remediation started.</strong> Vulnerability patched, clean backups verified, rebuild underway.</div></div>
+    </div>
+
+    <div class="two-col">
+        <div class="highlight">
+            <h3>Key NZ Contacts</h3>
+            <p><strong>CERT NZ:</strong> 0800 2378 69<br><strong>CERT NZ report:</strong> cert.govt.nz/report<br><strong>Privacy Commissioner:</strong> privacy.org.nz/notify-us<br><strong>NZ Police online:</strong> police.govt.nz</p>
+        </div>
+        <div class="highlight-red highlight">
+            <h3 style="color:var(--red);">If Ransomware</h3>
+            <p><strong>Do NOT pay.</strong> 83% who pay get attacked again.<br><strong>Do NOT power off.</strong> Evidence is in RAM.<br><strong>Do NOT restore backups</strong> without verification.<br><strong>Call CERT NZ</strong> immediately.</p>
+        </div>
+    </div>
+</div>
+
+<!-- ============ CTA ============ -->
+<div class="cta-page">
+    <div class="section-num" style="margin-bottom:24px;">What's Next</div>
+    <h2>Prepare Before <span>It Happens</span></h2>
+    <p>The businesses that recover fastest are the ones that had a plan before the breach. Don't wait for the call from your IT team at 2am.</p>
+
+    <div class="cta-box">
+        <h3>Find Your Gaps Before Attackers Do</h3>
+        <p>Start with our free security assessment &mdash; 20 questions across 6 domains, with a personalised radar chart, risk exposure in NZD, and a prioritised action plan.</p>
+        <a href="https://www.wehack.co.nz/security-score" class="cta-btn">Take Your Free Security Score &rarr;</a>
+    </div>
+
+    <div style="max-width:500px; margin: 0 auto;">
+        <p style="font-size: 15px; color: var(--gray-300); margin-bottom: 20px;">Every business has different security challenges. Book a free 15-minute chat and we'll recommend the right approach &mdash; no obligation.</p>
+        <p style="font-size: 15px;"><strong>Mustafa Demirsoy</strong><br>Founder &amp; Hacker, WeHack<br><br>
+        <span style="color: var(--cyan);">wehack.co.nz</span> &nbsp;|&nbsp; info@wehack.co.nz &nbsp;|&nbsp; 022 091 7242<br>148 Durham Street, Tauranga 3110</p>
+    </div>
+
+    <div class="report-footer" style="margin-top:48px;">
+        <p>&copy; 2026 WeHack &nbsp;|&nbsp; Data sourced from CrowdStrike 2026 GTR, IBM X-Force 2026, Cobalt, Unit 42, NCSC NZ, CERT NZ, NZ Privacy Act 2020</p>
+        <p style="margin-top:8px;"><a href="https://www.wehack.co.nz">wehack.co.nz</a></p>
+    </div>
+</div>
+
+</body>
+</html>

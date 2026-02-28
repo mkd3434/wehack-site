@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Powered Social Engineering Defence Guide — WeHack</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Questrial&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cyan: #B8F0F0;
+            --green: #C4FF9E;
+            --green-bright: #A9FF8F;
+            --black: #0F0F10;
+            --card: #1A1A1C;
+            --border: #2A2A2E;
+            --teal: #0E99AB;
+            --dark-teal: #133C41;
+            --red: #FF4444;
+            --orange: #FF8C00;
+            --yellow: #FFD700;
+            --blue: #4A9EFF;
+            --purple: #A855F7;
+        }
+
+        @page { size: A4; margin: 0; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Questrial', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: var(--black);
+            color: #E0E0E0;
+            line-height: 1.6;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
+            padding: 50px 60px;
+            page-break-after: always;
+            position: relative;
+        }
+
+        /* ── COVER ── */
+        .cover {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            min-height: 297mm;
+            padding: 60px;
+        }
+        .cover-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--red), var(--orange));
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            padding: 8px 24px;
+            border-radius: 20px;
+            margin-bottom: 40px;
+        }
+        .cover h1 {
+            font-size: 42px;
+            line-height: 1.15;
+            margin-bottom: 16px;
+            color: white;
+        }
+        .cover h1 span {
+            background: linear-gradient(135deg, var(--cyan), var(--green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .cover .subtitle {
+            font-size: 17px;
+            color: #999;
+            margin-bottom: 50px;
+            max-width: 500px;
+        }
+        .cover-stats {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 50px;
+        }
+        .cover-stat {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 22px 24px;
+            text-align: center;
+            min-width: 130px;
+        }
+        .cover-stat .number { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+        .cover-stat .label { font-size: 10px; color: #888; line-height: 1.4; }
+        .cover-stat .source { font-size: 9px; color: #555; margin-top: 4px; }
+        .cover-footer { margin-top: auto; padding-top: 40px; }
+        .cover-footer .brand { font-size: 20px; color: var(--cyan); letter-spacing: 2px; }
+        .cover-footer .tagline { font-size: 12px; color: #666; margin-top: 4px; }
+
+        /* ── COMMON ── */
+        .section-label { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--cyan); margin-bottom: 8px; }
+        .section-title { font-size: 32px; color: white; margin-bottom: 12px; line-height: 1.2; }
+        .section-intro { color: #999; font-size: 14px; margin-bottom: 24px; line-height: 1.6; }
+        .gradient-line { height: 3px; background: linear-gradient(90deg, var(--cyan), var(--green), transparent); border: none; margin: 20px 0 30px; border-radius: 2px; }
+
+        .stat-row { display: flex; gap: 16px; margin: 24px 0; }
+        .stat-card { flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; text-align: center; }
+        .stat-card .number { font-size: 26px; font-weight: 700; margin-bottom: 4px; }
+        .stat-card .label { font-size: 11px; color: #888; line-height: 1.4; }
+        .stat-card .source { font-size: 9px; color: #555; margin-top: 4px; }
+
+        .callout { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; margin: 16px 0; }
+        .callout h4 { color: var(--cyan); font-size: 14px; margin-bottom: 8px; }
+        .callout p, .callout li { font-size: 13px; color: #AAA; line-height: 1.6; }
+        .callout-red { border-left: 4px solid var(--red); }
+        .callout-red h4 { color: var(--red); }
+        .callout-teal { border-left: 4px solid var(--teal); }
+        .callout-orange { border-left: 4px solid var(--orange); }
+        .callout-orange h4 { color: var(--orange); }
+
+        .bullet-list { list-style: none; padding: 0; }
+        .bullet-list li { padding: 5px 0 5px 20px; position: relative; font-size: 13px; color: #AAA; line-height: 1.5; }
+        .bullet-list li::before { content: ''; position: absolute; left: 0; top: 12px; width: 8px; height: 8px; border-radius: 50%; background: var(--cyan); }
+
+        /* ── ATTACK TYPE CARDS ── */
+        .attack-type {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 14px;
+        }
+        .attack-type-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+        .attack-type-icon {
+            width: 40px;
+            height: 40px;
+            min-width: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        .attack-type h3 { font-size: 16px; color: white; }
+        .attack-type .threat-level { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; padding: 2px 8px; border-radius: 4px; }
+        .attack-type p { font-size: 13px; color: #AAA; line-height: 1.5; }
+        .attack-type .source { font-size: 11px; color: var(--teal); }
+
+        /* ── SCENARIO CARDS ── */
+        .scenario {
+            background: linear-gradient(135deg, rgba(255,68,68,0.05), rgba(255,140,0,0.05));
+            border: 1px solid rgba(255,68,68,0.2);
+            border-radius: 12px;
+            padding: 18px 22px;
+            margin: 12px 0;
+        }
+        .scenario h4 { color: var(--red); font-size: 13px; margin-bottom: 6px; letter-spacing: 1px; text-transform: uppercase; }
+        .scenario p { font-size: 12px; color: #AAA; line-height: 1.5; }
+        .scenario .dialogue { font-style: italic; color: #CCC; margin: 8px 0; padding-left: 16px; border-left: 2px solid var(--orange); }
+
+        /* ── DEFENCE STEPS ── */
+        .defence-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 18px 22px;
+            margin-bottom: 12px;
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+        }
+        .defence-num {
+            width: 34px; height: 34px; min-width: 34px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--cyan), var(--green));
+            color: var(--black);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; font-weight: 700; margin-top: 2px;
+        }
+        .defence-card h3 { font-size: 15px; color: white; margin-bottom: 4px; }
+        .defence-card p { font-size: 12px; color: #AAA; line-height: 1.5; }
+
+        /* ── VERIFICATION PROTOCOL ── */
+        .protocol-step {
+            display: flex; gap: 16px; align-items: flex-start;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .protocol-step:last-child { border-bottom: none; }
+        .protocol-icon {
+            width: 36px; height: 36px; min-width: 36px;
+            border-radius: 50%; display: flex;
+            align-items: center; justify-content: center;
+            font-size: 16px;
+        }
+        .protocol-step h4 { font-size: 14px; color: white; margin-bottom: 2px; }
+        .protocol-step p { font-size: 12px; color: #AAA; line-height: 1.4; }
+
+        /* ── CHECKLIST ── */
+        .check-item {
+            display: flex; align-items: flex-start; gap: 12px;
+            padding: 8px 0; border-bottom: 1px solid var(--border);
+        }
+        .check-item:last-child { border-bottom: none; }
+        .check-box {
+            width: 20px; height: 20px; min-width: 20px;
+            border: 2px solid var(--cyan); border-radius: 4px; margin-top: 1px;
+        }
+        .check-item .label { font-size: 13px; color: white; }
+        .check-item .desc { font-size: 11px; color: #888; }
+
+        /* ── CTA ── */
+        .cta-box {
+            background: linear-gradient(135deg, var(--teal), #0BBD8B);
+            border-radius: 16px; padding: 40px; text-align: center; margin: 30px 0;
+        }
+        .cta-box h3 { font-size: 24px; color: white; margin-bottom: 12px; }
+        .cta-box p { color: rgba(255,255,255,0.85); font-size: 14px; margin-bottom: 20px; }
+        .cta-btn {
+            display: inline-block; background: var(--green-bright); color: var(--black);
+            font-size: 15px; font-weight: 700; padding: 14px 36px;
+            border-radius: 8px; text-decoration: none;
+        }
+        .pricing-row { display: flex; gap: 20px; justify-content: center; margin-top: 30px; }
+        .pricing-card {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 22px 28px; text-align: center; min-width: 150px;
+        }
+        .pricing-card h4 { font-size: 12px; color: #999; margin-bottom: 4px; }
+        .pricing-card .price { font-size: 20px; color: var(--green); font-weight: 700; }
+        .pricing-card .desc { font-size: 11px; color: #666; margin-top: 4px; }
+        .footer { text-align: center; padding: 30px 0; color: #555; font-size: 12px; }
+        .footer a { color: var(--cyan); text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+<!-- ═══════════════ COVER ═══════════════ -->
+<div class="page cover">
+    <div class="cover-badge">Critical Threat Brief</div>
+    <h1>AI-Powered<br><span>Social Engineering</span><br>Defence Guide</h1>
+    <p class="subtitle">How AI-generated phishing, voice cloning, and deepfake video calls are being weaponised against businesses — and what you can do about it.</p>
+
+    <div class="cover-stats">
+        <div class="cover-stat">
+            <div class="number" style="color: var(--red);">1,760%</div>
+            <div class="label">increase in AI-driven<br>BEC attacks since 2022</div>
+            <div class="source">Hoxhunt 2025</div>
+        </div>
+        <div class="cover-stat">
+            <div class="number" style="color: var(--orange);">60%</div>
+            <div class="label">of recipients fall for<br>AI-generated phishing</div>
+            <div class="source">StrongestLayer 2026</div>
+        </div>
+        <div class="cover-stat">
+            <div class="number" style="color: var(--yellow);">$40B</div>
+            <div class="label">projected deepfake<br>fraud losses by 2027</div>
+            <div class="source">DeepStrike</div>
+        </div>
+    </div>
+
+    <div class="cover-footer">
+        <div class="brand">WEHACK</div>
+        <div class="tagline">We hack you before they do.</div>
+    </div>
+</div>
+
+<!-- ═══════════════ THE NEW THREAT LANDSCAPE ═══════════════ -->
+<div class="page">
+    <div class="section-label">THE SHIFT</div>
+    <h2 class="section-title">Social Engineering<br>Has Been Weaponised by AI</h2>
+    <p class="section-intro">In 2024, social engineering was already the #1 attack vector. In 2025-2026, generative AI has industrialised it. Attacks that once took days of manual research now take seconds. The quality is indistinguishable from legitimate communication.</p>
+    <hr class="gradient-line">
+
+    <div class="stat-row">
+        <div class="stat-card">
+            <div class="number" style="color: var(--red);">80%+</div>
+            <div class="label">of phishing emails now<br>AI-generated</div>
+            <div class="source">StrongestLayer 2025</div>
+        </div>
+        <div class="stat-card">
+            <div class="number" style="color: var(--orange);">4x</div>
+            <div class="label">higher click-through for<br>AI-crafted phishing</div>
+            <div class="source">Programs.com</div>
+        </div>
+        <div class="stat-card">
+            <div class="number" style="color: var(--yellow);">89%</div>
+            <div class="label">increase in AI-enabled<br>attacks YoY</div>
+            <div class="source">CrowdStrike 2026 GTR</div>
+        </div>
+    </div>
+
+    <div class="attack-flow" style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;margin:16px 0;">
+        <h4 style="text-align:center;color:#888;font-size:11px;letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;">The AI Social Engineering Kill Chain</h4>
+        <svg viewBox="0 0 620 160" xmlns="http://www.w3.org/2000/svg" style="width:100%;">
+            <defs>
+                <marker id="arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+                    <path d="M0,0 L8,3 L0,6" fill="#666"/>
+                </marker>
+            </defs>
+            <!-- Flow -->
+            <line x1="105" y1="50" x2="140" y2="50" stroke="#444" stroke-width="2" marker-end="url(#arr)"/>
+            <line x1="240" y1="50" x2="275" y2="50" stroke="#444" stroke-width="2" marker-end="url(#arr)"/>
+            <line x1="375" y1="50" x2="410" y2="50" stroke="#444" stroke-width="2" marker-end="url(#arr)"/>
+            <line x1="510" y1="50" x2="545" y2="50" stroke="#444" stroke-width="2" marker-end="url(#arr)"/>
+            <!-- Boxes -->
+            <rect x="5" y="20" width="100" height="60" rx="8" fill="#1A1A1C" stroke="#A855F7" stroke-width="2"/>
+            <text x="55" y="45" text-anchor="middle" fill="#A855F7" font-size="10" font-weight="600">AI OSINT</text>
+            <text x="55" y="60" text-anchor="middle" fill="#888" font-size="9">Scrape LinkedIn</text>
+
+            <rect x="140" y="20" width="100" height="60" rx="8" fill="#1A1A1C" stroke="#FF4444" stroke-width="2"/>
+            <text x="190" y="45" text-anchor="middle" fill="#FF4444" font-size="10" font-weight="600">AI Generates</text>
+            <text x="190" y="60" text-anchor="middle" fill="#888" font-size="9">Email/Voice/Video</text>
+
+            <rect x="275" y="20" width="100" height="60" rx="8" fill="#1A1A1C" stroke="#FF8C00" stroke-width="2"/>
+            <text x="325" y="45" text-anchor="middle" fill="#FF8C00" font-size="10" font-weight="600">Deliver</text>
+            <text x="325" y="60" text-anchor="middle" fill="#888" font-size="9">Multi-Channel</text>
+
+            <rect x="410" y="20" width="100" height="60" rx="8" fill="#1A1A1C" stroke="#FFD700" stroke-width="2"/>
+            <text x="460" y="45" text-anchor="middle" fill="#FFD700" font-size="10" font-weight="600">Manipulate</text>
+            <text x="460" y="60" text-anchor="middle" fill="#888" font-size="9">Urgency/Trust</text>
+
+            <rect x="545" y="20" width="70" height="60" rx="8" fill="#1A1A1C" stroke="#FF4444" stroke-width="2"/>
+            <text x="580" y="45" text-anchor="middle" fill="#FF4444" font-size="10" font-weight="600">Exploit</text>
+            <text x="580" y="60" text-anchor="middle" fill="#888" font-size="9">$$$</text>
+
+            <!-- Bottom detail -->
+            <text x="55" y="108" text-anchor="middle" fill="#555" font-size="8">Scrapes your website,</text>
+            <text x="55" y="120" text-anchor="middle" fill="#555" font-size="8">social media, press</text>
+            <text x="190" y="108" text-anchor="middle" fill="#555" font-size="8">Personalised to your</text>
+            <text x="190" y="120" text-anchor="middle" fill="#555" font-size="8">context in seconds</text>
+            <text x="325" y="108" text-anchor="middle" fill="#555" font-size="8">Email + call + video</text>
+            <text x="325" y="120" text-anchor="middle" fill="#555" font-size="8">in coordinated attack</text>
+            <text x="460" y="108" text-anchor="middle" fill="#555" font-size="8">CEO voice clone says</text>
+            <text x="460" y="120" text-anchor="middle" fill="#555" font-size="8">"transfer now"</text>
+            <text x="580" y="108" text-anchor="middle" fill="#555" font-size="8">Wire transfer,</text>
+            <text x="580" y="120" text-anchor="middle" fill="#555" font-size="8">data theft</text>
+        </svg>
+    </div>
+
+    <ul class="bullet-list">
+        <li><strong>BEC now makes up 50%+ of all social engineering incidents.</strong> Organisations with fewer than 1,000 employees have a 70% weekly probability of experiencing at least one BEC attack. <span style="color:var(--teal);">Hoxhunt 2025</span></li>
+        <li><strong>Average BEC wire transfer request: $24,586.</strong> FBI IC3 logged $2.7 billion in BEC losses in 2024 alone — and that's only what was reported. <span style="color:var(--teal);">FBI IC3 2024</span></li>
+        <li><strong>73% of organisations affected by cyber-enabled fraud in 2025.</strong> AI has made social engineering profitable at industrial scale. <span style="color:var(--teal);">WEF Global Cybersecurity Outlook 2026</span></li>
+        <li><strong>AI scams surged 1,210% in 2025</strong> — growing 6x faster than traditional fraud. The tools are free, the barrier to entry is zero, and the quality is expert-level. <span style="color:var(--teal);">Vectra AI</span></li>
+    </ul>
+</div>
+
+<!-- ═══════════════ THE 5 ATTACK VECTORS ═══════════════ -->
+<div class="page">
+    <div class="section-label">ATTACK VECTORS</div>
+    <h2 class="section-title">The 5 AI-Powered Attacks<br>Targeting Your Business</h2>
+    <p class="section-intro">Each of these is being actively used against NZ businesses right now. Understanding them is the first step to defending against them.</p>
+    <hr class="gradient-line">
+
+    <div class="attack-type">
+        <div class="attack-type-header">
+            <div class="attack-type-icon" style="background:rgba(255,68,68,0.15);">📧</div>
+            <div>
+                <h3>1. AI-Generated Phishing Emails</h3>
+                <span class="threat-level" style="background:rgba(255,68,68,0.15);color:var(--red);">Critical Threat</span>
+            </div>
+        </div>
+        <p>AI generates grammatically perfect, contextually aware phishing emails at scale. Gone are the obvious "Dear Sir/Madam" scams with spelling errors. Modern AI phishing references your recent projects, uses your company's tone of voice, and targets specific employees with personalised pretexts. By early 2025, 80%+ of phishing emails were AI-generated.</p>
+        <p class="source" style="margin-top:6px;">Click-through rate: 54% for AI phishing vs 12% for traditional — StrongestLayer 2025</p>
+    </div>
+
+    <div class="attack-type">
+        <div class="attack-type-header">
+            <div class="attack-type-icon" style="background:rgba(255,140,0,0.15);">🎙️</div>
+            <div>
+                <h3>2. Voice Cloning & Vishing</h3>
+                <span class="threat-level" style="background:rgba(255,140,0,0.15);color:var(--orange);">High Threat</span>
+            </div>
+        </div>
+        <p>3 seconds of audio is all it takes to clone a voice at 85% accuracy. Attackers scrape CEO interviews, conference talks, or voicemail greetings, then generate convincing voice calls. 680% increase in voice cloning fraud year-over-year. 400 companies per day are targeted by CEO deepfake voice fraud. 77% of voice clone victims suffered financial loss. A Swiss businessman lost several million francs to a cloned business partner voice in January 2026.</p>
+        <p class="source" style="margin-top:6px;">DeepStrike 2025, Vectra AI 2026</p>
+    </div>
+
+    <div class="attack-type">
+        <div class="attack-type-header">
+            <div class="attack-type-icon" style="background:rgba(255,215,0,0.15);">📹</div>
+            <div>
+                <h3>3. Deepfake Video Calls</h3>
+                <span class="threat-level" style="background:rgba(255,215,0,0.15);color:var(--yellow);">Growing Threat</span>
+            </div>
+        </div>
+        <p>Real-time deepfake video impersonation on Zoom/Teams calls. The $25 million Arup Corporation loss came from a deepfake video call where every participant except the victim was fake. 700% surge in deepfake video scams in 2025. Only 24.5% of humans can reliably identify high-quality deepfake video. 80% of companies have no deepfake response protocols.</p>
+        <p class="source" style="margin-top:6px;">Brightside AI, ScamWatch HQ 2025, DeepStrike</p>
+    </div>
+
+    <div class="attack-type">
+        <div class="attack-type-header">
+            <div class="attack-type-icon" style="background:rgba(168,85,247,0.15);">🔍</div>
+            <div>
+                <h3>4. AI-Powered Pretexting & OSINT</h3>
+                <span class="threat-level" style="background:rgba(168,85,247,0.15);color:var(--purple);">High Threat</span>
+            </div>
+        </div>
+        <p>AI agents scrape LinkedIn, company websites, press releases, and social media to build detailed profiles of targets. They identify reporting structures, recent projects, upcoming events, and communication patterns — then craft attack scenarios that perfectly match the target's context. What used to take a human attacker days of research takes AI minutes.</p>
+        <p class="source" style="margin-top:6px;">87% of businesses say AI makes social engineering more convincing — Cobalt 2025</p>
+    </div>
+
+    <div class="attack-type">
+        <div class="attack-type-header">
+            <div class="attack-type-icon" style="background:rgba(74,158,255,0.15);">🤖</div>
+            <div>
+                <h3>5. Multi-Channel Coordinated Attacks</h3>
+                <span class="threat-level" style="background:rgba(74,158,255,0.15);color:var(--blue);">Emerging Threat</span>
+            </div>
+        </div>
+        <p>The most sophisticated attacks combine multiple vectors: an AI-generated email referencing a real invoice, followed by a voice-cloned phone call from the "CEO" to add urgency, potentially even a deepfake video call for confirmation. Each layer reinforces the others. When the same persona appears across email, phone, and video, human suspicion drops dramatically.</p>
+        <p class="source" style="margin-top:6px;">87% of attacks span multiple surfaces — Unit 42 2026</p>
+    </div>
+</div>
+
+<!-- ═══════════════ REAL-WORLD SCENARIOS ═══════════════ -->
+<div class="page">
+    <div class="section-label">HOW IT HAPPENS</div>
+    <h2 class="section-title">Real-World Attack Scenarios</h2>
+    <p class="section-intro">These aren't hypothetical. Every scenario below has been observed in the wild in 2025-2026. Any one of them could target your business tomorrow.</p>
+    <hr class="gradient-line">
+
+    <div class="scenario">
+        <h4>Scenario 1: The Urgent Wire Transfer</h4>
+        <p>Your CFO receives an email from the CEO about an urgent, confidential acquisition that requires an immediate wire transfer. The email is perfectly written, references a board meeting from last week, and is followed 10 minutes later by a phone call — in the CEO's cloned voice — confirming the request.</p>
+        <div class="dialogue">"Hey Sarah, it's Mark. Listen, did you get my email about the Meridian deal? The lawyers need the deposit by 3pm or we lose the bid. Can you process the $47,000 transfer? I've sent the details. I'm heading into another meeting — just let me know when it's done."</div>
+        <p><strong>Why it works:</strong> Email + voice creates dual-channel confirmation. The urgency prevents verification. The reference to a real meeting (scraped from LinkedIn) adds credibility. Average loss: $24,586 per BEC attempt.</p>
+    </div>
+
+    <div class="scenario">
+        <h4>Scenario 2: The Fake Video Call</h4>
+        <p>A finance team member is invited to a Zoom call with the "Regional Director" and "External Auditor" to discuss an emergency audit finding. Both participants are deepfakes. They instruct the employee to transfer funds to a "secure holding account" while the audit is resolved. The Arup Corporation lost $25M to this exact pattern.</p>
+        <p><strong>Why it works:</strong> Multiple authority figures on camera. Real-time interaction feels authentic. Urgency + authority + secrecy = perfect manipulation.</p>
+    </div>
+
+    <div class="scenario">
+        <h4>Scenario 3: The Vendor Invoice Redirect</h4>
+        <p>Your accounts payable team receives an email from a regular supplier — identical formatting, correct reference numbers, same contact name — with "updated banking details." The email is actually an AI-generated perfect copy, sent from a typosquatted domain (e.g., supp1ier.co.nz instead of supplier.co.nz).</p>
+        <p><strong>Why it works:</strong> References real purchase orders (scraped from compromised email). Uses identical branding. The domain change is near-invisible. NZ businesses lose millions annually to payment redirection fraud.</p>
+    </div>
+
+    <div class="scenario">
+        <h4>Scenario 4: The IT Support Callback</h4>
+        <p>An employee receives an email about a "security alert" on their M365 account, followed by a phone call from "IT Support" using a cloned voice of your actual IT manager. They're guided through resetting their password — to one the attacker controls. The 563% increase in fake CAPTCHA lures feeds exactly into this pattern.</p>
+        <p><strong>Why it works:</strong> Combines phishing anxiety with familiar voice. The employee thinks they're fixing a problem. The attacker gets live M365 credentials.</p>
+    </div>
+
+    <div class="callout callout-red" style="margin-top:12px;">
+        <h4>The NZ Context</h4>
+        <p>NZ's relatively high-trust business culture makes social engineering especially effective. We default to trusting people we "know." Add AI-generated voice and video that sounds exactly like someone we know, and our natural defences are bypassed. The 26,000 New Zealanders affected by Lumma Stealer credential theft mean there's already a pool of compromised NZ business credentials being traded on dark web markets.</p>
+    </div>
+</div>
+
+<!-- ═══════════════ THE DEFENCE FRAMEWORK ═══════════════ -->
+<div class="page">
+    <div class="section-label">YOUR DEFENCES</div>
+    <h2 class="section-title">The 8-Step<br>Defence Framework</h2>
+    <p class="section-intro">Technical controls aren't enough — social engineering targets humans. You need to change how your organisation makes decisions, verifies requests, and responds to pressure.</p>
+    <hr class="gradient-line">
+
+    <div class="defence-card">
+        <div class="defence-num">1</div>
+        <div>
+            <h3>Implement a Verification Protocol for Financial Requests</h3>
+            <p>Any wire transfer, payment change, or financial instruction over a threshold (e.g., $1,000) requires verification via a pre-agreed second channel. If the request came by email → verify by phone (using a known number, NOT a number in the email). If it came by phone → verify by a separate call back to a known number. Never verify through the same channel the request arrived on.</p>
+        </div>
+    </div>
+
+    <div class="defence-card">
+        <div class="defence-num">2</div>
+        <div>
+            <h3>Create a "Codeword" System for Sensitive Requests</h3>
+            <p>Establish rotating codewords that must be used for authorisation of high-value transactions, account changes, or credential resets. A voice clone can replicate how someone sounds — but it can't know a codeword that was shared in person. Change codewords monthly. Keep them off any digital system.</p>
+        </div>
+    </div>
+
+    <div class="defence-card">
+        <div class="defence-num">3</div>
+        <div>
+            <h3>Train Staff on AI-Specific Red Flags</h3>
+            <p>Traditional phishing training is outdated. Staff need to recognise: unusual urgency combined with secrecy ("don't tell anyone about this yet"), requests that bypass normal approval processes, any request for payment detail changes via email only, and video calls where participants seem slightly "off" (lighting, lip sync, eye contact). Security awareness training reduces phishing success by 86% after 1 year.</p>
+        </div>
+    </div>
+
+    <div class="defence-card">
+        <div class="defence-num">4</div>
+        <div>
+            <h3>Enforce Dual-Authorisation for All Payments</h3>
+            <p>No single person should be able to authorise or execute payments above a defined threshold. Require two-person sign-off with mandatory cooling-off period (even 30 minutes breaks the urgency manipulation). This one control alone would prevent the majority of BEC losses.</p>
+        </div>
+    </div>
+
+    <div class="defence-card">
+        <div class="defence-num">5</div>
+        <div>
+            <h3>Harden Your Digital Footprint</h3>
+            <p>AI-powered attacks start with reconnaissance. Reduce what attackers can learn: limit employee personal details on LinkedIn (job title is fine — reporting structure and project details feed attacks), review what your website reveals (team photos, bios, org charts), and check that ex-employee accounts are disabled immediately. The less data available, the harder it is to craft a convincing attack.</p>
+        </div>
+    </div>
+
+    <div class="defence-card">
+        <div class="defence-num">6</div>
+        <div>
+            <h3>Deploy AI-Aware Email Security</h3>
+            <p>Traditional email filters catch known threats. AI-generated phishing is unique each time — it evades signature-based detection. Deploy email security that uses AI/ML to analyse writing style, sender behaviour, and content anomalies. Configure M365 Defender with anti-phishing, Safe Links, and impersonation protection (see our M365 Hardening Guide).</p>
+        </div>
+    </div>
+
+    <div class="defence-card">
+        <div class="defence-num">7</div>
+        <div>
+            <h3>Establish a "Report Without Blame" Culture</h3>
+            <p>95% of breaches involve human error. If employees fear punishment for clicking a link or falling for a scam, they'll hide it — giving attackers more time. Create a no-blame reporting channel. Celebrate catches. Run simulated phishing tests to normalise the reporting process. The faster someone reports a suspicious interaction, the less damage occurs.</p>
+        </div>
+    </div>
+
+    <div class="defence-card">
+        <div class="defence-num">8</div>
+        <div>
+            <h3>Test Your Defences with Social Engineering Assessments</h3>
+            <p>The only way to know if your training and processes actually work is to test them. Professional social engineering assessments use the same AI tools and techniques that attackers use — phishing simulations, vishing calls, pretexting scenarios — in a controlled, authorised engagement. Find your weak spots before attackers do.</p>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════ VERIFICATION PROTOCOL ═══════════════ -->
+<div class="page">
+    <div class="section-label">QUICK REFERENCE</div>
+    <h2 class="section-title">The Verification Protocol</h2>
+    <p class="section-intro">Print this and give it to every employee who handles finances, credentials, or sensitive data. When in doubt — verify.</p>
+    <hr class="gradient-line">
+
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:20px;">
+        <h3 style="font-size:16px;color:white;margin-bottom:16px;text-align:center;">Before Approving Any Financial Request</h3>
+
+        <div class="protocol-step">
+            <div class="protocol-icon" style="background:rgba(255,68,68,0.15);color:var(--red);">🛑</div>
+            <div>
+                <h4>STOP — Don't Act Under Pressure</h4>
+                <p>If someone says "this is urgent" or "don't discuss this with anyone" — that's the red flag. Real emergencies allow 30 minutes of verification.</p>
+            </div>
+        </div>
+
+        <div class="protocol-step">
+            <div class="protocol-icon" style="background:rgba(255,140,0,0.15);color:var(--orange);">📞</div>
+            <div>
+                <h4>VERIFY — Call a Known Number</h4>
+                <p>Call the requester back on a phone number you already have (from your contacts, not from the email or message). If it was your CEO — call their mobile. If it was a supplier — call the number on your original contract, not the one in the email.</p>
+            </div>
+        </div>
+
+        <div class="protocol-step">
+            <div class="protocol-icon" style="background:rgba(255,215,0,0.15);color:var(--yellow);">🔑</div>
+            <div>
+                <h4>CONFIRM — Use the Codeword</h4>
+                <p>Ask for the current verification codeword. A voice clone can sound like your CEO but cannot know this week's codeword. If they can't provide it, treat it as suspicious.</p>
+            </div>
+        </div>
+
+        <div class="protocol-step">
+            <div class="protocol-icon" style="background:rgba(74,158,255,0.15);color:var(--blue);">👥</div>
+            <div>
+                <h4>AUTHORISE — Get Second Sign-Off</h4>
+                <p>No single person approves payments above your threshold. Walk to a colleague's desk. Send a separate message. Get eyes on the request from someone who wasn't part of the original communication chain.</p>
+            </div>
+        </div>
+
+        <div class="protocol-step">
+            <div class="protocol-icon" style="background:rgba(169,255,143,0.15);color:var(--green);">📝</div>
+            <div>
+                <h4>DOCUMENT — Log Everything</h4>
+                <p>Record the request details, who verified, and when. If it turns out to be legitimate — great, you have a paper trail. If it was an attack — you have evidence for insurers, police, and the Privacy Commissioner.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="stat-row">
+        <div class="stat-card" style="flex:1;">
+            <div class="number" style="color:var(--red);font-size:22px;">$2.7B</div>
+            <div class="label">BEC losses reported to<br>FBI IC3 in 2024</div>
+            <div class="source">FBI IC3</div>
+        </div>
+        <div class="stat-card" style="flex:1;">
+            <div class="number" style="color:var(--orange);font-size:22px;">70%</div>
+            <div class="label">can't distinguish real<br>voice from AI clone</div>
+            <div class="source">DeepStrike</div>
+        </div>
+        <div class="stat-card" style="flex:1;">
+            <div class="number" style="color:var(--green);font-size:22px;">86%</div>
+            <div class="label">reduction in phishing<br>after training</div>
+            <div class="source">Cobalt</div>
+        </div>
+    </div>
+
+    <div class="callout callout-teal">
+        <h4>AI Detection Tips for Video Calls</h4>
+        <ul class="bullet-list" style="margin-top:8px;">
+            <li>Ask the person to turn their head sideways or wave their hand in front of their face — current deepfakes struggle with occlusion</li>
+            <li>Watch for micro-delays between lip movement and audio — even slight desync is unnatural</li>
+            <li>Request they hold up a specific number of fingers or perform an unexpected action</li>
+            <li>Look for unnatural lighting on the face, especially around jaw/hairline edges</li>
+            <li>If something feels "off" — trust your instinct and verify through another channel</li>
+        </ul>
+    </div>
+</div>
+
+<!-- ═══════════════ ADVANCED: ATTACKER TOOLCHAIN ═══════════════ -->
+<div class="page">
+    <div class="section-label">ADVANCED INTELLIGENCE</div>
+    <h2 class="section-title">Inside the Attacker's<br>AI Toolchain (2026)</h2>
+    <p class="section-intro">Understanding what tools attackers actually use helps you build better defences. This isn't theoretical — these are the tools and techniques we see in active campaigns and simulate in our penetration tests.</p>
+    <hr class="gradient-line">
+
+    <div class="callout callout-red">
+        <h4>🎭 The Phishing Kit: Tycoon 2FA / EvilProxy / Evilginx</h4>
+        <p>These are reverse-proxy phishing frameworks that sit between the victim and the real Microsoft 365 login page. The victim sees a pixel-perfect copy of the real login, enters their credentials AND completes MFA — the proxy captures the session token post-authentication. The Tycoon phishing kit was the primary tool behind the December 2025 campaign that compromised 3,000+ M365 accounts across 900 organisations. These kits cost $200-400/month on criminal forums and require zero coding skill to deploy.</p>
+        <p style="margin-top:6px;font-size:12px;color:var(--red);">Defence: Phishing-resistant MFA (FIDO2 keys), Conditional Access token binding, Continuous Access Evaluation (CAE)</p>
+    </div>
+
+    <div class="callout callout-orange">
+        <h4>🎙️ Voice Cloning: ElevenLabs / RVC / So-VITS</h4>
+        <p>Commercial voice cloning services can create a convincing voice clone from as little as 3 seconds of audio. Open-source alternatives (RVC, So-VITS) run locally and leave no cloud traces. Attackers scrape CEO interviews from YouTube, conference recordings, or even company voicemail greetings. The quality is now indistinguishable from real speech in 70% of cases. Real-time voice conversion allows live phone conversations in a cloned voice — the attacker speaks naturally and the AI converts their voice to the target's in real-time with ~200ms latency.</p>
+        <p style="margin-top:6px;font-size:12px;color:var(--orange);">Defence: Codeword systems, callback verification to known numbers, never trust voice alone for authorisation</p>
+    </div>
+
+    <div class="callout" style="border-left:4px solid var(--yellow);">
+        <h4 style="color:var(--yellow);">📹 Deepfake Video: DeepFaceLive / FaceFusion / SimSwap</h4>
+        <p>Real-time face-swapping tools can run a deepfake during a live Zoom/Teams call. The attacker's webcam feed is replaced by a generated face that matches the target's appearance and moves in real-time. Current generation tools achieve 90%+ accuracy with good lighting. The $25M Arup loss used this technology — every participant on the call except the victim was a deepfake. 159,378 unique deepfake scam instances were detected in Q4 2025 alone (Gen Threat Labs).</p>
+        <p style="margin-top:6px;font-size:12px;color:var(--yellow);">Defence: Occlusion tests (hand in front of face), unexpected actions, side-profile requests, out-of-band verification</p>
+    </div>
+
+    <div class="callout" style="border-left:4px solid var(--purple);">
+        <h4 style="color:var(--purple);">🔍 AI OSINT: GPT-Researcher / Perplexity / Custom Agents</h4>
+        <p>AI research agents can compile a comprehensive target profile in minutes. They cross-reference LinkedIn, company websites, press releases, court records, Companies Office filings, and social media. They identify reporting structures, recent deals, communication styles, and personal interests. An attacker's AI agent can generate 50 personalised phishing emails in the time it takes a human to write one — each tailored to the recipient's role, recent activity, and communication preferences.</p>
+        <p style="margin-top:6px;font-size:12px;color:var(--purple);">Defence: Reduce digital footprint, limit LinkedIn detail, review what's publicly accessible about your organisation</p>
+    </div>
+
+    <div class="callout callout-teal">
+        <h4>The Multi-Modal Attack Stack</h4>
+        <p>The most sophisticated campaigns combine all of the above: AI OSINT builds the target profile → AI generates a contextually perfect phishing email → voice clone follows up by phone → deepfake video call for "confirmation." Each layer reinforces the others. The entire attack can be orchestrated by a single person using commercially available tools for under $1,000/month. This is why traditional security awareness training (built around grammar errors and suspicious domains) is no longer sufficient.</p>
+    </div>
+</div>
+
+<!-- ═══════════════ PSYCHOLOGY OF AI MANIPULATION ═══════════════ -->
+<div class="page">
+    <div class="section-label">THE PSYCHOLOGY</div>
+    <h2 class="section-title">Why AI Social Engineering<br>Works So Well</h2>
+    <p class="section-intro">Understanding the psychological principles being exploited is the deepest layer of defence. AI doesn't just automate attacks — it weaponises cognitive biases at scale.</p>
+    <hr class="gradient-line">
+
+    <div class="attack-type">
+        <div class="attack-type-header">
+            <div class="attack-type-icon" style="background:rgba(255,68,68,0.15);">⚡</div>
+            <div><h3>Urgency Exploitation</h3></div>
+        </div>
+        <p>AI-generated messages create time pressure that triggers the amygdala (fight-or-flight), bypassing the prefrontal cortex (rational analysis). When your "CEO" calls at 4:50pm on a Friday saying a transfer needs to happen before close of business, your brain prioritises compliance over verification. AI can identify the optimal timing for each target based on their calendar, timezone, and communication patterns.</p>
+    </div>
+
+    <div class="attack-type">
+        <div class="attack-type-header">
+            <div class="attack-type-icon" style="background:rgba(255,140,0,0.15);">👔</div>
+            <div><h3>Authority Amplification</h3></div>
+        </div>
+        <p>Milgram's obedience experiments showed that 65% of people will follow authority figures even against their better judgment. AI supercharges this by replicating the exact voice, face, and communication style of authority figures. When the request comes from someone who looks, sounds, and writes exactly like your CEO — your brain's authority compliance circuits override your suspicion circuits. This is exponentially more effective than a text-only email.</p>
+    </div>
+
+    <div class="attack-type">
+        <div class="attack-type-header">
+            <div class="attack-type-icon" style="background:rgba(255,215,0,0.15);">🤝</div>
+            <div><h3>Trust Network Poisoning</h3></div>
+        </div>
+        <p>AI builds rapport by referencing real shared experiences, recent events, and personal details scraped from social media. It creates a sense of existing relationship. When combined with voice cloning, the victim's brain activates recognition pathways — "I know this person, I trust this person." NZ's high-trust business culture is particularly vulnerable. We default to assuming good intent, especially with people we "recognise."</p>
+    </div>
+
+    <div class="attack-type">
+        <div class="attack-type-header">
+            <div class="attack-type-icon" style="background:rgba(74,158,255,0.15);">🧠</div>
+            <div><h3>Cognitive Load Overload</h3></div>
+        </div>
+        <p>Multi-channel attacks (email + call + video) overwhelm the brain's ability to critically evaluate each interaction. When you're processing visual input (deepfake video), audio input (cloned voice), and a complex request simultaneously, your capacity for suspicion drops dramatically. AI deliberately uses this — adding technical jargon, multiple reference numbers, and time pressure to maximise cognitive load and minimise critical thinking.</p>
+    </div>
+
+    <div class="stat-row">
+        <div class="stat-card">
+            <div class="number" style="color: var(--red);font-size:22px;">65%</div>
+            <div class="label">obey authority figures<br>against better judgment</div>
+            <div class="source">Milgram, replicated 2023</div>
+        </div>
+        <div class="stat-card">
+            <div class="number" style="color: var(--orange);font-size:22px;">95%</div>
+            <div class="label">of breaches involve<br>human error</div>
+            <div class="source">Cobalt</div>
+        </div>
+        <div class="stat-card">
+            <div class="number" style="color: var(--green);font-size:22px;">86%</div>
+            <div class="label">phishing reduction<br>after awareness training</div>
+            <div class="source">Cobalt</div>
+        </div>
+    </div>
+
+    <div class="callout callout-teal">
+        <h4>The Counter-Intuitive Defence</h4>
+        <p>The most effective defence against AI social engineering isn't technology — it's <strong>process</strong>. Technology detects threats; process prevents exploitation. A simple rule like "no wire transfer over $5,000 without two-person authorisation and callback verification" would prevent the majority of BEC losses. The Arup $25M loss could have been prevented by one phone call to a known number. Build processes that assume compromise and require verification, regardless of how "legitimate" a request appears.</p>
+    </div>
+</div>
+
+<!-- ═══════════════ CTA PAGE ═══════════════ -->
+<div class="page" style="display:flex; flex-direction:column; justify-content:center; text-align:center;">
+    <div class="section-label" style="text-align:center;">WHAT'S NEXT</div>
+    <h2 class="section-title" style="text-align:center;">
+        Test Before<br><span style="background:linear-gradient(135deg,var(--cyan),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">They Attack</span>
+    </h2>
+    <p class="section-intro" style="text-align:center; max-width:500px; margin:0 auto 30px;">
+        The only way to know if your people will fall for AI-powered social engineering is to test them — ethically, professionally, and before real attackers do.
+    </p>
+
+    <div class="cta-box">
+        <h3>Social Engineering Assessment</h3>
+        <p>We simulate AI-generated phishing, vishing (voice cloning), and pretexting attacks against your team in a controlled, authorised engagement. You get a detailed report showing who was vulnerable, what worked, and exactly how to fix it.</p>
+        <a href="https://wehack.co.nz" class="cta-btn">Take Your Free Security Score →</a>
+    </div>
+
+    <p style="color:#888; font-size:13px; margin-top:30px;">
+        Every business has different security challenges. Book a free 15-minute chat and we'll recommend the right approach &mdash; no obligation.
+    </p>
+
+    <div style="margin-top:30px;">
+        <p style="color:#999; font-size:13px;">Mustafa Demirsoy</p>
+        <p style="color:#888; font-size:12px;">Founder &amp; Hacker, WeHack</p>
+    </div>
+
+    <div class="footer">
+        <a href="https://wehack.co.nz">wehack.co.nz</a> &nbsp;|&nbsp; info@wehack.co.nz &nbsp;|&nbsp; 022 091 7242<br>
+        148 Durham Street, Tauranga 3110
+    </div>
+</div>
+
+</body>
+</html>

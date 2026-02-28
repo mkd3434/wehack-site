@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Deepfake Defence Playbook — WeHack</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Questrial&display=swap" rel="stylesheet">
+    <style>
+        @page { size: A4; margin: 0; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --cyan: #B8F0F0;
+            --green: #C4FF9E;
+            --green-bright: #A9FF8F;
+            --teal: #0E99AB;
+            --teal-dark: #133C41;
+            --black: #0F0F10;
+            --dark: #141416;
+            --card: #1A1A1C;
+            --border: #2A2A2E;
+            --white: #FFFFFF;
+            --gray-100: #F0F0F0;
+            --gray-300: #AAAAAA;
+            --gray-500: #777777;
+            --red: #FF4444;
+            --orange: #FF8C00;
+            --yellow: #FFD700;
+            --blue: #4A9EFF;
+        }
+        body { font-family: 'Questrial', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; background: var(--black); color: var(--white); line-height: 1.6; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+        /* === COVER === */
+        .cover { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 60px 40px; background: linear-gradient(160deg, #0F0F10 0%, #0F1618 30%, #0F1A1A 60%, #0F0F10 100%); position: relative; overflow: hidden; page-break-after: always; }
+        .cover::before { content: ''; position: absolute; top: -150px; right: -150px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(184,240,240,0.08) 0%, transparent 70%); pointer-events: none; }
+        .cover::after { content: ''; position: absolute; bottom: -150px; left: -100px; width: 400px; height: 400px; background: radial-gradient(circle, rgba(196,255,158,0.05) 0%, transparent 70%); pointer-events: none; }
+        .cover-logo { font-size: 24px; font-weight: 700; letter-spacing: -1px; color: var(--white); margin-bottom: 48px; z-index: 1; }
+        .cover-badge { display: inline-block; background: rgba(184,240,240,0.12); border: 1px solid rgba(184,240,240,0.25); color: var(--cyan); padding: 8px 20px; border-radius: 24px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 32px; z-index: 1; }
+        .cover h1 { font-size: clamp(34px, 5vw, 52px); font-weight: 800; line-height: 1.08; letter-spacing: -2px; max-width: 700px; margin-bottom: 20px; z-index: 1; }
+        .cover h1 span { background: linear-gradient(135deg, var(--cyan), var(--green)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .cover-sub { font-size: 17px; color: var(--gray-300); max-width: 520px; line-height: 1.5; margin-bottom: 48px; z-index: 1; }
+        .cover-stats { display: flex; gap: 40px; z-index: 1; }
+        .cover-stat { text-align: center; }
+        .cover-stat-num { font-size: 34px; font-weight: 800; background: linear-gradient(135deg, var(--cyan), var(--green)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .cover-stat-label { font-size: 11px; color: var(--gray-500); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+        .cover-footer { position: absolute; bottom: 40px; font-size: 13px; color: var(--gray-500); z-index: 1; }
+
+        /* === PAGE === */
+        .page { max-width: 900px; margin: 0 auto; padding: 60px 48px; page-break-after: always; }
+        .page:last-child { page-break-after: avoid; }
+
+        /* === SECTIONS === */
+        .section-num { font-size: 12px; font-weight: 700; color: var(--cyan); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 8px; }
+        .section-title { font-size: 30px; font-weight: 800; letter-spacing: -1px; line-height: 1.15; margin-bottom: 8px; }
+        .section-subtitle { font-size: 15px; color: var(--gray-300); margin-bottom: 28px; line-height: 1.5; }
+        .divider { height: 2px; background: linear-gradient(90deg, var(--cyan), var(--green), transparent); margin-bottom: 28px; border-radius: 1px; }
+
+        /* === STAT CARDS === */
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 28px; }
+        .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 22px 18px; text-align: center; }
+        .stat-card-num { font-size: 30px; font-weight: 800; line-height: 1; margin-bottom: 6px; }
+        .stat-card-num.red { color: var(--red); }
+        .stat-card-num.orange { color: var(--orange); }
+        .stat-card-num.yellow { color: var(--yellow); }
+        .stat-card-num.cyan { color: var(--cyan); }
+        .stat-card-num.teal { color: var(--teal); }
+        .stat-card-num.green { color: var(--green); }
+        .stat-card-num.blue { color: var(--blue); }
+        .stat-card-label { font-size: 12px; color: var(--gray-300); line-height: 1.4; }
+        .stat-card-source { font-size: 10px; color: var(--gray-500); margin-top: 5px; }
+
+        /* === HIGHLIGHTS === */
+        .highlight { background: linear-gradient(135deg, rgba(184,240,240,0.08), rgba(196,255,158,0.04)); border: 1px solid rgba(184,240,240,0.15); border-radius: 12px; padding: 22px 26px; margin-bottom: 22px; }
+        .highlight-red { background: rgba(255,68,68,0.06); border-color: rgba(255,68,68,0.2); }
+        .highlight h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+        .highlight p { font-size: 14px; color: var(--gray-300); line-height: 1.6; }
+        .highlight .big-num { font-size: 44px; font-weight: 800; line-height: 1; margin-bottom: 4px; }
+
+        /* === CONTENT === */
+        .content-block { margin-bottom: 24px; }
+        .content-block h3 { font-size: 19px; font-weight: 700; margin-bottom: 10px; }
+        .content-block p { font-size: 14px; color: var(--gray-300); line-height: 1.65; margin-bottom: 10px; }
+        .content-block ul { list-style: none; padding: 0; }
+        .content-block ul li { font-size: 14px; color: var(--gray-300); padding: 5px 0 5px 20px; position: relative; line-height: 1.5; }
+        .content-block ul li::before { content: ''; position: absolute; left: 0; top: 13px; width: 8px; height: 8px; border-radius: 50%; background: var(--cyan); }
+
+        /* === CASE STUDY === */
+        .case-study { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 24px; border-left: 4px solid var(--teal); }
+        .case-study .cs-header { font-size: 11px; font-weight: 700; color: var(--teal); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+        .case-study h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+        .case-study p { font-size: 13px; color: var(--gray-300); line-height: 1.6; }
+        .case-study .cs-stats { display: flex; gap: 20px; margin-top: 14px; flex-wrap: wrap; }
+        .case-study .cs-stat { text-align: center; }
+        .case-study .cs-stat-num { font-size: 22px; font-weight: 800; color: var(--orange); }
+        .case-study .cs-stat-label { font-size: 10px; color: var(--gray-500); }
+
+        /* === TIMELINE / STEPS === */
+        .step-grid { display: grid; gap: 14px; margin-bottom: 24px; }
+        .step-item { display: flex; gap: 16px; padding: 18px 20px; background: var(--card); border: 1px solid var(--border); border-radius: 10px; }
+        .step-num { min-width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--cyan), var(--green)); color: var(--black); font-size: 18px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .step-content h4 { font-size: 15px; font-weight: 700; margin-bottom: 3px; }
+        .step-content p { font-size: 13px; color: var(--gray-300); line-height: 1.5; }
+
+        /* === COMPARISON === */
+        .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+        .compare-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 22px; }
+        .compare-card h4 { font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+        .compare-card.bad { border-top: 3px solid var(--red); }
+        .compare-card.bad h4 { color: var(--red); }
+        .compare-card.good { border-top: 3px solid var(--green); }
+        .compare-card.good h4 { color: var(--green); }
+        .compare-card ul { list-style: none; padding: 0; }
+        .compare-card ul li { font-size: 13px; color: var(--gray-300); padding: 4px 0; line-height: 1.4; }
+
+        /* === CHECKLIST === */
+        .checklist { margin-bottom: 24px; }
+        .check-item { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+        .check-item:last-child { border-bottom: none; }
+        .check-box { width: 22px; height: 22px; border: 2px solid var(--cyan); border-radius: 4px; flex-shrink: 0; margin-top: 2px; }
+        .check-text { font-size: 14px; color: var(--gray-300); line-height: 1.5; }
+        .check-text strong { color: var(--white); }
+
+        /* === TWO COL === */
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+
+        /* === SVG CHARTS === */
+        .chart-container { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 24px; text-align: center; }
+        .chart-container h4 { font-size: 14px; font-weight: 700; margin-bottom: 16px; color: var(--gray-300); text-transform: uppercase; letter-spacing: 1px; }
+
+        /* === CTA === */
+        .cta-page { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 60px 40px; }
+        .cta-page h2 { font-size: 36px; font-weight: 800; letter-spacing: -1.5px; margin-bottom: 16px; }
+        .cta-page h2 span { background: linear-gradient(135deg, var(--cyan), var(--green)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .cta-page p { font-size: 16px; color: var(--gray-300); max-width: 500px; line-height: 1.6; margin-bottom: 32px; }
+        .cta-box { background: linear-gradient(135deg, var(--teal), #0BBD8B); color: var(--white); padding: 32px 48px; border-radius: 16px; margin-bottom: 40px; }
+        .cta-box h3 { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+        .cta-box p { color: rgba(255,255,255,0.85); margin-bottom: 16px; font-size: 15px; }
+        .cta-btn { display: inline-block; background: var(--green-bright); color: var(--black); padding: 14px 36px; border-radius: 8px; font-size: 16px; font-weight: 700; text-decoration: none; }
+        .report-footer { text-align: center; padding: 40px; color: var(--gray-500); font-size: 12px; }
+        .report-footer a { color: var(--cyan); text-decoration: none; }
+
+        /* === PRINT === */
+        @media print { body { background: var(--black) !important; } .page { padding: 40px 36px; } }
+        @media (max-width: 700px) { .stat-grid { grid-template-columns: 1fr 1fr; } .cover-stats { flex-direction: column; gap: 16px; } .two-col, .compare-grid { grid-template-columns: 1fr; } .page { padding: 32px 20px; } }
+    </style>
+</head>
+<body>
+
+<!-- ============ COVER ============ -->
+<div class="cover">
+    <div class="cover-logo">WeHack</div>
+    <div class="cover-badge">Defence Playbook &bull; 2026</div>
+    <h1>The AI Deepfake<br><span>Defence Playbook</span></h1>
+    <p class="cover-sub">How NZ businesses can detect, prevent, and respond to AI-generated voice cloning, video deepfakes, and social engineering attacks.</p>
+    <div class="cover-stats">
+        <div class="cover-stat">
+            <div class="cover-stat-num">$1.1B</div>
+            <div class="cover-stat-label">Lost to deepfakes in 2025</div>
+        </div>
+        <div class="cover-stat">
+            <div class="cover-stat-num">3 sec</div>
+            <div class="cover-stat-label">To clone any voice</div>
+        </div>
+        <div class="cover-stat">
+            <div class="cover-stat-num">680%</div>
+            <div class="cover-stat-label">Voice fraud increase YoY</div>
+        </div>
+    </div>
+    <div class="cover-footer">wehack.co.nz &nbsp;|&nbsp; Prepared by Mustafa Demirsoy, Founder &amp; Hacker &nbsp;|&nbsp; Sources: DeepStrike, CrowdStrike, IBM, Cobalt</div>
+</div>
+
+<!-- ============ THE 3-SECOND PROBLEM ============ -->
+<div class="page">
+    <div class="section-num">Section 01</div>
+    <div class="section-title">The 3-Second Problem</div>
+    <div class="section-subtitle">AI can now clone anyone's voice from a single audio clip. Here's how it works and why it matters.</div>
+    <div class="divider"></div>
+
+    <div class="highlight">
+        <div class="big-num" style="color: var(--cyan);">3 seconds</div>
+        <p>That's all the audio an attacker needs to clone your voice at 85% accuracy. A LinkedIn video, a podcast appearance, a voicemail greeting, or even a conference recording. <span style="color: var(--gray-500);">Source: DeepStrike 2025</span></p>
+    </div>
+
+    <!-- Voice cloning flow chart -->
+    <div class="chart-container">
+        <h4>How Voice Cloning Works</h4>
+        <svg width="100%" height="120" viewBox="0 0 700 120" xmlns="http://www.w3.org/2000/svg">
+            <!-- Step 1: Audio capture -->
+            <text x="90" y="18" fill="#AAAAAA" font-size="11" font-weight="600" text-anchor="middle">1. CAPTURE</text>
+            <rect x="30" y="30" width="120" height="60" rx="8" fill="#1A1A1C" stroke="#2A2A2E"/>
+            <text x="90" y="55" fill="#B8F0F0" font-size="22" font-weight="800" text-anchor="middle">3s</text>
+            <text x="90" y="75" fill="#777" font-size="10" text-anchor="middle">of audio</text>
+            <!-- Arrow -->
+            <line x1="160" y1="60" x2="210" y2="60" stroke="#B8F0F0" stroke-width="2"/>
+            <polygon points="210,55 220,60 210,65" fill="#B8F0F0"/>
+            <!-- Step 2: AI processing -->
+            <text x="290" y="18" fill="#AAAAAA" font-size="11" font-weight="600" text-anchor="middle">2. AI CLONING</text>
+            <rect x="230" y="30" width="120" height="60" rx="8" fill="#1A1A1C" stroke="#0E99AB" stroke-opacity="0.5"/>
+            <text x="290" y="55" fill="#0E99AB" font-size="14" font-weight="700" text-anchor="middle">Neural Net</text>
+            <text x="290" y="75" fill="#777" font-size="10" text-anchor="middle">processes voice</text>
+            <!-- Arrow -->
+            <line x1="360" y1="60" x2="410" y2="60" stroke="#0E99AB" stroke-width="2"/>
+            <polygon points="410,55 420,60 410,65" fill="#0E99AB"/>
+            <!-- Step 3: Output -->
+            <text x="490" y="18" fill="#AAAAAA" font-size="11" font-weight="600" text-anchor="middle">3. IMPERSONATE</text>
+            <rect x="430" y="30" width="120" height="60" rx="8" fill="#1A1A1C" stroke="#C4FF9E" stroke-opacity="0.4"/>
+            <text x="490" y="55" fill="#FF8C00" font-size="14" font-weight="700" text-anchor="middle">85%</text>
+            <text x="490" y="75" fill="#777" font-size="10" text-anchor="middle">accuracy clone</text>
+            <!-- Arrow -->
+            <line x1="560" y1="60" x2="610" y2="60" stroke="#FF8C00" stroke-width="2"/>
+            <polygon points="610,55 620,60 610,65" fill="#FF8C00"/>
+            <!-- Step 4: Attack -->
+            <text x="665" y="18" fill="#AAAAAA" font-size="11" font-weight="600" text-anchor="middle">4. ATTACK</text>
+            <rect x="625" y="30" width="70" height="60" rx="8" fill="rgba(255,68,68,0.12)" stroke="#FF4444"/>
+            <text x="660" y="58" fill="#FF4444" font-size="20" text-anchor="middle">$$</text>
+            <text x="660" y="78" fill="#FF4444" font-size="9" text-anchor="middle">fraud</text>
+        </svg>
+    </div>
+
+    <div class="stat-grid">
+        <div class="stat-card">
+            <div class="stat-card-num red">70%</div>
+            <div class="stat-card-label">of people can't tell a cloned voice from the real one</div>
+            <div class="stat-card-source">DeepStrike</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-num orange">77%</div>
+            <div class="stat-card-label">of voice clone victims suffered financial loss</div>
+            <div class="stat-card-source">DeepStrike</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-num yellow">1 in 4</div>
+            <div class="stat-card-label">adults have experienced an AI voice scam</div>
+            <div class="stat-card-source">McAfee 2024</div>
+        </div>
+    </div>
+
+    <div class="content-block">
+        <h3>Where Attackers Get Your Voice</h3>
+        <ul>
+            <li><strong>LinkedIn videos</strong> and podcast appearances (public, high quality audio)</li>
+            <li><strong>Conference recordings</strong> and webinars posted online</li>
+            <li><strong>Voicemail greetings</strong> on your work and mobile phones</li>
+            <li><strong>YouTube content</strong>, media interviews, or company promotional videos</li>
+            <li><strong>Phone calls</strong> where the attacker records your voice during normal conversation</li>
+        </ul>
+    </div>
+
+    <div class="highlight">
+        <h3>The CEO Fraud Epidemic</h3>
+        <p><strong>400 companies per day</strong> are targeted by CEO deepfake fraud. Attackers clone the CEO's voice, call the finance team, and request urgent wire transfers. It works because employees are trained to follow their boss's instructions quickly. <span style="color: var(--gray-500);">Source: DeepStrike</span></p>
+    </div>
+</div>
+
+<!-- ============ REAL ATTACKS ============ -->
+<div class="page">
+    <div class="section-num">Section 02</div>
+    <div class="section-title">Real Attacks, Real Losses</div>
+    <div class="section-subtitle">These aren't hypothetical scenarios. They happened in 2025-2026.</div>
+    <div class="divider"></div>
+
+    <div class="case-study">
+        <div class="cs-header">Case Study 1 &mdash; Arup Corporation, 2025</div>
+        <h3>$25 Million Lost in a Single Deepfake Video Call</h3>
+        <p>An employee at international engineering firm Arup was invited to a video conference with what appeared to be senior management. Every person on the screen was an AI-generated deepfake. The employee was instructed to transfer funds across multiple transactions. Total loss: $25 million.</p>
+        <div class="cs-stats">
+            <div class="cs-stat"><div class="cs-stat-num">$25M</div><div class="cs-stat-label">Total loss</div></div>
+            <div class="cs-stat"><div class="cs-stat-num">1</div><div class="cs-stat-label">Video call</div></div>
+            <div class="cs-stat"><div class="cs-stat-num">100%</div><div class="cs-stat-label">AI-generated</div></div>
+            <div class="cs-stat"><div class="cs-stat-num">0</div><div class="cs-stat-label">Real humans on screen</div></div>
+        </div>
+    </div>
+
+    <div class="case-study">
+        <div class="cs-header">Case Study 2 &mdash; Swiss Executive, January 2026</div>
+        <h3>"Several Million Francs" Lost to Cloned Business Partner Voice</h3>
+        <p>A Swiss businessman received a phone call from what sounded exactly like his long-time business partner. The cloned voice referenced specific details of their ongoing deals. The businessman authorised a transfer of several million Swiss francs before realising the call was fraudulent.</p>
+        <div class="cs-stats">
+            <div class="cs-stat"><div class="cs-stat-num">~$3M+</div><div class="cs-stat-label">Estimated loss</div></div>
+            <div class="cs-stat"><div class="cs-stat-num">1</div><div class="cs-stat-label">Phone call</div></div>
+            <div class="cs-stat"><div class="cs-stat-num">AI</div><div class="cs-stat-label">Voice clone used</div></div>
+        </div>
+    </div>
+
+    <!-- Bar chart: Growth of deepfake fraud -->
+    <div class="chart-container">
+        <h4>Deepfake Fraud Losses &mdash; US Market</h4>
+        <svg width="100%" height="180" viewBox="0 0 600 180" xmlns="http://www.w3.org/2000/svg">
+            <!-- Y axis -->
+            <line x1="80" y1="20" x2="80" y2="150" stroke="#2A2A2E" stroke-width="1"/>
+            <!-- Bars -->
+            <rect x="120" y="120" width="80" height="30" rx="4" fill="#0E99AB" opacity="0.6"/>
+            <text x="160" y="140" fill="white" font-size="12" font-weight="700" text-anchor="middle">$360M</text>
+            <text x="160" y="168" fill="#777" font-size="11" text-anchor="middle">2024</text>
+
+            <rect x="260" y="70" width="80" height="80" rx="4" fill="#0E99AB" opacity="0.85"/>
+            <text x="300" y="95" fill="white" font-size="12" font-weight="700" text-anchor="middle">$1.1B</text>
+            <text x="300" y="168" fill="#777" font-size="11" text-anchor="middle">2025</text>
+
+            <rect x="400" y="30" width="80" height="120" rx="4" fill="#FF4444"/>
+            <text x="440" y="55" fill="white" font-size="12" font-weight="700" text-anchor="middle">$3B+</text>
+            <text x="440" y="168" fill="#777" font-size="11" text-anchor="middle">2025 (Jan-Sep)</text>
+
+            <!-- Labels -->
+            <text x="40" y="30" fill="#777" font-size="10" text-anchor="middle">$3B</text>
+            <text x="40" y="80" fill="#777" font-size="10" text-anchor="middle">$1B</text>
+            <text x="40" y="130" fill="#777" font-size="10" text-anchor="middle">$360M</text>
+
+            <!-- Growth arrow -->
+            <text x="520" y="75" fill="#FF4444" font-size="26" font-weight="800">3x</text>
+            <text x="520" y="95" fill="#777" font-size="10">YoY growth</text>
+        </svg>
+    </div>
+
+    <div class="stat-grid">
+        <div class="stat-card">
+            <div class="stat-card-num cyan">$500K</div>
+            <div class="stat-card-label">average loss per deepfake incident for businesses</div>
+            <div class="stat-card-source">DeepStrike</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-num red">1,600%</div>
+            <div class="stat-card-label">increase in deepfake vishing attacks Q1 2025</div>
+            <div class="stat-card-source">Programs.com</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-num orange">$40B</div>
+            <div class="stat-card-label">projected deepfake fraud losses by 2027</div>
+            <div class="stat-card-source">DeepStrike</div>
+        </div>
+    </div>
+
+    <div class="content-block">
+        <h3>The Financial Services Target</h3>
+        <p>Over <strong>10% of financial institutions</strong> have already suffered a deepfake vishing attack costing more than $1 million. The average loss at financial institutions is approximately $600,000 per incident. Attackers target finance teams because they're authorised to move money quickly. <span style="color:var(--gray-500);">Source: Group-IB</span></p>
+    </div>
+</div>
+
+<!-- ============ CAN YOU SPOT IT? ============ -->
+<div class="page">
+    <div class="section-num">Section 03</div>
+    <div class="section-title">Can You Actually Spot a Deepfake?</div>
+    <div class="section-subtitle">The honest answer: probably not. Here's why detection alone isn't enough.</div>
+    <div class="divider"></div>
+
+    <!-- Donut chart: Detection rates -->
+    <div class="chart-container">
+        <h4>Human Deepfake Detection Rates</h4>
+        <svg width="100%" height="200" viewBox="0 0 600 200" xmlns="http://www.w3.org/2000/svg">
+            <!-- Donut 1: Video detection -->
+            <circle cx="150" cy="100" r="60" fill="none" stroke="#2A2A2E" stroke-width="16"/>
+            <circle cx="150" cy="100" r="60" fill="none" stroke="#FF4444" stroke-width="16" stroke-dasharray="92.4 284.4" stroke-dashoffset="94.2" stroke-linecap="round"/>
+            <text x="150" y="95" fill="#FF4444" font-size="28" font-weight="800" text-anchor="middle">24.5%</text>
+            <text x="150" y="115" fill="#777" font-size="11" text-anchor="middle">detect video</text>
+            <text x="150" y="180" fill="#AAAAAA" font-size="12" font-weight="600" text-anchor="middle">Video Deepfakes</text>
+
+            <!-- Donut 2: Voice detection -->
+            <circle cx="350" cy="100" r="60" fill="none" stroke="#2A2A2E" stroke-width="16"/>
+            <circle cx="350" cy="100" r="60" fill="none" stroke="#FF8C00" stroke-width="16" stroke-dasharray="113.1 263.7" stroke-dashoffset="94.2" stroke-linecap="round"/>
+            <text x="350" y="95" fill="#FF8C00" font-size="28" font-weight="800" text-anchor="middle">30%</text>
+            <text x="350" y="115" fill="#777" font-size="11" text-anchor="middle">detect voice</text>
+            <text x="350" y="180" fill="#AAAAAA" font-size="12" font-weight="600" text-anchor="middle">Voice Clones</text>
+
+            <!-- Annotation -->
+            <text x="520" y="80" fill="#FF4444" font-size="14" font-weight="700">3 out of 4</text>
+            <text x="520" y="100" fill="#777" font-size="11">people are</text>
+            <text x="520" y="118" fill="#FF4444" font-size="14" font-weight="700">fooled</text>
+        </svg>
+    </div>
+
+    <div class="compare-grid">
+        <div class="compare-card bad">
+            <h4>False Confidence</h4>
+            <ul>
+                <li><strong>60%</strong> of people believe they can spot deepfakes</li>
+                <li>Only <strong>24.5%</strong> actually can (for video)</li>
+                <li>Only <strong>30%</strong> can detect cloned voices</li>
+                <li><strong>80%</strong> of companies have zero deepfake response protocols</li>
+                <li><strong>50%+</strong> of business leaders report zero employee training</li>
+            </ul>
+        </div>
+        <div class="compare-card good">
+            <h4>The Reality Check</h4>
+            <ul>
+                <li>Detection software exists but isn't 100% reliable</li>
+                <li>AI deepfakes are improving faster than detection tools</li>
+                <li><strong>Prevention &gt; detection</strong> is the correct strategy</li>
+                <li>Process-based defences (code words, callbacks) work regardless of quality</li>
+                <li>Human training + verification protocols = best defence</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="content-block">
+        <h3>AI-Enhanced Phishing: The Multiplier Effect</h3>
+        <p>Deepfakes are only part of the picture. AI is supercharging every form of social engineering:</p>
+        <ul>
+            <li>AI-generated phishing emails achieve <strong>4x higher click-through rates</strong> than human-crafted ones</li>
+            <li><strong>87% of businesses</strong> say AI deepfakes make phishing attacks more convincing</li>
+            <li><strong>563% increase</strong> in fake CAPTCHA lures designed to trick people into downloading malware</li>
+            <li><strong>141% increase</strong> in spam email volume, largely driven by AI generation</li>
+            <li><strong>442% surge</strong> in vishing (voice phishing) attacks in 2025</li>
+        </ul>
+    </div>
+
+    <div class="highlight">
+        <h3>The Scale of the Problem</h3>
+        <p><strong>8 million deepfake files</strong> are projected to be circulating online in 2025, with a 900% annual growth rate in deepfake video volume. <strong>ChatGPT is mentioned 550% more</strong> than any other AI model in criminal forums. Over <strong>300,000 ChatGPT credentials</strong> have been exposed via infostealer malware. <span style="color:var(--gray-500);">Sources: DeepStrike, CrowdStrike, IBM X-Force</span></p>
+    </div>
+</div>
+
+<!-- ============ THE DEFENCE PLAYBOOK ============ -->
+<div class="page">
+    <div class="section-num">Section 04</div>
+    <div class="section-title">The 8-Step Defence Playbook</div>
+    <div class="section-subtitle">Process beats technology. These defences work regardless of how good deepfakes become.</div>
+    <div class="divider"></div>
+
+    <div class="step-grid">
+        <div class="step-item">
+            <div class="step-num">1</div>
+            <div class="step-content">
+                <h4>Establish Code Words for Financial Requests</h4>
+                <p>Create a shared code word between executives, finance, and anyone who can authorise payments. Change it monthly. A deepfake can clone a voice, but it can't know your secret phrase.</p>
+            </div>
+        </div>
+        <div class="step-item">
+            <div class="step-num">2</div>
+            <div class="step-content">
+                <h4>Mandatory Callback Verification</h4>
+                <p>Any request to transfer money, change bank details, or share sensitive data must be verified by calling back on a <strong>pre-registered number</strong> (not the number from the email/call). No exceptions.</p>
+            </div>
+        </div>
+        <div class="step-item">
+            <div class="step-num">3</div>
+            <div class="step-content">
+                <h4>Dual-Approval for Transfers Over $1,000</h4>
+                <p>No single person should be able to authorise a payment alone. Two people verify, two people approve. This simple control would have prevented the Arup attack.</p>
+            </div>
+        </div>
+        <div class="step-item">
+            <div class="step-num">4</div>
+            <div class="step-content">
+                <h4>Train Staff on Deepfake Awareness (15 Minutes)</h4>
+                <p>Run a 15-minute session: show examples of AI cloned voices, demonstrate how easy it is, explain the code word system. Do this quarterly. Security training reduces phishing success by <strong>86%</strong> after one year.</p>
+            </div>
+        </div>
+        <div class="step-item">
+            <div class="step-num">5</div>
+            <div class="step-content">
+                <h4>Create an "Urgent Request" Red Flag Policy</h4>
+                <p>Attackers create urgency to bypass rational thinking. Policy: the more urgent a request, the <strong>more</strong> verification is required. "We need this done NOW" = slow down and verify harder.</p>
+            </div>
+        </div>
+        <div class="step-item">
+            <div class="step-num">6</div>
+            <div class="step-content">
+                <h4>Limit Voice and Video Exposure</h4>
+                <p>Audit what executive audio/video is publicly available. Consider whether conference recordings, podcast appearances, or LinkedIn videos need to be public. Each one is potential cloning material.</p>
+            </div>
+        </div>
+        <div class="step-item">
+            <div class="step-num">7</div>
+            <div class="step-content">
+                <h4>Never Trust Video Calls Alone for Identity</h4>
+                <p>If someone joins a video call requesting money or sensitive actions, verify their identity through a separate channel. A quick text to their known mobile: "Are you really on this call?"</p>
+            </div>
+        </div>
+        <div class="step-item">
+            <div class="step-num">8</div>
+            <div class="step-content">
+                <h4>Run Deepfake Phishing Simulations</h4>
+                <p>Test your team with controlled deepfake scenarios. WeHack offers deepfake social engineering simulations to test whether your staff would fall for a cloned voice requesting a transfer.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="highlight">
+        <h3>The Golden Rule</h3>
+        <p>Never rely solely on voice or video to authenticate a person's identity. <strong>Trust the process, not the voice.</strong> A well-designed verification procedure protects you even when the deepfake is indistinguishable from reality.</p>
+    </div>
+</div>
+
+<!-- ============ PRINTABLE CHECKLIST ============ -->
+<div class="page">
+    <div class="section-num">Section 05</div>
+    <div class="section-title">Your Deepfake Defence Checklist</div>
+    <div class="section-subtitle">Print this page. Check off what you've done. Fix what you haven't.</div>
+    <div class="divider"></div>
+
+    <div class="checklist">
+        <div class="check-item">
+            <div class="check-box"></div>
+            <div class="check-text"><strong>Code word system established</strong> between executives and finance team. Changed monthly.</div>
+        </div>
+        <div class="check-item">
+            <div class="check-box"></div>
+            <div class="check-text"><strong>Callback verification policy</strong> in writing. All financial requests verified via pre-registered number.</div>
+        </div>
+        <div class="check-item">
+            <div class="check-box"></div>
+            <div class="check-text"><strong>Dual-approval required</strong> for all payments over $1,000 NZD.</div>
+        </div>
+        <div class="check-item">
+            <div class="check-box"></div>
+            <div class="check-text"><strong>Staff trained on deepfake awareness.</strong> Can demonstrate AI voice cloning. Understand red flags.</div>
+        </div>
+        <div class="check-item">
+            <div class="check-box"></div>
+            <div class="check-text"><strong>Urgent request policy documented.</strong> More urgency = more verification, not less.</div>
+        </div>
+        <div class="check-item">
+            <div class="check-box"></div>
+            <div class="check-text"><strong>Executive voice/video exposure audited.</strong> Unnecessary public audio removed or restricted.</div>
+        </div>
+        <div class="check-item">
+            <div class="check-box"></div>
+            <div class="check-text"><strong>Video call identity verification</strong> process in place. Second-channel confirmation for sensitive requests.</div>
+        </div>
+        <div class="check-item">
+            <div class="check-box"></div>
+            <div class="check-text"><strong>Deepfake phishing simulation conducted.</strong> Team tested with realistic scenarios.</div>
+        </div>
+        <div class="check-item">
+            <div class="check-box"></div>
+            <div class="check-text"><strong>Bank detail change process</strong> requires in-person or multi-channel verification. Not just email/phone.</div>
+        </div>
+        <div class="check-item">
+            <div class="check-box"></div>
+            <div class="check-text"><strong>Incident response plan updated</strong> to include deepfake scenarios. Team knows the escalation path.</div>
+        </div>
+        <div class="check-item">
+            <div class="check-box"></div>
+            <div class="check-text"><strong>Email security (SPF, DKIM, DMARC)</strong> configured to prevent domain spoofing alongside deepfake attacks.</div>
+        </div>
+        <div class="check-item">
+            <div class="check-box"></div>
+            <div class="check-text"><strong>MFA enabled on all accounts.</strong> Deepfakes bypass authentication, but MFA adds a layer attackers can't clone.</div>
+        </div>
+    </div>
+
+    <div class="two-col">
+        <div class="highlight">
+            <h3 style="color: var(--green);">If You Can Check 10+</h3>
+            <p>You're ahead of 90% of NZ businesses. A penetration test will validate your controls and find any remaining gaps.</p>
+        </div>
+        <div class="highlight-red highlight">
+            <h3 style="color: var(--red);">If You Can Check Fewer Than 5</h3>
+            <p>Your business is vulnerable to deepfake social engineering. The good news: most of these items cost nothing to implement today.</p>
+        </div>
+    </div>
+
+    <div class="content-block">
+        <h3>NZ Context: It's Already Happening Here</h3>
+        <p>New Zealand lost <strong>$7.8 million to cybercrime in Q1 2025 alone</strong>. The NCSC handles approximately one nationally significant cyber incident per day. While deepfake-specific NZ statistics are still emerging, the global trends are clear: NZ businesses face the same threats as every other country, often with fewer resources to defend against them.</p>
+        <p><strong>25% of NZ's nationally significant incidents</strong> were linked to state-sponsored actors who increasingly use AI-powered social engineering as their primary access method.</p>
+    </div>
+</div>
+
+<!-- ============ CTA ============ -->
+<div class="cta-page">
+    <div class="section-num" style="margin-bottom:24px;">What's Next</div>
+    <h2>Don't Wait for <span>the Call</span></h2>
+    <p>The businesses that survive deepfake attacks are the ones that prepared before the call came. Your defence starts with a conversation.</p>
+
+    <div class="cta-box">
+        <h3>Test Your Team Before Attackers Do</h3>
+        <p>Start with our free security assessment &mdash; 20 questions across 6 domains, with a personalised radar chart and risk exposure in NZD. Then let's talk about what to fix first.</p>
+        <a href="https://www.wehack.co.nz/security-score" class="cta-btn">Take Your Free Security Score &rarr;</a>
+    </div>
+
+    <div style="max-width:500px; margin: 0 auto;">
+        <p style="font-size: 15px; color: var(--gray-300); margin-bottom: 20px;">Every business has different security challenges. Book a free 15-minute chat and we'll recommend the right approach &mdash; no obligation.</p>
+        <p style="font-size: 15px;"><strong>Mustafa Demirsoy</strong><br>Founder &amp; Hacker, WeHack<br><br>
+        <span style="color: var(--cyan);">wehack.co.nz</span> &nbsp;|&nbsp; info@wehack.co.nz &nbsp;|&nbsp; 022 091 7242<br>148 Durham Street, Tauranga 3110</p>
+    </div>
+
+    <div class="report-footer" style="margin-top:48px;">
+        <p>&copy; 2026 WeHack &nbsp;|&nbsp; Data sourced from DeepStrike 2025, CrowdStrike 2026 GTR, IBM X-Force 2026, Cobalt 2026, Group-IB, Programs.com</p>
+        <p style="margin-top:8px;"><a href="https://www.wehack.co.nz">wehack.co.nz</a></p>
+    </div>
+</div>
+
+</body>
+</html>

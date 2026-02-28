@@ -1,0 +1,2137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WeHack — Free Security Assessment (Wix Embed)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Questrial&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================================
+           RESET & VARIABLES
+           ============================================================ */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --cyan: #B8F0F0;
+            --green: #C4FF9E;
+            --green-bright: #A9FF8F;
+            --black: #0F0F10;
+            --surface: #1A1A1B;
+            --surface-2: #232324;
+            --border: #333;
+            --text: #FFFFFF;
+            --text-muted: #999;
+            --text-dim: #666;
+            --red: #FF4757;
+            --orange: #FF8C42;
+            --yellow: #FFD93D;
+            --teal: #0E99AB;
+            --blue: #4A9EFF;
+        }
+
+        /* ============================================================
+           BASE
+           ============================================================ */
+        body {
+            font-family: 'Questrial', sans-serif;
+            background: var(--black);
+            background-image: radial-gradient(circle at 1px 1px, rgba(184,240,240,0.03) 1px, transparent 0);
+            background-size: 32px 32px;
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* ============================================================
+           HERO
+           ============================================================ */
+        .hero {
+            background: linear-gradient(135deg, var(--cyan), var(--green));
+            padding: 56px 40px 44px;
+            text-align: center;
+            color: var(--black);
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(15,15,16,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(15,15,16,0.05) 1px, transparent 1px);
+            background-size: 32px 32px;
+            pointer-events: none;
+        }
+        .hero-content { position: relative; z-index: 1; }
+        .badge {
+            display: inline-block;
+            background: var(--black);
+            color: var(--green);
+            padding: 6px 18px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+        .hero h1 {
+            font-size: clamp(28px, 5vw, 48px);
+            font-weight: 400;
+            line-height: 1.15;
+            margin: 18px 0 14px;
+            letter-spacing: -1px;
+        }
+        .hero p {
+            font-size: 16px;
+            color: #333;
+            max-width: 540px;
+            margin: 0 auto 24px;
+            line-height: 1.55;
+        }
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            flex-wrap: wrap;
+        }
+        .hero-stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            font-size: 13px;
+            color: #444;
+        }
+        .hero-stat span {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--black);
+        }
+
+        /* ============================================================
+           CONTAINER
+           ============================================================ */
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 32px 20px 40px;
+        }
+
+        /* ============================================================
+           CATEGORY STEPPER
+           ============================================================ */
+        .stepper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            margin-bottom: 8px;
+            padding: 0 8px;
+            overflow-x: auto;
+        }
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            flex-shrink: 0;
+        }
+        .step-node {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-dim);
+            background: var(--surface);
+            transition: all 0.35s ease;
+            flex-shrink: 0;
+        }
+        .step-node.active {
+            border-color: var(--cyan);
+            color: var(--cyan);
+            background: rgba(184,240,240,0.1);
+            box-shadow: 0 0 12px rgba(184,240,240,0.2);
+        }
+        .step-node.done {
+            border-color: var(--green);
+            color: var(--black);
+            background: var(--green);
+        }
+        .step-line {
+            width: 24px;
+            height: 2px;
+            background: var(--border);
+            transition: background 0.35s ease;
+            flex-shrink: 0;
+        }
+        .step-line.done { background: var(--green); }
+        .stepper-label {
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            min-height: 20px;
+        }
+        .stepper-label strong { color: var(--cyan); }
+
+        /* ============================================================
+           PROGRESS BAR
+           ============================================================ */
+        .progress-wrap { margin-bottom: 0; }
+        .progress-bar {
+            height: 4px;
+            background: #222;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--cyan), var(--green));
+            border-radius: 2px;
+            transition: width 0.4s ease;
+            width: 0%;
+        }
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 6px;
+            font-size: 12px;
+            color: var(--text-dim);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* ============================================================
+           QUESTION CARDS
+           ============================================================ */
+        .question-card { display: none; animation: fadeUp 0.35s ease; }
+        .question-card.active { display: block; }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(14px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .question-number {
+            font-size: 11px;
+            color: var(--cyan);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            margin-top: 28px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .question-text {
+            font-size: 22px;
+            line-height: 1.3;
+            margin-bottom: 6px;
+        }
+        .question-context {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 28px;
+            line-height: 1.5;
+        }
+        .options { display: flex; flex-direction: column; gap: 10px; }
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 18px;
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 15px;
+            line-height: 1.35;
+        }
+        .option:hover { border-color: rgba(184,240,240,0.4); background: var(--surface-2); }
+        .option.selected { border-color: var(--green); background: rgba(196,255,158,0.06); }
+        .option-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid #555;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .option.selected .option-dot {
+            border-color: var(--green);
+            background: var(--green);
+        }
+        .option.selected .option-dot::after {
+            content: '';
+            position: absolute;
+            top: 4px; left: 4px;
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--black);
+        }
+
+        /* ============================================================
+           NAVIGATION BUTTONS
+           ============================================================ */
+        .nav-buttons { display: flex; justify-content: space-between; margin-top: 36px; gap: 14px; }
+        .btn {
+            padding: 13px 28px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: 'Questrial', sans-serif;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+        .btn-back { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); }
+        .btn-back:hover { background: #2a2a2b; }
+        .btn-next { background: var(--green); color: var(--black); flex: 1; font-weight: 600; }
+        .btn-next:hover { background: var(--green-bright); }
+        .btn-next:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        /* ============================================================
+           CATEGORY TRANSITION
+           ============================================================ */
+        .cat-transition { display: none; animation: fadeUp 0.35s ease; text-align: center; padding: 48px 20px; }
+        .cat-transition.active { display: block; }
+        .cat-check {
+            width: 56px; height: 56px;
+            border-radius: 50%;
+            background: var(--green);
+            color: var(--black);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin-bottom: 16px;
+        }
+        .cat-done-label { font-size: 18px; margin-bottom: 6px; }
+        .cat-done-label strong { color: var(--green); }
+        .cat-next-label { font-size: 14px; color: var(--text-muted); }
+
+        /* ============================================================
+           LEAD FORM
+           ============================================================ */
+        .lead-form { display: none; animation: fadeUp 0.4s ease; }
+        .lead-form.active { display: block; }
+        .lead-icon {
+            width: 64px; height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--cyan), var(--green));
+            display: flex; align-items: center; justify-content: center;
+            margin: 24px auto 20px;
+            font-size: 28px;
+            color: var(--black);
+        }
+        .lead-form h2 { font-size: 26px; text-align: center; margin-bottom: 6px; }
+        .lead-form > p { color: var(--text-muted); text-align: center; margin-bottom: 28px; line-height: 1.5; max-width: 480px; margin-left: auto; margin-right: auto; font-size: 15px; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 13px; margin-bottom: 5px; color: var(--text-muted); }
+        .form-group input {
+            width: 100%;
+            padding: 13px 16px;
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 15px;
+            font-family: 'Questrial', sans-serif;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus { border-color: var(--cyan); }
+        .form-group input::placeholder { color: #555; }
+        .form-group select {
+            width: 100%;
+            padding: 13px 16px;
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 15px;
+            font-family: 'Questrial', sans-serif;
+            outline: none;
+            transition: border-color 0.2s;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%23999' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            cursor: pointer;
+        }
+        .form-group select:focus { border-color: var(--cyan); }
+        .form-group select option { background: var(--surface); color: var(--text); }
+
+        /* Business Profile */
+        .biz-profile { display: none; animation: fadeUp 0.4s ease; }
+        .biz-profile.active { display: block; }
+        .biz-profile h2 { font-size: 24px; text-align: center; margin: 24px 0 6px; }
+        .biz-profile > p { color: var(--text-muted); text-align: center; margin-bottom: 28px; line-height: 1.5; font-size: 15px; }
+        .biz-profile .biz-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        @media (max-width: 640px) { .biz-profile .biz-grid { grid-template-columns: 1fr; } }
+
+        /* ============================================================
+           RESULTS DASHBOARD
+           ============================================================ */
+        .results { display: none; animation: fadeUp 0.5s ease; }
+        .results.active { display: block; }
+
+        /* Score Header */
+        .score-header { text-align: center; padding: 20px 0 32px; }
+        .score-ring-wrap { position: relative; width: 180px; height: 180px; margin: 0 auto 16px; }
+        .score-ring-bg, .score-ring-fill {
+            position: absolute; top: 0; left: 0;
+            width: 180px; height: 180px;
+        }
+        .score-ring-center {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .score-grade {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 56px;
+            font-weight: 700;
+            line-height: 1;
+        }
+        .score-pct {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+        .score-title { font-size: 24px; margin-bottom: 6px; }
+        .score-desc { font-size: 15px; color: var(--text-muted); max-width: 500px; margin: 0 auto; line-height: 1.5; }
+        .maturity-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 13px;
+            margin-top: 16px;
+        }
+        .maturity-badge .level {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            color: var(--cyan);
+        }
+
+        /* Risk Banner */
+        .risk-banner {
+            padding: 20px 24px;
+            border-radius: 12px;
+            margin-bottom: 32px;
+            text-align: center;
+            border: 1px solid;
+        }
+        .risk-banner .risk-label { font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; font-family: 'JetBrains Mono', monospace; margin-bottom: 4px; }
+        .risk-banner .risk-amount { font-family: 'JetBrains Mono', monospace; font-size: 28px; font-weight: 700; }
+        .risk-banner .risk-note { font-size: 13px; margin-top: 6px; opacity: 0.7; }
+
+        /* Radar Chart */
+        .radar-section { margin-bottom: 36px; }
+        .radar-section h3 { font-size: 18px; margin-bottom: 4px; }
+        .radar-section .section-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+        .radar-wrap {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+        }
+        .radar-legend {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 16px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        .radar-legend span {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .legend-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        /* Category Cards */
+        .cat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 36px;
+        }
+        .cat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 18px;
+            transition: border-color 0.2s;
+        }
+        .cat-card:hover { border-color: rgba(184,240,240,0.3); }
+        .cat-card-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .cat-card-name { font-size: 14px; }
+        .cat-card-grade {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 18px;
+            font-weight: 700;
+        }
+        .cat-bar {
+            height: 6px;
+            background: #2a2a2b;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+        .cat-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 1s ease;
+        }
+        .cat-card-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .cat-card-stats .benchmark { font-size: 11px; }
+        .cat-card-stats .above { color: var(--green); }
+        .cat-card-stats .below { color: var(--red); }
+
+        /* Recommendations */
+        .recs-section { margin-bottom: 36px; }
+        .recs-section h3 { font-size: 18px; margin-bottom: 4px; }
+        .recs-section .section-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 16px; }
+        .rec-item {
+            padding: 16px 18px;
+            background: var(--surface);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border-left: 4px solid var(--yellow);
+        }
+        .rec-item.critical { border-left-color: var(--red); }
+        .rec-item.high { border-left-color: var(--orange); }
+        .rec-item.medium { border-left-color: var(--yellow); }
+        .rec-item.low { border-left-color: var(--blue); }
+        .rec-head {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+            flex-wrap: wrap;
+        }
+        .rec-severity {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: 'JetBrains Mono', monospace;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+        .rec-item.critical .rec-severity { color: var(--red); background: rgba(255,71,87,0.12); }
+        .rec-item.high .rec-severity { color: var(--orange); background: rgba(255,140,66,0.12); }
+        .rec-item.medium .rec-severity { color: var(--yellow); background: rgba(255,217,61,0.12); }
+        .rec-item.low .rec-severity { color: var(--blue); background: rgba(74,158,255,0.12); }
+        .rec-cat {
+            font-size: 11px;
+            color: var(--text-dim);
+            font-family: 'JetBrains Mono', monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .rec-effort {
+            margin-left: auto;
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: rgba(184,240,240,0.08);
+            color: var(--cyan);
+            font-family: 'JetBrains Mono', monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .rec-text { font-size: 14px; line-height: 1.45; color: var(--text); }
+
+        /* Quick Wins */
+        .quick-wins { margin-bottom: 36px; }
+        .quick-wins h3 { font-size: 18px; margin-bottom: 4px; }
+        .quick-wins .section-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 16px; }
+        .qw-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 14px 18px;
+            background: rgba(196,255,158,0.04);
+            border: 1px solid rgba(196,255,158,0.15);
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+        .qw-icon {
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            background: rgba(196,255,158,0.15);
+            color: var(--green);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+        .qw-text { font-size: 14px; line-height: 1.45; }
+
+        /* Guides */
+        .guides-section { margin-bottom: 36px; }
+        .guides-section h3 { font-size: 18px; margin-bottom: 4px; }
+        .guides-section .section-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 16px; }
+        .guide-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 18px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 10px;
+            text-decoration: none;
+            color: var(--text);
+            transition: all 0.2s;
+        }
+        .guide-card:hover { border-color: var(--cyan); background: var(--surface-2); }
+        .guide-icon {
+            width: 44px; height: 44px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--cyan), var(--green));
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        .guide-info { flex: 1; }
+        .guide-title { font-size: 15px; margin-bottom: 2px; }
+        .guide-desc { font-size: 13px; color: var(--text-muted); }
+        .guide-arrow { font-size: 18px; color: var(--cyan); }
+
+        /* CTA */
+        .cta-section {
+            background: linear-gradient(135deg, var(--cyan), var(--green));
+            color: var(--black);
+            padding: 32px;
+            border-radius: 16px;
+            text-align: center;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(15,15,16,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(15,15,16,0.04) 1px, transparent 1px);
+            background-size: 24px 24px;
+            pointer-events: none;
+        }
+        .cta-section h3 { font-size: 22px; margin-bottom: 8px; position: relative; }
+        .cta-section p { font-size: 15px; color: #333; margin-bottom: 20px; max-width: 440px; margin-left: auto; margin-right: auto; position: relative; }
+        .btn-cta {
+            display: inline-block;
+            padding: 14px 32px;
+            background: var(--black);
+            color: var(--text);
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: 'Questrial', sans-serif;
+            text-decoration: none;
+            position: relative;
+            transition: background 0.2s;
+        }
+        .btn-cta:hover { background: #222; }
+
+        /* Report Actions */
+        .report-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 24px;
+        }
+        .btn-report {
+            padding: 10px 22px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Questrial', sans-serif;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text);
+            transition: all 0.2s;
+        }
+        .btn-report:hover { border-color: var(--cyan); }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-top: 32px;
+        }
+        .stat-item {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 18px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .stat-number {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--green);
+        }
+        .stat-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+        /* ============================================================
+           FOOTER
+           ============================================================ */
+        .footer {
+            text-align: center;
+            padding: 28px 20px;
+            color: var(--text-dim);
+            font-size: 13px;
+        }
+        .footer a { color: var(--cyan); text-decoration: none; }
+        .footer a:hover { text-decoration: underline; }
+
+        /* ============================================================
+           TOAST
+           ============================================================ */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--surface-2);
+            color: var(--green);
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            z-index: 100;
+            border: 1px solid var(--green);
+        }
+        .toast.show { opacity: 1; }
+
+        /* ============================================================
+           ANIMATIONS
+           ============================================================ */
+        @keyframes popIn {
+            0% { transform: scale(0.6); opacity: 0; }
+            60% { transform: scale(1.05); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .anim-pop { animation: popIn 0.5s ease forwards; }
+        .anim-slide { animation: slideUp 0.4s ease forwards; opacity: 0; }
+
+        /* ============================================================
+           PRINT STYLES
+           ============================================================ */
+        @media print {
+            body { background: #fff !important; color: #111 !important; background-image: none !important; }
+            .hero, .stepper, .stepper-label, .progress-wrap, .lead-form, .footer, .toast,
+            .nav-buttons, .report-actions, .btn-cta, .cta-section { display: none !important; }
+            .results { display: block !important; }
+            .container { max-width: 100%; padding: 0 20px; }
+            .score-header { padding-top: 0; }
+            .cat-card, .rec-item, .qw-item, .guide-card, .stat-item, .radar-wrap, .risk-banner {
+                break-inside: avoid;
+                border-color: #ddd !important;
+                background: #fafafa !important;
+            }
+            .cat-card-grade, .score-grade { color: #111 !important; }
+            .rec-text, .qw-text { color: #333 !important; }
+            .section-sub { color: #666 !important; }
+            .print-header {
+                display: flex !important;
+                justify-content: space-between;
+                align-items: center;
+                padding: 20px 0;
+                border-bottom: 2px solid #111;
+                margin-bottom: 24px;
+            }
+            .print-header .logo { font-size: 24px; font-weight: 700; color: #111; }
+            .print-header .date { font-size: 13px; color: #666; }
+        }
+        .print-header { display: none; }
+
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+        @media (max-width: 640px) {
+            .hero { padding: 40px 20px 32px; }
+            .hero h1 { font-size: 28px; }
+            .hero-stats { gap: 20px; }
+            .container { padding: 24px 16px; }
+            .cat-grid { grid-template-columns: 1fr; }
+            .stats-bar { grid-template-columns: 1fr; }
+            .question-text { font-size: 19px; }
+            .stepper { gap: 0; }
+            .step-line { width: 12px; }
+            .step-node { width: 24px; height: 24px; font-size: 10px; }
+            .radar-wrap { padding: 16px; }
+            .rec-head { gap: 6px; }
+            .rec-effort { margin-left: 0; margin-top: 4px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- HERO -->
+    <div class="hero">
+        <div class="hero-content">
+            <div class="badge">Free &middot; 4 Minutes &middot; 20 Questions &middot; 6 Domains</div>
+            <h1>How Secure Is<br>Your Business?</h1>
+            <p>20 expert questions across 6 critical security domains. Get your risk score, threat analysis, and a personalised action plan.</p>
+            <div class="hero-stats">
+                <div class="hero-stat"><span>6</span>Security Domains</div>
+                <div class="hero-stat"><span>20</span>Expert Questions</div>
+                <div class="hero-stat"><span>Free</span>Action Plan</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTAINER -->
+    <div class="container">
+        <!-- Category Stepper -->
+        <div class="stepper" id="stepper"></div>
+        <div class="stepper-label" id="stepperLabel"></div>
+
+        <!-- Progress -->
+        <div class="progress-wrap" id="progressWrap">
+            <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+            <div class="progress-text">
+                <span id="progressLabel">Question 1 of 20</span>
+                <span id="progressPct" class="mono">0%</span>
+            </div>
+        </div>
+
+        <!-- Business Profile -->
+        <div class="biz-profile active" id="bizProfile">
+            <h2>Tell Us About Your Business</h2>
+            <p>This helps us tailor your assessment with industry-specific benchmarks and size-appropriate recommendations.</p>
+            <div class="biz-grid">
+                <div class="form-group">
+                    <label>Industry</label>
+                    <select id="bizIndustry">
+                        <option value="">Select your industry...</option>
+                        <option value="professional">Professional Services</option>
+                        <option value="healthcare">Healthcare</option>
+                        <option value="finance">Finance & Insurance</option>
+                        <option value="tech">Technology / SaaS</option>
+                        <option value="retail">Retail & Hospitality</option>
+                        <option value="construction">Construction & Trades</option>
+                        <option value="manufacturing">Manufacturing</option>
+                        <option value="education">Education</option>
+                        <option value="government">Government / Public Sector</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Number of Employees</label>
+                    <select id="bizSize">
+                        <option value="">Select company size...</option>
+                        <option value="1-10">1 &ndash; 10</option>
+                        <option value="11-50">11 &ndash; 50</option>
+                        <option value="51-200">51 &ndash; 200</option>
+                        <option value="200+">200+</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Primary Cloud Platform</label>
+                    <select id="bizCloud">
+                        <option value="">Select platform...</option>
+                        <option value="m365">Microsoft 365</option>
+                        <option value="google">Google Workspace</option>
+                        <option value="hybrid">Both / Hybrid</option>
+                        <option value="other">Other / Not sure</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>IT Support</label>
+                    <select id="bizIT">
+                        <option value="">Select IT model...</option>
+                        <option value="inhouse">In-house IT team</option>
+                        <option value="msp">Managed Service Provider (MSP)</option>
+                        <option value="parttime">Part-time / Shared IT person</option>
+                        <option value="none">No dedicated IT support</option>
+                    </select>
+                </div>
+            </div>
+            <div class="nav-buttons" style="margin-top:32px">
+                <div></div>
+                <button class="btn btn-next" id="bizNextBtn" onclick="startAssessment()">Start Assessment &rarr;</button>
+            </div>
+        </div>
+
+        <!-- Questions (JS-generated) -->
+        <div id="questionsContainer"></div>
+
+        <!-- Category Transitions (JS-generated) -->
+        <div id="transitionsContainer"></div>
+
+        <!-- Lead Form -->
+        <div class="lead-form" id="leadForm">
+            <div class="lead-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0F0F10" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <h2>Your Assessment Is Ready</h2>
+            <p>Enter your details to unlock your personalised Security Assessment — including risk score, radar analysis, and prioritised action plan.</p>
+            <div class="form-group"><label>Full Name *</label><input type="text" id="leadName" placeholder="e.g. Sarah Mitchell" required></div>
+            <div class="form-group"><label>Work Email *</label><input type="email" id="leadEmail" placeholder="e.g. sarah@company.co.nz" required></div>
+            <div class="form-group"><label>Company Name</label><input type="text" id="leadCompany" placeholder="e.g. Mitchell & Partners"></div>
+            <div class="form-group"><label>Phone (optional)</label><input type="tel" id="leadPhone" placeholder="e.g. 021 123 4567"></div>
+            <div class="nav-buttons">
+                <button class="btn btn-back" onclick="goBack()">Back</button>
+                <button class="btn btn-next" onclick="submitLead()">Unlock My Assessment &rarr;</button>
+            </div>
+        </div>
+
+        <!-- Print Header (only visible in print) -->
+        <div class="print-header">
+            <div class="logo">WeHack</div>
+            <div class="date">Security Assessment Report</div>
+        </div>
+
+        <!-- Results Dashboard (JS-generated) -->
+        <div class="results" id="results"></div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        <p>&copy; 2026 WeHack &nbsp;|&nbsp; <a href="https://www.wehack.co.nz">wehack.co.nz</a> &nbsp;|&nbsp; <a href="mailto:info@wehack.co.nz">info@wehack.co.nz</a> &nbsp;|&nbsp; <a href="tel:0220917242">022 091 7242</a></p>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+    /* ================================================================
+       CONFIG
+       ================================================================ */
+    var WEBHOOK_URL = ''; // Make.com, Zapier, or Google Apps Script
+
+    /* ================================================================
+       WIX IFRAME HEIGHT BRIDGE
+       ================================================================ */
+    function notifyHeight() {
+        var h = document.documentElement.scrollHeight;
+        window.parent.postMessage({ type: 'wehack-scorecard-height', height: h }, '*');
+    }
+    window.addEventListener('resize', notifyHeight);
+    setInterval(notifyHeight, 500);
+
+    /* ================================================================
+       BUSINESS PROFILE
+       ================================================================ */
+    var bizProfile = { industry: '', size: '', cloud: '', it: '' };
+
+    /* Industry-specific benchmark adjustments (added to base benchmarks) */
+    var industryAdjust = {
+        professional: { identity: 0, email: 0, data: 0, network: 0, human: 0, governance: 0 },
+        healthcare:   { identity: 3, email: 2, data: 5, network: 0, human: -3, governance: 8 },
+        finance:      { identity: 8, email: 5, data: 3, network: 5, human: 3, governance: 10 },
+        tech:         { identity: 5, email: 3, data: 0, network: 8, human: 5, governance: -2 },
+        retail:       { identity: -5, email: -3, data: -5, network: -3, human: -5, governance: -5 },
+        construction: { identity: -8, email: -5, data: -5, network: -5, human: -8, governance: -8 },
+        manufacturing:{ identity: -3, email: -2, data: 0, network: 2, human: -5, governance: 0 },
+        education:    { identity: 0, email: -2, data: 3, network: 0, human: 0, governance: 5 },
+        government:   { identity: 5, email: 3, data: 5, network: 3, human: 0, governance: 12 },
+        other:        { identity: 0, email: 0, data: 0, network: 0, human: 0, governance: 0 }
+    };
+
+    /* Size-based risk multipliers */
+    var sizeMultipliers = { '1-10': 0.5, '11-50': 1.0, '51-200': 1.8, '200+': 3.0 };
+
+    /* Industry display names */
+    var industryNames = {
+        professional: 'Professional Services', healthcare: 'Healthcare', finance: 'Finance & Insurance',
+        tech: 'Technology', retail: 'Retail & Hospitality', construction: 'Construction',
+        manufacturing: 'Manufacturing', education: 'Education', government: 'Government', other: 'General'
+    };
+
+    function startAssessment() {
+        bizProfile.industry = document.getElementById('bizIndustry').value || 'other';
+        bizProfile.size = document.getElementById('bizSize').value || '11-50';
+        bizProfile.cloud = document.getElementById('bizCloud').value || 'other';
+        bizProfile.it = document.getElementById('bizIT').value || 'none';
+
+        /* Apply industry adjustments to benchmarks */
+        var adj = industryAdjust[bizProfile.industry] || industryAdjust.other;
+        var catKeys = ['identity', 'email', 'data', 'network', 'human', 'governance'];
+        categories.forEach(function(cat, i) {
+            cat.benchmark = cat.baseBenchmark + (adj[catKeys[i]] || 0);
+            cat.benchmark = Math.max(10, Math.min(90, cat.benchmark));
+        });
+
+        document.getElementById('bizProfile').classList.remove('active');
+        document.getElementById('stepper').style.display = 'flex';
+        document.getElementById('stepperLabel').style.display = 'block';
+        document.getElementById('progressWrap').style.display = 'block';
+        document.getElementById('q-0').classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        setTimeout(notifyHeight, 100);
+    }
+
+    /* ================================================================
+       CATEGORIES
+       ================================================================ */
+    var categories = [
+        { id: 'identity',   name: 'Identity & Access',     short: 'Identity',   baseBenchmark: 52, benchmark: 52, questions: [] },
+        { id: 'email',      name: 'Email & Phishing',      short: 'Email',      baseBenchmark: 33, benchmark: 33, questions: [] },
+        { id: 'data',       name: 'Data Protection',        short: 'Data',       baseBenchmark: 38, benchmark: 38, questions: [] },
+        { id: 'network',    name: 'Network & Endpoint',     short: 'Network',    baseBenchmark: 42, benchmark: 42, questions: [] },
+        { id: 'human',      name: 'Human Layer',            short: 'Human',      baseBenchmark: 22, benchmark: 22, questions: [] },
+        { id: 'governance', name: 'Governance & Compliance', short: 'Governance', baseBenchmark: 28, benchmark: 28, questions: [] }
+    ];
+
+    /* ================================================================
+       QUESTIONS (20)
+       ================================================================ */
+    var questions = [
+        /* --- IDENTITY & ACCESS (0-3) --- */
+        {
+            cat: 0,
+            text: "Do you use multi-factor authentication (MFA) on all business accounts?",
+            context: "MFA blocks 99.9% of automated account compromises. It's the single most impactful control.",
+            options: [
+                { label: "Yes, on all accounts including hardware keys for admins", score: 3 },
+                { label: "Yes, app-based MFA on all accounts", score: 2 },
+                { label: "On some accounts, but not all", score: 1 },
+                { label: "No MFA in place", score: 0 }
+            ],
+            rec: "Enable MFA on ALL business accounts immediately — start with email and admin accounts. Use authenticator apps (not SMS). Hardware keys like YubiKeys for admin accounts.",
+            effort: "Quick Win",
+            quickWin: true,
+            guide: null
+        },
+        {
+            cat: 0,
+            text: "How do you manage passwords across the organisation?",
+            context: "Credential stuffing attacks use billions of leaked passwords. Reused passwords are the #1 account takeover vector.",
+            options: [
+                { label: "Password manager enforced, unique passwords everywhere", score: 3 },
+                { label: "Password manager available, not mandatory", score: 2 },
+                { label: "Password policy exists, no manager", score: 1 },
+                { label: "No policy — people choose their own", score: 0 }
+            ],
+            rec: "Deploy a password manager (Bitwarden, 1Password) and enforce unique passwords for every account. Eliminate shared credentials. This costs $3-5/user/month.",
+            effort: "Quick Win",
+            quickWin: true,
+            guide: null
+        },
+        {
+            cat: 0,
+            text: "How do you manage admin and privileged access?",
+            context: "Compromised admin accounts give attackers total control. 74% of breaches involve privilege misuse.",
+            options: [
+                { label: "Separate admin accounts, time-limited elevation (PIM/PAM)", score: 3 },
+                { label: "Separate admin accounts, always-on access", score: 2 },
+                { label: "Shared admin credentials among IT staff", score: 1 },
+                { label: "Most users have admin-level access", score: 0 }
+            ],
+            rec: "Create separate admin accounts — never use admin privileges for daily work. Review who has admin access monthly. Consider Privileged Identity Management (PIM) for just-in-time access.",
+            effort: "Medium",
+            quickWin: false,
+            guide: 'm365-hardening-guide.html'
+        },
+        {
+            cat: 0,
+            text: "What happens to accounts when someone leaves the company?",
+            context: "Former employees with active access are a top breach vector. One in four ex-employees still has access to company systems.",
+            options: [
+                { label: "Automated deprovisioning within 24 hours across all systems", score: 3 },
+                { label: "Manual checklist, completed within a week", score: 2 },
+                { label: "We get around to it eventually", score: 1 },
+                { label: "No formal offboarding process", score: 0 }
+            ],
+            rec: "Create an offboarding checklist covering ALL systems: email, VPN, cloud apps, physical access, shared credentials. Audit quarterly for orphaned accounts.",
+            effort: "Medium",
+            quickWin: false,
+            guide: null
+        },
+
+        /* --- EMAIL & PHISHING (4-6) --- */
+        {
+            cat: 1,
+            text: "Have you configured SPF, DKIM, and DMARC for your email domain?",
+            context: "Without DMARC at 'reject', anyone can send emails pretending to be your company. Only 33% of NZ domains have proper DMARC.",
+            options: [
+                { label: "DMARC at reject + SPF + DKIM fully configured", score: 3 },
+                { label: "DMARC at quarantine or monitor mode", score: 2 },
+                { label: "SPF only, no DMARC", score: 1 },
+                { label: "Don't know / not configured", score: 0 }
+            ],
+            rec: "Configure SPF, DKIM, and DMARC for your domain. Start DMARC at 'none' (monitor), then move to 'reject' over 4-6 weeks. This prevents email spoofing of your brand — it's free.",
+            effort: "Medium",
+            quickWin: false,
+            guide: 'm365-hardening-guide.html'
+        },
+        {
+            cat: 1,
+            text: "What email security controls do you have beyond basic spam filtering?",
+            context: "AI-generated phishing achieves 4x higher click-through rates. Basic filters miss sophisticated attacks.",
+            options: [
+                { label: "Advanced filtering + safe links + attachment sandboxing", score: 3 },
+                { label: "Enhanced spam filter with some link protection", score: 2 },
+                { label: "Basic built-in spam filter only", score: 1 },
+                { label: "Default email settings, no additional protection", score: 0 }
+            ],
+            rec: "Enable advanced email filtering with safe link scanning and attachment sandboxing. Microsoft Defender for Office 365 or Proofpoint Essentials are strong options for NZ SMBs.",
+            effort: "Medium",
+            quickWin: false,
+            guide: 'm365-hardening-guide.html'
+        },
+        {
+            cat: 1,
+            text: "Do you run phishing simulations or email security testing?",
+            context: "Organisations running monthly phishing sims reduce click rates by 75% within 12 months.",
+            options: [
+                { label: "Regular phishing sims + targeted follow-up training", score: 3 },
+                { label: "Annual security awareness training (no sims)", score: 2 },
+                { label: "One-time onboarding training only", score: 1 },
+                { label: "No phishing training at all", score: 0 }
+            ],
+            rec: "Start phishing simulations — even quarterly makes a massive difference. Services like KnowBe4, or free tools like GoPhish, let you test and train simultaneously.",
+            effort: "Medium",
+            quickWin: false,
+            guide: 'ai-social-engineering-defence.html'
+        },
+
+        /* --- DATA PROTECTION (7-9) --- */
+        {
+            cat: 2,
+            text: "Do you know what data you hold, where it lives, and who can access it?",
+            context: "You can't protect what you don't know you have. This is also a legal requirement under the NZ Privacy Act 2020.",
+            options: [
+                { label: "Complete data inventory — classified, mapped, access-controlled", score: 3 },
+                { label: "General awareness, partially documented", score: 2 },
+                { label: "Rough idea, nothing written down", score: 1 },
+                { label: "No idea what data we hold or where", score: 0 }
+            ],
+            rec: "Map your data: what you collect, where it's stored, who has access, and how long you keep it. This is legally required under the NZ Privacy Act 2020 and critical for breach response.",
+            effort: "Major",
+            quickWin: false,
+            guide: 'breach-response-checklist.html'
+        },
+        {
+            cat: 2,
+            text: "How robust is your backup and disaster recovery capability?",
+            context: "93% of ransomware victims who pay still have their data stolen. Immutable backups are your last line of defence.",
+            options: [
+                { label: "3-2-1 backups with immutable/offline copies, tested quarterly", score: 3 },
+                { label: "Automated backups, rarely tested restore", score: 2 },
+                { label: "Some backups, never tested if restore works", score: 1 },
+                { label: "No backup strategy in place", score: 0 }
+            ],
+            rec: "Implement the 3-2-1 rule: 3 copies, 2 different media, 1 offsite. Add immutable backups to defeat ransomware encryption. TEST restores quarterly — backups that don't restore are useless.",
+            effort: "Medium",
+            quickWin: false,
+            guide: null
+        },
+        {
+            cat: 2,
+            text: "Is sensitive data encrypted at rest and in transit?",
+            context: "Unencrypted data is readable to anyone who gains access. Encryption is the difference between a breach and an incident.",
+            options: [
+                { label: "Full-disk encryption + HTTPS everywhere + database encryption", score: 3 },
+                { label: "HTTPS on websites, some disk encryption", score: 2 },
+                { label: "HTTPS only, no endpoint encryption", score: 1 },
+                { label: "No encryption strategy", score: 0 }
+            ],
+            rec: "Enable full-disk encryption on ALL devices (BitLocker on Windows, FileVault on Mac). Ensure HTTPS everywhere. Encrypt sensitive database fields. This can be done today.",
+            effort: "Quick Win",
+            quickWin: true,
+            guide: null
+        },
+
+        /* --- NETWORK & ENDPOINT (10-13) --- */
+        {
+            cat: 3,
+            text: "What endpoint protection do you use across company devices?",
+            context: "Traditional antivirus misses 60%+ of modern threats. EDR catches what AV misses.",
+            options: [
+                { label: "EDR (Endpoint Detection & Response) with managed monitoring", score: 3 },
+                { label: "EDR or next-gen AV, self-managed", score: 2 },
+                { label: "Basic traditional antivirus", score: 1 },
+                { label: "No endpoint protection", score: 0 }
+            ],
+            rec: "Deploy EDR (Endpoint Detection & Response) — not just antivirus. CrowdStrike Falcon Go, SentinelOne, or Microsoft Defender for Business are strong options for SMBs.",
+            effort: "Medium",
+            quickWin: false,
+            guide: null
+        },
+        {
+            cat: 3,
+            text: "Can you detect if someone is currently in your network or systems?",
+            context: "The average breach goes undetected for 197 days. Internal detection saves $900,000 on average vs external notification.",
+            options: [
+                { label: "SIEM/SOC with real-time alerting and response", score: 3 },
+                { label: "Centralised logging, reviewed periodically", score: 2 },
+                { label: "Logs exist somewhere but are never reviewed", score: 1 },
+                { label: "No monitoring — we'd have no idea", score: 0 }
+            ],
+            rec: "Implement centralised logging and monitoring. At minimum, enable unified audit logging in M365 and review weekly. Consider a managed SOC service for 24/7 coverage.",
+            effort: "Medium",
+            quickWin: false,
+            guide: 'm365-hardening-guide.html'
+        },
+        {
+            cat: 3,
+            text: "How quickly are systems patched when vulnerabilities are announced?",
+            context: "Unpatched systems are the #1 entry point for attackers. Exploitation now happens within hours of CVE disclosure.",
+            options: [
+                { label: "Automated patching — critical patches within 48 hours", score: 3 },
+                { label: "Regular schedule, applied within 1-2 weeks", score: 2 },
+                { label: "Ad-hoc — when we get around to it", score: 1 },
+                { label: "No patching process at all", score: 0 }
+            ],
+            rec: "Implement automated patching. Enable Windows Update for Business, auto-update macOS, and patch third-party apps. Critical vulnerabilities must be patched within 48 hours.",
+            effort: "Quick Win",
+            quickWin: true,
+            guide: null
+        },
+        {
+            cat: 3,
+            text: "Have your cloud services been professionally reviewed for security?",
+            context: "Cloud misconfiguration is the fastest-growing attack vector. Default settings in M365/Google Workspace are NOT secure.",
+            options: [
+                { label: "Professionally audited and hardened against benchmarks (CISA SCuBA)", score: 3 },
+                { label: "Followed vendor security guides during setup", score: 2 },
+                { label: "Mostly default settings", score: 1 },
+                { label: "Not sure how things are configured", score: 0 }
+            ],
+            rec: "Get a professional cloud security review. CISA's SCuBA baselines cover M365 in detail. Default configurations are designed for convenience, not security — there are 47+ configuration points to check.",
+            effort: "Major",
+            quickWin: false,
+            guide: 'm365-hardening-guide.html'
+        },
+
+        /* --- HUMAN LAYER (14-16) --- */
+        {
+            cat: 4,
+            text: "Do you have an ongoing security awareness program for all staff?",
+            context: "95% of breaches involve human error. A trained team is your strongest defence layer.",
+            options: [
+                { label: "Ongoing program: monthly micro-trainings + phishing sims + gamification", score: 3 },
+                { label: "Annual training session for all staff", score: 2 },
+                { label: "Informal reminders — 'be careful out there'", score: 1 },
+                { label: "No security awareness program", score: 0 }
+            ],
+            rec: "Build an ongoing security awareness program. Monthly 5-minute micro-trainings are more effective than annual hour-long sessions. Make it engaging and non-punitive.",
+            effort: "Medium",
+            quickWin: false,
+            guide: 'ai-social-engineering-defence.html'
+        },
+        {
+            cat: 4,
+            text: "How easy is it for staff to report a suspicious email, call, or incident?",
+            context: "Organisations with easy, no-blame reporting catch breaches 12x faster. Early detection saves hundreds of thousands.",
+            options: [
+                { label: "One-click reporting button, no-blame culture, rapid response", score: 3 },
+                { label: "Reporting process exists, used occasionally", score: 2 },
+                { label: "People would probably tell IT informally", score: 1 },
+                { label: "No reporting process — people wouldn't know what to do", score: 0 }
+            ],
+            rec: "Create a simple incident reporting channel (dedicated email, Slack channel, or phish-report button). Make it blame-free — reward reporting. Early detection saves hundreds of thousands in breach costs.",
+            effort: "Quick Win",
+            quickWin: true,
+            guide: null
+        },
+        {
+            cat: 4,
+            text: "Can your team verify if a request is legitimate when contacted by AI voice clones or deepfakes?",
+            context: "AI voice cloning now needs just 3 seconds of audio. 70% of people can't tell real from cloned voices. 400 companies per day face CEO deepfake fraud.",
+            options: [
+                { label: "Verification protocol in place for all financial/sensitive requests", score: 3 },
+                { label: "Some awareness of social engineering, no formal protocol", score: 2 },
+                { label: "We trust calls and emails at face value", score: 1 },
+                { label: "Never heard of AI voice cloning or deepfakes", score: 0 }
+            ],
+            rec: "Implement a verification protocol: any financial or sensitive request must be confirmed out-of-band (call back on known number, not the one provided). Train staff on AI voice cloning — 3 seconds of audio is enough to clone a voice.",
+            effort: "Quick Win",
+            quickWin: true,
+            guide: 'ai-social-engineering-defence.html'
+        },
+
+        /* --- GOVERNANCE & COMPLIANCE (17-19) --- */
+        {
+            cat: 5,
+            text: "Do you have a documented and tested incident response plan?",
+            context: "When a breach happens, every minute counts. Organisations with tested IR plans contain breaches 58% faster.",
+            options: [
+                { label: "Documented, tested annually, roles and escalation paths defined", score: 3 },
+                { label: "Documented but never actually tested", score: 2 },
+                { label: "Informal — 'we'd figure it out'", score: 1 },
+                { label: "No incident response plan", score: 0 }
+            ],
+            rec: "Create and TEST an incident response plan. Define roles, communication chains, and decision authority BEFORE a breach. Tabletop exercises cost nothing and dramatically improve response speed.",
+            effort: "Medium",
+            quickWin: false,
+            guide: 'breach-response-checklist.html'
+        },
+        {
+            cat: 5,
+            text: "Do you have cyber insurance, and do you understand what it covers?",
+            context: "Many policies exclude nation-state attacks, social engineering, and pre-existing vulnerabilities. A pentest report can reduce premiums 15-25%.",
+            options: [
+                { label: "Comprehensive cyber insurance, requirements met, exclusions understood", score: 3 },
+                { label: "Basic coverage bundled with general insurance, unsure of exclusions", score: 2 },
+                { label: "Looked into it, haven't purchased", score: 1 },
+                { label: "No cyber insurance at all", score: 0 }
+            ],
+            rec: "Investigate comprehensive cyber insurance — but read the exclusions carefully. Many policies won't pay if you lack basic controls (MFA, patching). A penetration test report can reduce premiums by 15-25%.",
+            effort: "Medium",
+            quickWin: false,
+            guide: null
+        },
+        {
+            cat: 5,
+            text: "How compliant are you with the NZ Privacy Act 2020?",
+            context: "The Privacy Act requires mandatory breach notification within 72 hours. Non-compliance carries significant penalties and reputational damage.",
+            options: [
+                { label: "Fully compliant — privacy officer, breach process, data governance in place", score: 3 },
+                { label: "Mostly compliant, some gaps remain", score: 2 },
+                { label: "Aware of obligations, haven't implemented", score: 1 },
+                { label: "Unaware of our obligations under the Act", score: 0 }
+            ],
+            rec: "Appoint a privacy officer (can be an existing role). Document your data practices. Create a breach notification process — the NZ Privacy Act requires notification to the Privacy Commissioner within 72 hours of a notifiable breach.",
+            effort: "Major",
+            quickWin: false,
+            guide: 'breach-response-checklist.html'
+        }
+    ];
+
+    /* Map questions to categories */
+    questions.forEach(function(q, i) { categories[q.cat].questions.push(i); });
+
+    /* ================================================================
+       GUIDE METADATA
+       ================================================================ */
+    var guideInfo = {
+        'm365-hardening-guide.html': {
+            title: 'Microsoft 365 Hardening Guide',
+            desc: '10 critical controls, AiTM attack flow, 5-minute audit checklist, real pentest findings',
+            icon: 'M'
+        },
+        'ai-social-engineering-defence.html': {
+            title: 'AI Social Engineering Defence Guide',
+            desc: '5 AI attack vectors, voice cloning, deepfakes, 8-step defence framework, verification protocol',
+            icon: 'AI'
+        },
+        'breach-response-checklist.html': {
+            title: '72-Hour Breach Response Checklist',
+            desc: '18-step IR guide, NZ Privacy Act compliance, real NZ case study, printable checklist',
+            icon: 'IR'
+        }
+    };
+
+    /* ================================================================
+       STATE
+       ================================================================ */
+    var currentQ = 0;
+    var answers = {};
+    var showingTransition = false;
+
+    /* ================================================================
+       TOAST
+       ================================================================ */
+    function showToast(msg) {
+        var t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        setTimeout(function() { t.classList.remove('show'); }, 3000);
+    }
+
+    /* ================================================================
+       INIT
+       ================================================================ */
+    function init() {
+        buildStepper();
+        buildQuestions();
+        updateStepper();
+        updateProgress();
+        /* Hide stepper/progress/Q0 until business profile is done */
+        document.getElementById('stepper').style.display = 'none';
+        document.getElementById('stepperLabel').style.display = 'none';
+        document.getElementById('progressWrap').style.display = 'none';
+        document.getElementById('q-0').classList.remove('active');
+        setTimeout(notifyHeight, 100);
+    }
+
+    /* ================================================================
+       BUILD STEPPER
+       ================================================================ */
+    function buildStepper() {
+        var stepper = document.getElementById('stepper');
+        for (var i = 0; i < categories.length; i++) {
+            var step = document.createElement('div');
+            step.className = 'step';
+            var node = document.createElement('div');
+            node.className = 'step-node';
+            node.id = 'stepNode-' + i;
+            node.textContent = i + 1;
+            step.appendChild(node);
+            if (i < categories.length - 1) {
+                var line = document.createElement('div');
+                line.className = 'step-line';
+                line.id = 'stepLine-' + i;
+                step.appendChild(line);
+            }
+            stepper.appendChild(step);
+        }
+    }
+
+    /* ================================================================
+       BUILD QUESTIONS
+       ================================================================ */
+    function buildQuestions() {
+        var container = document.getElementById('questionsContainer');
+        questions.forEach(function(q, i) {
+            var card = document.createElement('div');
+            card.className = 'question-card' + (i === 0 ? ' active' : '');
+            card.id = 'q-' + i;
+
+            var num = document.createElement('div');
+            num.className = 'question-number';
+            num.textContent = 'Question ' + (i + 1) + ' of 20';
+            card.appendChild(num);
+
+            var text = document.createElement('div');
+            text.className = 'question-text';
+            text.textContent = q.text;
+            card.appendChild(text);
+
+            var ctx = document.createElement('div');
+            ctx.className = 'question-context';
+            ctx.textContent = q.context;
+            card.appendChild(ctx);
+
+            var opts = document.createElement('div');
+            opts.className = 'options';
+            q.options.forEach(function(opt, j) {
+                var el = document.createElement('div');
+                el.className = 'option';
+                el.addEventListener('click', function() { selectOption(i, j, opt.score); });
+                var dot = document.createElement('div');
+                dot.className = 'option-dot';
+                el.appendChild(dot);
+                var lbl = document.createElement('div');
+                lbl.textContent = opt.label;
+                el.appendChild(lbl);
+                opts.appendChild(el);
+            });
+            card.appendChild(opts);
+
+            var nav = document.createElement('div');
+            nav.className = 'nav-buttons';
+            if (i > 0) {
+                var back = document.createElement('button');
+                back.className = 'btn btn-back';
+                back.textContent = 'Back';
+                back.addEventListener('click', goBack);
+                nav.appendChild(back);
+            } else {
+                nav.appendChild(document.createElement('div'));
+            }
+            var next = document.createElement('button');
+            next.className = 'btn btn-next';
+            next.id = 'nextBtn-' + i;
+            next.textContent = i === questions.length - 1 ? 'Get My Assessment \u2192' : 'Next \u2192';
+            next.disabled = true;
+            next.addEventListener('click', goNext);
+            nav.appendChild(next);
+            card.appendChild(nav);
+
+            container.appendChild(card);
+        });
+    }
+
+    /* ================================================================
+       QUIZ LOGIC
+       ================================================================ */
+    function selectOption(qi, oi, score) {
+        answers[qi] = score;
+        var opts = document.querySelectorAll('#q-' + qi + ' .option');
+        opts.forEach(function(o, j) { o.classList.toggle('selected', j === oi); });
+        document.getElementById('nextBtn-' + qi).disabled = false;
+    }
+
+    function goNext() {
+        if (showingTransition) return;
+        var curCat = questions[currentQ].cat;
+        var isLastInCat = (currentQ < questions.length - 1) && (questions[currentQ + 1].cat !== curCat);
+        var isLastQuestion = (currentQ === questions.length - 1);
+
+        document.getElementById('q-' + currentQ).classList.remove('active');
+
+        if (isLastQuestion) {
+            document.getElementById('progressWrap').style.display = 'none';
+            document.getElementById('stepper').style.display = 'none';
+            document.getElementById('stepperLabel').style.display = 'none';
+            document.getElementById('leadForm').classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            setTimeout(notifyHeight, 100);
+            return;
+        }
+
+        if (isLastInCat) {
+            showCategoryTransition(curCat, questions[currentQ + 1].cat);
+        } else {
+            currentQ++;
+            document.getElementById('q-' + currentQ).classList.add('active');
+            updateProgress();
+            updateStepper();
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        setTimeout(notifyHeight, 100);
+    }
+
+    function goBack() {
+        if (showingTransition) return;
+        if (document.getElementById('leadForm').classList.contains('active')) {
+            document.getElementById('leadForm').classList.remove('active');
+            document.getElementById('q-' + currentQ).classList.add('active');
+            document.getElementById('progressWrap').style.display = 'block';
+            document.getElementById('stepper').style.display = 'flex';
+            document.getElementById('stepperLabel').style.display = 'block';
+            return;
+        }
+        if (currentQ > 0) {
+            document.getElementById('q-' + currentQ).classList.remove('active');
+            currentQ--;
+            document.getElementById('q-' + currentQ).classList.add('active');
+            updateProgress();
+            updateStepper();
+        }
+    }
+
+    function showCategoryTransition(doneCatIdx, nextCatIdx) {
+        showingTransition = true;
+        var catScore = getCategoryScore(doneCatIdx);
+        var overlay = document.createElement('div');
+        overlay.className = 'cat-transition active';
+        overlay.id = 'catTransition';
+        overlay.innerHTML =
+            '<div class="cat-check">\u2713</div>' +
+            '<div class="cat-done-label"><strong>' + categories[doneCatIdx].name + '</strong> \u2014 Complete</div>' +
+            '<div class="cat-done-label mono" style="font-size:14px;color:var(--text-muted);margin-top:4px;">' +
+                catScore.score + '/' + catScore.max + ' (' + catScore.pct + '%)</div>' +
+            '<div class="cat-next-label" style="margin-top:16px;">Next up: <strong style="color:var(--cyan);">' + categories[nextCatIdx].name + '</strong></div>';
+        document.getElementById('questionsContainer').appendChild(overlay);
+
+        setTimeout(function() {
+            overlay.remove();
+            showingTransition = false;
+            currentQ++;
+            document.getElementById('q-' + currentQ).classList.add('active');
+            updateProgress();
+            updateStepper();
+        }, 1800);
+    }
+
+    function updateProgress() {
+        var pct = ((currentQ) / questions.length) * 100;
+        document.getElementById('progressFill').style.width = pct + '%';
+        document.getElementById('progressLabel').textContent = 'Question ' + (currentQ + 1) + ' of 20';
+        document.getElementById('progressPct').textContent = Math.round(pct) + '%';
+    }
+
+    function updateStepper() {
+        var activeCat = questions[currentQ].cat;
+        for (var i = 0; i < categories.length; i++) {
+            var node = document.getElementById('stepNode-' + i);
+            var line = document.getElementById('stepLine-' + i);
+            node.classList.remove('active', 'done');
+            if (line) line.classList.remove('done');
+            if (i < activeCat) {
+                node.classList.add('done');
+                node.textContent = '\u2713';
+                if (line) line.classList.add('done');
+            } else if (i === activeCat) {
+                node.classList.add('active');
+                node.textContent = i + 1;
+            } else {
+                node.textContent = i + 1;
+            }
+        }
+        document.getElementById('stepperLabel').innerHTML =
+            '<strong>' + categories[activeCat].name + '</strong>';
+    }
+
+    /* ================================================================
+       CATEGORY SCORING
+       ================================================================ */
+    function getCategoryScore(catIdx) {
+        var qs = categories[catIdx].questions;
+        var score = 0, max = qs.length * 3, answered = 0;
+        qs.forEach(function(qi) {
+            if (answers[qi] !== undefined) { score += answers[qi]; answered++; }
+        });
+        return { score: score, max: max, pct: max > 0 ? Math.round((score / max) * 100) : 0, answered: answered };
+    }
+
+    /* ================================================================
+       RESULTS CALCULATION
+       ================================================================ */
+    function calculateResults() {
+        var totalScore = 0, maxScore = questions.length * 3;
+        Object.keys(answers).forEach(function(k) { totalScore += answers[k]; });
+        var pct = Math.round((totalScore / maxScore) * 100);
+
+        /* Grade */
+        var grade, color, title, desc;
+        if (pct >= 80) { grade = 'A'; color = '#00C9A7'; title = 'Strong Security Posture'; desc = 'ahead of most NZ SMBs. A penetration test would validate your controls and find any remaining gaps.'; }
+        else if (pct >= 65) { grade = 'B'; color = '#4A9EFF'; title = 'Good Foundation, Room to Improve'; desc = 'has solid practices in place, but gaps remain that a determined attacker could exploit.'; }
+        else if (pct >= 50) { grade = 'C'; color = '#FFD93D'; title = 'Average — Significant Gaps Exist'; desc = 'has common vulnerabilities. The good news: the most impactful fixes are often the quickest to implement.'; }
+        else if (pct >= 35) { grade = 'D'; color = '#FF8C42'; title = 'Below Average — Action Needed'; desc = 'has serious security gaps. A breach at this level could cost $170k+ and threaten business continuity.'; }
+        else { grade = 'F'; color = '#FF4757'; title = 'Critical — Urgent Action Required'; desc = 'is essentially unprotected. 60% of breached SMBs shut down within 6 months.'; }
+
+        /* Maturity Level */
+        var maturity;
+        if (pct >= 85) maturity = { level: 5, name: 'Optimised', desc: 'Proactive, continuously improving' };
+        else if (pct >= 65) maturity = { level: 4, name: 'Managed', desc: 'Measured, monitored, improved' };
+        else if (pct >= 50) maturity = { level: 3, name: 'Established', desc: 'Documented policies, generally followed' };
+        else if (pct >= 30) maturity = { level: 2, name: 'Developing', desc: 'Some awareness, inconsistent' };
+        else maturity = { level: 1, name: 'Partial', desc: 'Ad-hoc, reactive' };
+
+        /* Category Scores */
+        var catScores = categories.map(function(cat, i) {
+            var cs = getCategoryScore(i);
+            var g;
+            if (cs.pct >= 80) g = 'A';
+            else if (cs.pct >= 65) g = 'B';
+            else if (cs.pct >= 50) g = 'C';
+            else if (cs.pct >= 35) g = 'D';
+            else g = 'F';
+            return { idx: i, name: cat.name, short: cat.short, score: cs.score, max: cs.max, pct: cs.pct, grade: g, benchmark: cat.benchmark };
+        });
+
+        /* Risk Estimation — adjusted by company size */
+        var breachCost = 173000;
+        var sizeMult = sizeMultipliers[bizProfile.size] || 1.0;
+        var riskFactor = 1 - (pct / 100) * 0.8;
+        var exposureMid = breachCost * riskFactor * sizeMult;
+        var exposureLow = Math.round(exposureMid * 0.6 / 1000) * 1000;
+        var exposureHigh = Math.round(exposureMid * 1.5 / 1000) * 1000;
+
+        /* Recommendations (sorted by severity) */
+        var recs = [];
+        questions.forEach(function(q, i) {
+            if (answers[i] !== undefined && answers[i] < 3) {
+                var sev;
+                if (answers[i] === 0) sev = 'critical';
+                else if (answers[i] === 1) sev = 'high';
+                else sev = 'medium';
+                recs.push({
+                    severity: sev,
+                    sevOrder: answers[i] === 0 ? 0 : answers[i] === 1 ? 1 : 2,
+                    cat: categories[q.cat].name,
+                    text: q.rec,
+                    effort: q.effort,
+                    quickWin: q.quickWin,
+                    guide: q.guide
+                });
+            }
+        });
+        recs.sort(function(a, b) { return a.sevOrder - b.sevOrder; });
+
+        /* Quick Wins */
+        var quickWins = recs.filter(function(r) { return r.quickWin; });
+
+        /* Relevant Guides */
+        var guideSet = {};
+        recs.forEach(function(r) { if (r.guide) guideSet[r.guide] = true; });
+        var guides = Object.keys(guideSet);
+
+        return {
+            totalScore: totalScore, maxScore: maxScore, pct: pct,
+            grade: grade, color: color, title: title, desc: desc,
+            maturity: maturity, catScores: catScores,
+            exposureLow: exposureLow, exposureHigh: exposureHigh,
+            recs: recs, quickWins: quickWins, guides: guides
+        };
+    }
+
+    /* ================================================================
+       SUBMIT LEAD + SHOW RESULTS
+       ================================================================ */
+    function submitLead() {
+        var name = document.getElementById('leadName').value.trim();
+        var email = document.getElementById('leadEmail').value.trim();
+        var company = document.getElementById('leadCompany').value.trim();
+        var phone = document.getElementById('leadPhone').value.trim();
+        if (!name || !email) { showToast('Please enter your name and email.'); return; }
+
+        var r = calculateResults();
+
+        /* Lead data for webhook */
+        var leadData = {
+            name: name, email: email, company: company, phone: phone,
+            industry: bizProfile.industry, industryName: industryNames[bizProfile.industry] || 'Other',
+            companySize: bizProfile.size, cloudPlatform: bizProfile.cloud, itModel: bizProfile.it,
+            score: r.totalScore, maxScore: r.maxScore, grade: r.grade, percentage: r.pct,
+            maturityLevel: r.maturity.level, maturityName: r.maturity.name,
+            exposureLow: r.exposureLow, exposureHigh: r.exposureHigh,
+            categoryScores: r.catScores.map(function(c) { return c.short + ':' + c.pct + '%(' + c.grade + ')'; }).join(', '),
+            topWeaknesses: r.recs.slice(0, 3).map(function(rec) { return rec.severity.toUpperCase() + ' [' + rec.cat + ']: ' + rec.text.substring(0, 80); }).join(' | '),
+            recommendedGuides: r.guides.join(', '),
+            timestamp: new Date().toISOString(),
+            source: 'wehack-security-score-v2'
+        };
+
+        if (WEBHOOK_URL) {
+            fetch(WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(leadData), mode: 'no-cors' }).catch(function() {});
+        }
+        console.log('LEAD CAPTURED:', leadData);
+
+        /* Notify parent Wix page via postMessage */
+        window.parent.postMessage({ type: 'wehack-lead-captured', data: leadData }, '*');
+
+        document.getElementById('leadForm').classList.remove('active');
+        renderResults(r, company || 'Your business');
+        setTimeout(notifyHeight, 100);
+    }
+
+    /* ================================================================
+       RENDER RESULTS
+       ================================================================ */
+    function renderResults(r, companyName) {
+        var el = document.getElementById('results');
+        el.innerHTML = '';
+
+        /* --- Executive Header --- */
+        var indName = industryNames[bizProfile.industry] || 'General';
+        var dateStr = new Date().toLocaleDateString('en-NZ', { day: 'numeric', month: 'long', year: 'numeric' });
+        var execBar = document.createElement('div');
+        execBar.style.cssText = 'text-align:center;padding:16px 20px 12px;border-bottom:1px solid var(--border);margin-bottom:8px;';
+        execBar.innerHTML = '<div style="font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);font-family:JetBrains Mono,monospace">Security Assessment Report</div>' +
+            '<div style="font-size:14px;color:var(--text-muted);margin-top:6px">' + companyName + ' &nbsp;|&nbsp; ' + indName + ' &nbsp;|&nbsp; ' + bizProfile.size + ' employees &nbsp;|&nbsp; ' + dateStr + '</div>';
+        el.appendChild(execBar);
+
+        /* --- Score Header --- */
+        var header = document.createElement('div');
+        header.className = 'score-header';
+
+        // SVG Ring
+        var ringWrap = document.createElement('div');
+        ringWrap.className = 'score-ring-wrap anim-pop';
+        var circumference = 2 * Math.PI * 78;
+        var dashOffset = circumference * (1 - r.pct / 100);
+        ringWrap.innerHTML =
+            '<svg class="score-ring-bg" viewBox="0 0 180 180"><circle cx="90" cy="90" r="78" fill="none" stroke="#2a2a2b" stroke-width="8"/></svg>' +
+            '<svg class="score-ring-fill" viewBox="0 0 180 180" style="transform:rotate(-90deg)">' +
+                '<circle cx="90" cy="90" r="78" fill="none" stroke="' + r.color + '" stroke-width="8" ' +
+                'stroke-dasharray="' + circumference + '" stroke-dashoffset="' + circumference + '" stroke-linecap="round">' +
+                '<animate attributeName="stroke-dashoffset" from="' + circumference + '" to="' + dashOffset + '" dur="1.2s" fill="freeze" begin="0.3s" calcMode="spline" keySplines="0.4 0 0.2 1"/>' +
+                '</circle></svg>' +
+            '<div class="score-ring-center">' +
+                '<div class="score-grade" style="color:' + r.color + '">' + r.grade + '</div>' +
+                '<div class="score-pct" id="scoreCounter">0%</div>' +
+            '</div>';
+        header.appendChild(ringWrap);
+
+        var titleEl = document.createElement('div');
+        titleEl.className = 'score-title anim-slide';
+        titleEl.style.animationDelay = '0.6s';
+        titleEl.textContent = r.title;
+        header.appendChild(titleEl);
+
+        var descEl = document.createElement('div');
+        descEl.className = 'score-desc anim-slide';
+        descEl.style.animationDelay = '0.8s';
+        descEl.textContent = companyName + ' ' + r.desc;
+        header.appendChild(descEl);
+
+        var matBadge = document.createElement('div');
+        matBadge.className = 'maturity-badge anim-slide';
+        matBadge.style.animationDelay = '1s';
+        matBadge.innerHTML = 'Maturity: <span class="level">Level ' + r.maturity.level + '</span> — ' + r.maturity.name;
+        header.appendChild(matBadge);
+
+        el.appendChild(header);
+
+        /* --- Risk Banner --- */
+        var riskColor, riskBg, riskBorder;
+        if (r.pct >= 65) { riskColor = '#00C9A7'; riskBg = 'rgba(0,201,167,0.06)'; riskBorder = 'rgba(0,201,167,0.2)'; }
+        else if (r.pct >= 50) { riskColor = '#FFD93D'; riskBg = 'rgba(255,217,61,0.06)'; riskBorder = 'rgba(255,217,61,0.2)'; }
+        else if (r.pct >= 35) { riskColor = '#FF8C42'; riskBg = 'rgba(255,140,66,0.06)'; riskBorder = 'rgba(255,140,66,0.2)'; }
+        else { riskColor = '#FF4757'; riskBg = 'rgba(255,71,87,0.06)'; riskBorder = 'rgba(255,71,87,0.2)'; }
+
+        var risk = document.createElement('div');
+        risk.className = 'risk-banner anim-slide';
+        risk.style.animationDelay = '1.2s';
+        risk.style.background = riskBg;
+        risk.style.borderColor = riskBorder;
+        risk.innerHTML =
+            '<div class="risk-label" style="color:' + riskColor + '">Estimated Annual Risk Exposure</div>' +
+            '<div class="risk-amount" style="color:' + riskColor + '">$' + formatK(r.exposureLow) + ' \u2013 $' + formatK(r.exposureHigh) + ' NZD</div>' +
+            '<div class="risk-note" style="color:' + riskColor + '">Based on NZ SMB average breach cost of $173,000 adjusted for ' + (bizProfile.size || '11-50') + ' employee ' + (industryNames[bizProfile.industry] || 'business') + '</div>';
+        el.appendChild(risk);
+
+        /* --- Radar Chart --- */
+        var radarSection = document.createElement('div');
+        radarSection.className = 'radar-section anim-slide';
+        radarSection.style.animationDelay = '1.4s';
+        var radarLabel = bizProfile.industry && bizProfile.industry !== 'other'
+            ? 'Your scores across 6 domains vs NZ ' + (industryNames[bizProfile.industry] || 'SMB') + ' average'
+            : 'Your scores across 6 domains vs NZ SMB average';
+        radarSection.innerHTML = '<h3>Security Radar</h3><div class="section-sub">' + radarLabel + '</div>';
+
+        var radarWrap = document.createElement('div');
+        radarWrap.className = 'radar-wrap';
+        radarWrap.innerHTML = buildRadarSVG(r.catScores);
+        var legendAvg = bizProfile.industry && bizProfile.industry !== 'other'
+            ? 'NZ ' + (industryNames[bizProfile.industry] || 'SMB') + ' Avg'
+            : 'NZ SMB Average';
+        radarWrap.innerHTML += '<div class="radar-legend">' +
+            '<span><span class="legend-dot" style="background:' + r.color + '"></span> Your Score</span>' +
+            '<span><span class="legend-dot" style="background:rgba(255,255,255,0.3);border:1px dashed rgba(255,255,255,0.4)"></span> ' + legendAvg + '</span>' +
+            '</div>';
+        radarSection.appendChild(radarWrap);
+        el.appendChild(radarSection);
+
+        /* --- Category Cards --- */
+        var catSection = document.createElement('div');
+        catSection.innerHTML = '<h3 style="font-size:18px;margin-bottom:4px">Domain Breakdown</h3><div class="section-sub" style="font-size:13px;color:var(--text-muted);margin-bottom:16px">Individual scores for each security domain</div>';
+        var grid = document.createElement('div');
+        grid.className = 'cat-grid';
+        r.catScores.forEach(function(c, i) {
+            var card = document.createElement('div');
+            card.className = 'cat-card anim-slide';
+            card.style.animationDelay = (1.6 + i * 0.1) + 's';
+            var gradeColor;
+            if (c.pct >= 80) gradeColor = '#00C9A7';
+            else if (c.pct >= 65) gradeColor = '#4A9EFF';
+            else if (c.pct >= 50) gradeColor = '#FFD93D';
+            else if (c.pct >= 35) gradeColor = '#FF8C42';
+            else gradeColor = '#FF4757';
+
+            var diff = c.pct - c.benchmark;
+            var avgLabel = bizProfile.industry && bizProfile.industry !== 'other' ? 'vs industry' : 'vs avg';
+            var diffStr = diff >= 0
+                ? '<span class="above">+' + diff + '% ' + avgLabel + '</span>'
+                : '<span class="below">' + diff + '% ' + avgLabel + '</span>';
+
+            card.innerHTML =
+                '<div class="cat-card-head">' +
+                    '<div class="cat-card-name">' + c.name + '</div>' +
+                    '<div class="cat-card-grade" style="color:' + gradeColor + '">' + c.grade + '</div>' +
+                '</div>' +
+                '<div class="cat-bar"><div class="cat-bar-fill" style="width:' + c.pct + '%;background:' + gradeColor + '"></div></div>' +
+                '<div class="cat-card-stats">' +
+                    '<span>' + c.pct + '%</span>' +
+                    '<span class="benchmark">' + diffStr + '</span>' +
+                '</div>';
+            grid.appendChild(card);
+        });
+        catSection.appendChild(grid);
+        el.appendChild(catSection);
+
+        /* --- Top Priorities --- */
+        if (r.recs.length > 0) {
+            var recsSection = document.createElement('div');
+            recsSection.className = 'recs-section';
+            recsSection.innerHTML = '<h3>Priority Actions</h3><div class="section-sub">Ranked by risk severity — address critical items first</div>';
+            var shown = r.recs.slice(0, 6);
+            shown.forEach(function(rec, i) {
+                var item = document.createElement('div');
+                item.className = 'rec-item ' + rec.severity + ' anim-slide';
+                item.style.animationDelay = (2.2 + i * 0.08) + 's';
+                item.innerHTML =
+                    '<div class="rec-head">' +
+                        '<span class="rec-severity">' + rec.severity + '</span>' +
+                        '<span class="rec-cat">' + rec.cat + '</span>' +
+                        '<span class="rec-effort">' + rec.effort + '</span>' +
+                    '</div>' +
+                    '<div class="rec-text">' + rec.text + '</div>';
+                recsSection.appendChild(item);
+            });
+            if (r.recs.length > 6) {
+                var more = document.createElement('div');
+                more.style.cssText = 'text-align:center;padding:12px;font-size:13px;color:var(--text-muted);';
+                more.textContent = '+ ' + (r.recs.length - 6) + ' more recommendations in your full report';
+                recsSection.appendChild(more);
+            }
+            el.appendChild(recsSection);
+        }
+
+        /* --- Quick Wins --- */
+        if (r.quickWins.length > 0) {
+            var qwSection = document.createElement('div');
+            qwSection.className = 'quick-wins';
+            qwSection.innerHTML = '<h3>Quick Wins</h3><div class="section-sub">Actions you can take today with minimal cost or effort</div>';
+            r.quickWins.forEach(function(qw, i) {
+                var item = document.createElement('div');
+                item.className = 'qw-item anim-slide';
+                item.style.animationDelay = (2.8 + i * 0.08) + 's';
+                item.innerHTML =
+                    '<div class="qw-icon">\u26A1</div>' +
+                    '<div class="qw-text">' + qw.text + '</div>';
+                qwSection.appendChild(item);
+            });
+            el.appendChild(qwSection);
+        }
+
+        /* --- Recommended Guides --- */
+        if (r.guides.length > 0) {
+            var guidesSection = document.createElement('div');
+            guidesSection.className = 'guides-section';
+            guidesSection.innerHTML = '<h3>Recommended Reading</h3><div class="section-sub">Free guides based on your weak areas — download them now</div>';
+            r.guides.forEach(function(g) {
+                var info = guideInfo[g];
+                if (!info) return;
+                var card = document.createElement('a');
+                card.className = 'guide-card anim-slide';
+                card.style.animationDelay = '3.2s';
+                card.href = g;
+                card.target = '_blank';
+                card.innerHTML =
+                    '<div class="guide-icon"><strong style="color:var(--black);font-size:13px;font-family:JetBrains Mono,monospace">' + info.icon + '</strong></div>' +
+                    '<div class="guide-info">' +
+                        '<div class="guide-title">' + info.title + '</div>' +
+                        '<div class="guide-desc">' + info.desc + '</div>' +
+                    '</div>' +
+                    '<div class="guide-arrow">\u2192</div>';
+                guidesSection.appendChild(card);
+            });
+            el.appendChild(guidesSection);
+        }
+
+        /* --- CTA --- */
+        var cta = document.createElement('div');
+        cta.className = 'cta-section anim-slide';
+        cta.style.animationDelay = '3.4s';
+        cta.innerHTML =
+            '<h3>Want Expert Help Fixing This?</h3>' +
+            '<p>Every business has different challenges. Book a free 15-minute chat and we\u2019ll recommend the right approach \u2014 no obligation.</p>' +
+            '<a href="https://www.wehack.co.nz/#contact" target="_blank" class="btn-cta">Book Free Security Chat \u2192</a>';
+        el.appendChild(cta);
+
+        /* --- Report Actions --- */
+        var actions = document.createElement('div');
+        actions.className = 'report-actions anim-slide';
+        actions.style.animationDelay = '3.5s';
+        var printBtn = document.createElement('button');
+        printBtn.className = 'btn-report';
+        printBtn.textContent = 'Download PDF Report';
+        printBtn.addEventListener('click', function() { window.print(); });
+        actions.appendChild(printBtn);
+        var copyBtn = document.createElement('button');
+        copyBtn.className = 'btn-report';
+        copyBtn.textContent = 'Copy Summary';
+        copyBtn.addEventListener('click', function() { copySummary(r, companyName); });
+        actions.appendChild(copyBtn);
+        el.appendChild(actions);
+
+        /* --- Stats Bar --- */
+        var statsBar = document.createElement('div');
+        statsBar.className = 'stats-bar anim-slide';
+        statsBar.style.animationDelay = '3.6s';
+        var stats = [
+            { num: '$173k', label: 'Average NZ SMB breach cost' },
+            { num: '197', label: 'Days average breach goes undetected' },
+            { num: '60%', label: 'of breached SMBs close within 6 months' }
+        ];
+        stats.forEach(function(s) {
+            var item = document.createElement('div');
+            item.className = 'stat-item';
+            item.innerHTML = '<div class="stat-number">' + s.num + '</div><div class="stat-label">' + s.label + '</div>';
+            statsBar.appendChild(item);
+        });
+        el.appendChild(statsBar);
+
+        /* Show results */
+        el.classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        /* Animate score counter */
+        animateCounter('scoreCounter', r.pct, '%', 1200);
+    }
+
+    /* ================================================================
+       SVG RADAR CHART
+       ================================================================ */
+    function buildRadarSVG(catScores) {
+        var cx = 200, cy = 180, maxR = 120;
+        var n = 6;
+        var svg = '<svg viewBox="0 0 400 380" style="max-width:420px;width:100%">';
+
+        /* Grid hexagons */
+        [25, 50, 75, 100].forEach(function(pct) {
+            var points = [];
+            for (var i = 0; i < n; i++) {
+                var p = radarPoint(i, n, pct, cx, cy, maxR);
+                points.push(p.x + ',' + p.y);
+            }
+            svg += '<polygon points="' + points.join(' ') + '" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>';
+        });
+
+        /* Axis lines */
+        for (var i = 0; i < n; i++) {
+            var p = radarPoint(i, n, 100, cx, cy, maxR);
+            svg += '<line x1="' + cx + '" y1="' + cy + '" x2="' + p.x + '" y2="' + p.y + '" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>';
+        }
+
+        /* NZ Average polygon */
+        var avgPoints = [];
+        for (var i = 0; i < n; i++) {
+            var p = radarPoint(i, n, catScores[i].benchmark, cx, cy, maxR);
+            avgPoints.push(p.x + ',' + p.y);
+        }
+        svg += '<polygon points="' + avgPoints.join(' ') + '" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-dasharray="4 4"/>';
+
+        /* User polygon */
+        var userPoints = [];
+        for (var i = 0; i < n; i++) {
+            var p = radarPoint(i, n, catScores[i].pct, cx, cy, maxR);
+            userPoints.push(p.x + ',' + p.y);
+        }
+        var userColor = catScores[0] ? getGradeColor(catScores.reduce(function(s, c) { return s + c.pct; }, 0) / n) : 'var(--cyan)';
+        svg += '<polygon points="' + userPoints.join(' ') + '" fill="' + hexToRGBA(userColor, 0.15) + '" stroke="' + userColor + '" stroke-width="2">' +
+            '<animate attributeName="opacity" from="0" to="1" dur="0.8s" fill="freeze" begin="1.5s"/>' +
+            '</polygon>';
+
+        /* User dots */
+        for (var i = 0; i < n; i++) {
+            var p = radarPoint(i, n, catScores[i].pct, cx, cy, maxR);
+            svg += '<circle cx="' + p.x + '" cy="' + p.y + '" r="4" fill="' + userColor + '" stroke="var(--black)" stroke-width="2">' +
+                '<animate attributeName="opacity" from="0" to="1" dur="0.3s" fill="freeze" begin="' + (1.5 + i * 0.1) + 's"/></circle>';
+        }
+
+        /* Labels */
+        var labelOffsets = [
+            { dx: 0, dy: -14, anchor: 'middle' },
+            { dx: 14, dy: -4, anchor: 'start' },
+            { dx: 14, dy: 12, anchor: 'start' },
+            { dx: 0, dy: 22, anchor: 'middle' },
+            { dx: -14, dy: 12, anchor: 'end' },
+            { dx: -14, dy: -4, anchor: 'end' }
+        ];
+        for (var i = 0; i < n; i++) {
+            var p = radarPoint(i, n, 108, cx, cy, maxR);
+            svg += '<text x="' + (p.x + labelOffsets[i].dx) + '" y="' + (p.y + labelOffsets[i].dy) + '" ' +
+                'text-anchor="' + labelOffsets[i].anchor + '" fill="' + (catScores[i].pct >= 50 ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.5)') + '" ' +
+                'font-size="11" font-family="Questrial,sans-serif">' + catScores[i].short + '</text>';
+            svg += '<text x="' + (p.x + labelOffsets[i].dx) + '" y="' + (p.y + labelOffsets[i].dy + 13) + '" ' +
+                'text-anchor="' + labelOffsets[i].anchor + '" fill="' + getGradeColor2(catScores[i].pct) + '" ' +
+                'font-size="12" font-family="JetBrains Mono,monospace" font-weight="700">' + catScores[i].pct + '%</text>';
+        }
+
+        svg += '</svg>';
+        return svg;
+    }
+
+    function radarPoint(i, n, pct, cx, cy, maxR) {
+        var angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+        var r = maxR * pct / 100;
+        return { x: Math.round((cx + r * Math.cos(angle)) * 10) / 10, y: Math.round((cy + r * Math.sin(angle)) * 10) / 10 };
+    }
+
+    /* ================================================================
+       HELPERS
+       ================================================================ */
+    function formatK(n) {
+        if (n >= 1000) return Math.round(n / 1000) + 'k';
+        return n.toString();
+    }
+
+    function getGradeColor(pct) {
+        if (pct >= 80) return '#00C9A7';
+        if (pct >= 65) return '#4A9EFF';
+        if (pct >= 50) return '#FFD93D';
+        if (pct >= 35) return '#FF8C42';
+        return '#FF4757';
+    }
+    function getGradeColor2(pct) { return getGradeColor(pct); }
+
+    function hexToRGBA(hex, alpha) {
+        if (hex.indexOf('var(') === 0) return 'rgba(184,240,240,' + alpha + ')';
+        hex = hex.replace('#', '');
+        var r = parseInt(hex.substring(0, 2), 16);
+        var g = parseInt(hex.substring(2, 4), 16);
+        var b = parseInt(hex.substring(4, 6), 16);
+        return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
+    }
+
+    function animateCounter(id, target, suffix, duration) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        var start = 0;
+        var startTime = null;
+        function step(timestamp) {
+            if (!startTime) startTime = timestamp;
+            var progress = Math.min((timestamp - startTime) / duration, 1);
+            var eased = 1 - Math.pow(1 - progress, 3);
+            var current = Math.round(eased * target);
+            el.textContent = current + suffix;
+            if (progress < 1) requestAnimationFrame(step);
+        }
+        setTimeout(function() { requestAnimationFrame(step); }, 400);
+    }
+
+    function copySummary(r, company) {
+        var text = 'Security Assessment — ' + company + '\n' +
+            'Grade: ' + r.grade + ' (' + r.pct + '%)\n' +
+            'Maturity: Level ' + r.maturity.level + ' — ' + r.maturity.name + '\n' +
+            'Risk Exposure: $' + formatK(r.exposureLow) + ' - $' + formatK(r.exposureHigh) + ' NZD\n\n' +
+            'Domain Scores:\n';
+        r.catScores.forEach(function(c) {
+            text += '  ' + c.name + ': ' + c.grade + ' (' + c.pct + '%)\n';
+        });
+        text += '\nTop Priorities:\n';
+        r.recs.slice(0, 5).forEach(function(rec, i) {
+            text += '  ' + (i + 1) + '. [' + rec.severity.toUpperCase() + '] ' + rec.text.substring(0, 100) + '\n';
+        });
+        text += '\nAssessed by WeHack | wehack.co.nz';
+
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(text).then(function() { showToast('Summary copied to clipboard'); });
+        } else {
+            showToast('Copy not supported in this browser');
+        }
+    }
+
+    /* ================================================================
+       INIT
+       ================================================================ */
+    init();
+    </script>
+</body>
+</html>
