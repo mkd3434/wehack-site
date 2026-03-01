@@ -1063,6 +1063,26 @@
             // Request viewport width from parent on load
             window.parent.postMessage({ type: 'wehack-request-viewport' }, '*');
 
+            // Fix anchor navigation in embed mode:
+            // The inner iframe is full-height (6000px) so content fits without internal scroll.
+            // Anchor clicks need to scroll the PARENT Wix page via postMessage.
+            document.addEventListener('click', function(e) {
+                var link = e.target.closest('a[href^="#"]');
+                if (!link) return;
+                var targetId = link.getAttribute('href');
+                var target = document.querySelector(targetId);
+                if (!target) return;
+                e.preventDefault();
+                // Close mobile menu if open
+                var nav = document.querySelector('.nav');
+                if (nav) nav.classList.remove('nav-open');
+                // Send scroll offset to parent chain (wrapper → Wix page)
+                var offsetTop = target.getBoundingClientRect().top + window.pageYOffset;
+                window.parent.postMessage({ type: 'wehack-scroll', top: offsetTop }, '*');
+                // Also try scrollIntoView as fallback (works if iframe has own scrollbar)
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+
             window.addEventListener('load', function() {
                 sendHeight();
                 window.parent.postMessage({ type: 'wehack-request-viewport' }, '*');
