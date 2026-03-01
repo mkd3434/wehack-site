@@ -945,7 +945,7 @@
     /* ================================================================
        CONFIG
        ================================================================ */
-    var WEBHOOK_URL = ''; // Make.com, Zapier, or Google Apps Script
+    var WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbyRFEHnLbmhYgWZDihRykSozxSb0EFqG7_zrn4J0ivdTHwNc76TMPtlNR5ZIEK_D7Vd/exec';
 
     /* ================================================================
        BUSINESS PROFILE
@@ -1703,7 +1703,7 @@
         };
 
         if (WEBHOOK_URL) {
-            fetch(WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(leadData), mode: 'no-cors' }).catch(function() {});
+            fetch(WEBHOOK_URL, { method: 'POST', mode: 'no-cors', redirect: 'follow', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(leadData) }).catch(function() {});
         }
         console.log('LEAD CAPTURED:', leadData);
 
