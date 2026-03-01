@@ -24,24 +24,20 @@
             --purple: #A855F7;
         }
 
-        @page { size: A4; margin: 0; }
+        html { scroll-behavior: smooth; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Questrial', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
             background: var(--black);
             color: #E0E0E0;
-            line-height: 1.6;
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
+            line-height: 1.75;
         }
 
         .page {
-            width: 210mm;
-            min-height: 297mm;
+            max-width: 900px;
             margin: 0 auto;
-            padding: 50px 60px;
-            page-break-after: always;
+            padding: 60px 48px;
             position: relative;
         }
 
@@ -52,8 +48,8 @@
             justify-content: center;
             align-items: center;
             text-align: center;
-            min-height: 297mm;
-            padding: 60px;
+            min-height: auto;
+            padding: 100px 40px;
         }
         .cover-badge {
             display: inline-block;
@@ -81,7 +77,7 @@
         }
         .cover .subtitle {
             font-size: 17px;
-            color: #999;
+            color: #AAAAAA;
             margin-bottom: 50px;
             max-width: 500px;
         }
@@ -103,12 +99,12 @@
         .cover-stat .source { font-size: 9px; color: #555; margin-top: 4px; }
         .cover-footer { margin-top: auto; padding-top: 40px; }
         .cover-footer .brand { font-size: 20px; color: var(--cyan); letter-spacing: 2px; }
-        .cover-footer .tagline { font-size: 12px; color: #666; margin-top: 4px; }
+        .cover-footer .tagline { font-size: 14px; color: #666; margin-top: 4px; }
 
         /* ── COMMON ── */
         .section-label { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--cyan); margin-bottom: 8px; }
         .section-title { font-size: 32px; color: white; margin-bottom: 12px; line-height: 1.2; }
-        .section-intro { color: #999; font-size: 14px; margin-bottom: 24px; line-height: 1.6; }
+        .section-intro { color: #AAAAAA; font-size: 17px; margin-bottom: 24px; line-height: 1.75; }
         .gradient-line { height: 3px; background: linear-gradient(90deg, var(--cyan), var(--green), transparent); border: none; margin: 20px 0 30px; border-radius: 2px; }
 
         .stat-row { display: flex; gap: 16px; margin: 24px 0; }
@@ -118,8 +114,8 @@
         .stat-card .source { font-size: 9px; color: #555; margin-top: 4px; }
 
         .callout { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; margin: 16px 0; }
-        .callout h4 { color: var(--cyan); font-size: 14px; margin-bottom: 8px; }
-        .callout p, .callout li { font-size: 13px; color: #AAA; line-height: 1.6; }
+        .callout h4 { color: var(--cyan); font-size: 17px; margin-bottom: 8px; }
+        .callout p, .callout li { font-size: 15px; color: #CCCCCC; line-height: 1.75; }
         .callout-red { border-left: 4px solid var(--red); }
         .callout-red h4 { color: var(--red); }
         .callout-teal { border-left: 4px solid var(--teal); }
@@ -127,7 +123,7 @@
         .callout-orange h4 { color: var(--orange); }
 
         .bullet-list { list-style: none; padding: 0; }
-        .bullet-list li { padding: 5px 0 5px 20px; position: relative; font-size: 13px; color: #AAA; line-height: 1.5; }
+        .bullet-list li { padding: 5px 0 5px 20px; position: relative; font-size: 15px; color: #CCCCCC; line-height: 1.7; }
         .bullet-list li::before { content: ''; position: absolute; left: 0; top: 12px; width: 8px; height: 8px; border-radius: 50%; background: var(--cyan); }
 
         /* ── ATTACK TYPE CARDS ── */
@@ -156,7 +152,7 @@
         }
         .attack-type h3 { font-size: 16px; color: white; }
         .attack-type .threat-level { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; padding: 2px 8px; border-radius: 4px; }
-        .attack-type p { font-size: 13px; color: #AAA; line-height: 1.5; }
+        .attack-type p { font-size: 15px; color: #CCCCCC; line-height: 1.7; }
         .attack-type .source { font-size: 11px; color: var(--teal); }
 
         /* ── SCENARIO CARDS ── */
@@ -167,8 +163,8 @@
             padding: 18px 22px;
             margin: 12px 0;
         }
-        .scenario h4 { color: var(--red); font-size: 13px; margin-bottom: 6px; letter-spacing: 1px; text-transform: uppercase; }
-        .scenario p { font-size: 12px; color: #AAA; line-height: 1.5; }
+        .scenario h4 { color: var(--red); font-size: 15px; margin-bottom: 6px; letter-spacing: 1px; text-transform: uppercase; }
+        .scenario p { font-size: 14px; color: #CCCCCC; line-height: 1.7; }
         .scenario .dialogue { font-style: italic; color: #CCC; margin: 8px 0; padding-left: 16px; border-left: 2px solid var(--orange); }
 
         /* ── DEFENCE STEPS ── */
@@ -190,8 +186,8 @@
             display: flex; align-items: center; justify-content: center;
             font-size: 14px; font-weight: 700; margin-top: 2px;
         }
-        .defence-card h3 { font-size: 15px; color: white; margin-bottom: 4px; }
-        .defence-card p { font-size: 12px; color: #AAA; line-height: 1.5; }
+        .defence-card h3 { font-size: 17px; color: white; margin-bottom: 4px; }
+        .defence-card p { font-size: 14px; color: #CCCCCC; line-height: 1.7; }
 
         /* ── VERIFICATION PROTOCOL ── */
         .protocol-step {
@@ -206,8 +202,8 @@
             align-items: center; justify-content: center;
             font-size: 16px;
         }
-        .protocol-step h4 { font-size: 14px; color: white; margin-bottom: 2px; }
-        .protocol-step p { font-size: 12px; color: #AAA; line-height: 1.4; }
+        .protocol-step h4 { font-size: 17px; color: white; margin-bottom: 2px; }
+        .protocol-step p { font-size: 14px; color: #CCCCCC; line-height: 1.4; }
 
         /* ── CHECKLIST ── */
         .check-item {
@@ -219,7 +215,7 @@
             width: 20px; height: 20px; min-width: 20px;
             border: 2px solid var(--cyan); border-radius: 4px; margin-top: 1px;
         }
-        .check-item .label { font-size: 13px; color: white; }
+        .check-item .label { font-size: 15px; color: white; }
         .check-item .desc { font-size: 11px; color: #888; }
 
         /* ── CTA ── */
@@ -228,10 +224,10 @@
             border-radius: 16px; padding: 40px; text-align: center; margin: 30px 0;
         }
         .cta-box h3 { font-size: 24px; color: white; margin-bottom: 12px; }
-        .cta-box p { color: rgba(255,255,255,0.85); font-size: 14px; margin-bottom: 20px; }
+        .cta-box p { color: rgba(255,255,255,0.85); font-size: 17px; margin-bottom: 20px; }
         .cta-btn {
             display: inline-block; background: var(--green-bright); color: var(--black);
-            font-size: 15px; font-weight: 700; padding: 14px 36px;
+            font-size: 17px; font-weight: 700; padding: 14px 36px;
             border-radius: 8px; text-decoration: none;
         }
         .pricing-row { display: flex; gap: 20px; justify-content: center; margin-top: 30px; }
@@ -239,10 +235,11 @@
             background: var(--card); border: 1px solid var(--border);
             border-radius: 12px; padding: 22px 28px; text-align: center; min-width: 150px;
         }
-        .pricing-card h4 { font-size: 12px; color: #999; margin-bottom: 4px; }
+        .pricing-card h4 { font-size: 14px; color: #AAAAAA; margin-bottom: 4px; }
         .pricing-card .price { font-size: 20px; color: var(--green); font-weight: 700; }
         .pricing-card .desc { font-size: 11px; color: #666; margin-top: 4px; }
-        .footer { text-align: center; padding: 30px 0; color: #555; font-size: 12px; }
+        .cta-page { min-height: auto; padding: 100px 40px; }
+        .footer { text-align: center; padding: 30px 0; color: #555; font-size: 14px; }
         .footer a { color: var(--cyan); text-decoration: underline; }
         /* === NAV BAR === */
         .lm-nav{position:sticky;top:0;z-index:1000;padding:14px 24px;display:flex;justify-content:space-between;align-items:center;background:rgba(15,15,16,0.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,0.06)}
@@ -251,7 +248,7 @@
         .lm-nav-logo:hover{text-decoration:none}
         .lm-nav-logo span{color:var(--green)}
         .lm-nav-links{display:flex;gap:28px}
-        .lm-nav-links a{color:#999;font-size:14px;text-decoration:none;transition:color 0.2s;font-family:'Questrial',sans-serif}
+        .lm-nav-links a{color:#AAAAAA;font-size:14px;text-decoration:none;transition:color 0.2s;font-family:'Questrial',sans-serif}
         .lm-nav-links a:hover{color:#fff;text-decoration:none}
         .lm-nav-right{display:flex;align-items:center;gap:16px}
         .lm-nav-cta{display:inline-block;padding:8px 20px;background:var(--green);color:var(--black);border-radius:6px;font-weight:700;font-size:14px;text-decoration:none;transition:all 0.2s;font-family:'Questrial',sans-serif}
@@ -267,12 +264,21 @@
         @media(max-width:900px){
             .lm-nav-hamburger{display:block}
             .lm-nav-cta{display:none}
-            .lm-nav-links{display:none;position:fixed;top:50px;left:0;right:0;background:rgba(15,15,16,0.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);flex-direction:column;padding:20px 24px;gap:0;border-bottom:1px solid rgba(255,255,255,0.08);z-index:999}
+            .lm-nav-links{display:none;position:absolute;top:100%;left:0;right:0;background:rgba(15,15,16,0.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);flex-direction:column;padding:20px 24px;gap:0;border-bottom:1px solid rgba(255,255,255,0.08);z-index:999}
             .lm-nav-open .lm-nav-links{display:flex}
             .lm-nav-links a{padding:14px 0;font-size:16px;border-bottom:1px solid rgba(255,255,255,0.06)}
             .lm-nav-links a:last-child{border-bottom:none}
         }
         @media print{.lm-nav{display:none!important}}
+        @media (max-width: 700px) {
+            .page { padding: 32px 20px; }
+            .cover { padding: 40px 20px; }
+        }
+        @media (max-width: 500px) {
+            .page { padding: 24px 16px; }
+            .cover { padding: 60px 20px; }
+            .stat-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
@@ -677,25 +683,25 @@
     <div class="callout callout-red">
         <h4>🎭 The Phishing Kit: Tycoon 2FA / EvilProxy / Evilginx</h4>
         <p>These are reverse-proxy phishing frameworks that sit between the victim and the real Microsoft 365 login page. The victim sees a pixel-perfect copy of the real login, enters their credentials AND completes MFA — the proxy captures the session token post-authentication. The Tycoon phishing kit was the primary tool behind the December 2025 campaign that compromised 3,000+ M365 accounts across 900 organisations. These kits cost $200-400/month on criminal forums and require zero coding skill to deploy.</p>
-        <p style="margin-top:6px;font-size:12px;color:var(--red);">Defence: Phishing-resistant MFA (FIDO2 keys), Conditional Access token binding, Continuous Access Evaluation (CAE)</p>
+        <p style="margin-top:6px;font-size:14px;color:var(--red);">Defence: Phishing-resistant MFA (FIDO2 keys), Conditional Access token binding, Continuous Access Evaluation (CAE)</p>
     </div>
 
     <div class="callout callout-orange">
         <h4>🎙️ Voice Cloning: ElevenLabs / RVC / So-VITS</h4>
         <p>Commercial voice cloning services can create a convincing voice clone from as little as 3 seconds of audio. Open-source alternatives (RVC, So-VITS) run locally and leave no cloud traces. Attackers scrape CEO interviews from YouTube, conference recordings, or even company voicemail greetings. The quality is now indistinguishable from real speech in 70% of cases. Real-time voice conversion allows live phone conversations in a cloned voice — the attacker speaks naturally and the AI converts their voice to the target's in real-time with ~200ms latency.</p>
-        <p style="margin-top:6px;font-size:12px;color:var(--orange);">Defence: Codeword systems, callback verification to known numbers, never trust voice alone for authorisation</p>
+        <p style="margin-top:6px;font-size:14px;color:var(--orange);">Defence: Codeword systems, callback verification to known numbers, never trust voice alone for authorisation</p>
     </div>
 
     <div class="callout" style="border-left:4px solid var(--yellow);">
         <h4 style="color:var(--yellow);">📹 Deepfake Video: DeepFaceLive / FaceFusion / SimSwap</h4>
         <p>Real-time face-swapping tools can run a deepfake during a live Zoom/Teams call. The attacker's webcam feed is replaced by a generated face that matches the target's appearance and moves in real-time. Current generation tools achieve 90%+ accuracy with good lighting. The $25M Arup loss used this technology — every participant on the call except the victim was a deepfake. 159,378 unique deepfake scam instances were detected in Q4 2025 alone (Gen Threat Labs).</p>
-        <p style="margin-top:6px;font-size:12px;color:var(--yellow);">Defence: Occlusion tests (hand in front of face), unexpected actions, side-profile requests, out-of-band verification</p>
+        <p style="margin-top:6px;font-size:14px;color:var(--yellow);">Defence: Occlusion tests (hand in front of face), unexpected actions, side-profile requests, out-of-band verification</p>
     </div>
 
     <div class="callout" style="border-left:4px solid var(--purple);">
         <h4 style="color:var(--purple);">🔍 AI OSINT: GPT-Researcher / Perplexity / Custom Agents</h4>
         <p>AI research agents can compile a comprehensive target profile in minutes. They cross-reference LinkedIn, company websites, press releases, court records, Companies Office filings, and social media. They identify reporting structures, recent deals, communication styles, and personal interests. An attacker's AI agent can generate 50 personalised phishing emails in the time it takes a human to write one — each tailored to the recipient's role, recent activity, and communication preferences.</p>
-        <p style="margin-top:6px;font-size:12px;color:var(--purple);">Defence: Reduce digital footprint, limit LinkedIn detail, review what's publicly accessible about your organisation</p>
+        <p style="margin-top:6px;font-size:14px;color:var(--purple);">Defence: Reduce digital footprint, limit LinkedIn detail, review what's publicly accessible about your organisation</p>
     </div>
 
     <div class="callout callout-teal">
@@ -768,7 +774,7 @@
 </div>
 
 <!-- ═══════════════ CTA PAGE ═══════════════ -->
-<div class="page" style="display:flex; flex-direction:column; justify-content:center; text-align:center;">
+<div class="page cta-page" style="display:flex; flex-direction:column; justify-content:center; text-align:center;">
     <div class="section-label" style="text-align:center;">WHAT'S NEXT</div>
     <h2 class="section-title" style="text-align:center;">
         Test Before<br><span style="background:linear-gradient(135deg,var(--cyan),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">They Attack</span>
@@ -783,13 +789,13 @@
         <a href="https://score.wehack.co.nz" class="cta-btn">Take Your Free Security Score →</a>
     </div>
 
-    <p style="color:#888; font-size:13px; margin-top:30px;">
+    <p style="color:#888; font-size:15px; margin-top:30px;">
         Every business has different security challenges. Book a free 15-minute chat and we'll recommend the right approach &mdash; no obligation.
     </p>
 
     <div style="margin-top:30px;">
-        <p style="color:#999; font-size:13px;">Mustafa Demirsoy</p>
-        <p style="color:#888; font-size:12px;">Founder &amp; Hacker, WeHack</p>
+        <p style="color:#AAAAAA; font-size:15px;">Mustafa Demirsoy</p>
+        <p style="color:#888; font-size:14px;">Founder &amp; Hacker, WeHack</p>
     </div>
 
     <div class="footer">

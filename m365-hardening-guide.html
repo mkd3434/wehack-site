@@ -23,25 +23,20 @@
             --blue: #4A9EFF;
         }
 
-        @page { size: A4; margin: 0; }
-
+        html { scroll-behavior: smooth; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Questrial', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
             background: var(--black);
             color: #E0E0E0;
-            line-height: 1.6;
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
+            line-height: 1.75;
         }
 
         .page {
-            width: 210mm;
-            min-height: 297mm;
+            max-width: 900px;
             margin: 0 auto;
-            padding: 50px 60px;
-            page-break-after: always;
+            padding: 60px 48px;
             position: relative;
         }
 
@@ -52,8 +47,8 @@
             justify-content: center;
             align-items: center;
             text-align: center;
-            min-height: 297mm;
-            padding: 60px;
+            min-height: auto;
+            padding: 100px 40px;
         }
         .cover-badge {
             display: inline-block;
@@ -81,7 +76,7 @@
         }
         .cover .subtitle {
             font-size: 18px;
-            color: #999;
+            color: #AAAAAA;
             margin-bottom: 50px;
             max-width: 480px;
         }
@@ -123,7 +118,7 @@
             letter-spacing: 2px;
         }
         .cover-footer .tagline {
-            font-size: 12px;
+            font-size: 14px;
             color: #666;
             margin-top: 4px;
         }
@@ -143,10 +138,10 @@
             line-height: 1.2;
         }
         .section-intro {
-            color: #999;
-            font-size: 14px;
+            color: #AAAAAA;
+            font-size: 17px;
             margin-bottom: 24px;
-            line-height: 1.6;
+            line-height: 1.75;
         }
         .gradient-line {
             height: 3px;
@@ -187,9 +182,9 @@
             margin-bottom: 4px;
         }
         .step-content p {
-            font-size: 13px;
-            color: #AAA;
-            line-height: 1.5;
+            font-size: 15px;
+            color: #CCCCCC;
+            line-height: 1.7;
         }
         .step-content .source {
             font-size: 11px;
@@ -250,13 +245,13 @@
         }
         .callout h4 {
             color: var(--cyan);
-            font-size: 14px;
+            font-size: 17px;
             margin-bottom: 8px;
         }
         .callout p, .callout li {
-            font-size: 13px;
-            color: #AAA;
-            line-height: 1.6;
+            font-size: 15px;
+            color: #CCCCCC;
+            line-height: 1.75;
         }
         .callout-red {
             border-left: 4px solid var(--red);
@@ -276,9 +271,9 @@
         .bullet-list li {
             padding: 6px 0 6px 20px;
             position: relative;
-            font-size: 13px;
-            color: #AAA;
-            line-height: 1.5;
+            font-size: 15px;
+            color: #CCCCCC;
+            line-height: 1.7;
         }
         .bullet-list li::before {
             content: '';
@@ -353,11 +348,11 @@
             margin-top: 1px;
         }
         .audit-item .label {
-            font-size: 13px;
+            font-size: 15px;
             color: white;
         }
         .audit-item .desc {
-            font-size: 12px;
+            font-size: 14px;
             color: #888;
         }
         .audit-item .nav {
@@ -381,7 +376,7 @@
         }
         .cta-box p {
             color: rgba(255,255,255,0.85);
-            font-size: 14px;
+            font-size: 17px;
             margin-bottom: 20px;
         }
         .cta-btn {
@@ -409,8 +404,8 @@
             min-width: 160px;
         }
         .pricing-card h4 {
-            font-size: 13px;
-            color: #999;
+            font-size: 15px;
+            color: #AAAAAA;
             margin-bottom: 4px;
         }
         .pricing-card .price {
@@ -419,9 +414,15 @@
             font-weight: 700;
         }
         .pricing-card .desc {
-            font-size: 11px;
+            font-size: 14px;
             color: #666;
             margin-top: 4px;
+        }
+
+        /* ── CTA PAGE ── */
+        .cta-page {
+            min-height: auto;
+            padding: 100px 40px;
         }
 
         /* ── FOOTER ── */
@@ -429,7 +430,7 @@
             text-align: center;
             padding: 30px 0;
             color: #555;
-            font-size: 12px;
+            font-size: 14px;
         }
         .footer a {
             color: var(--cyan);
@@ -442,7 +443,7 @@
         .lm-nav-logo:hover{text-decoration:none}
         .lm-nav-logo span{color:var(--green)}
         .lm-nav-links{display:flex;gap:28px}
-        .lm-nav-links a{color:#999;font-size:14px;text-decoration:none;transition:color 0.2s;font-family:'Questrial',sans-serif}
+        .lm-nav-links a{color:#AAAAAA;font-size:14px;text-decoration:none;transition:color 0.2s;font-family:'Questrial',sans-serif}
         .lm-nav-links a:hover{color:#fff;text-decoration:none}
         .lm-nav-right{display:flex;align-items:center;gap:16px}
         .lm-nav-cta{display:inline-block;padding:8px 20px;background:var(--green);color:var(--black);border-radius:6px;font-weight:700;font-size:14px;text-decoration:none;transition:all 0.2s;font-family:'Questrial',sans-serif}
@@ -458,12 +459,21 @@
         @media(max-width:900px){
             .lm-nav-hamburger{display:block}
             .lm-nav-cta{display:none}
-            .lm-nav-links{display:none;position:fixed;top:50px;left:0;right:0;background:rgba(15,15,16,0.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);flex-direction:column;padding:20px 24px;gap:0;border-bottom:1px solid rgba(255,255,255,0.08);z-index:999}
+            .lm-nav-links{display:none;position:absolute;top:100%;left:0;right:0;background:rgba(15,15,16,0.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);flex-direction:column;padding:20px 24px;gap:0;border-bottom:1px solid rgba(255,255,255,0.08);z-index:999}
             .lm-nav-open .lm-nav-links{display:flex}
             .lm-nav-links a{padding:14px 0;font-size:16px;border-bottom:1px solid rgba(255,255,255,0.06)}
             .lm-nav-links a:last-child{border-bottom:none}
         }
         @media print{.lm-nav{display:none!important}}
+        @media (max-width: 700px) {
+            .page { padding: 32px 20px; }
+            .cover { padding: 40px 20px; }
+        }
+        @media (max-width: 500px) {
+            .page { padding: 24px 16px; }
+            .cover { padding: 60px 20px; }
+            .stat-row { flex-direction: column; }
+        }
     </style>
 </head>
 <body>
@@ -666,7 +676,7 @@
     <div class="callout callout-teal">
         <h4>💡 Quick Win: Security Defaults</h4>
         <p>If you're on Microsoft 365 Business Basic/Standard and don't have Entra ID P1/P2 for Conditional Access, at minimum enable Security Defaults. This forces MFA registration for all users and blocks legacy authentication. It's free and takes 30 seconds.</p>
-        <p style="margin-top:6px;font-size:12px;color:var(--teal);">Navigate: Entra ID → Properties → Manage Security Defaults → Enable</p>
+        <p style="margin-top:6px;font-size:14px;color:var(--teal);">Navigate: Entra ID → Properties → Manage Security Defaults → Enable</p>
     </div>
 </div>
 
@@ -777,7 +787,7 @@
     <div class="callout callout-teal">
         <h4>💡 Data Loss Prevention (DLP) — Bonus Control</h4>
         <p>If you have M365 E3/E5 or Business Premium, enable DLP policies in Microsoft Purview. Set rules to detect and block sensitive data (credit card numbers, NZ IRD numbers, health information) from being shared externally via email, Teams, or SharePoint. With NZ Privacy Act 2020 mandatory breach reporting, preventing data leakage is better than reporting it.</p>
-        <p style="margin-top:6px;font-size:12px;color:var(--teal);">Navigate: Purview → Data Loss Prevention → Policies → Create</p>
+        <p style="margin-top:6px;font-size:14px;color:var(--teal);">Navigate: Purview → Data Loss Prevention → Policies → Create</p>
     </div>
 
     <div class="stat-row">
@@ -878,8 +888,8 @@
     </div>
 
     <div style="margin-top:24px; text-align:center; padding:16px; border:1px solid var(--border); border-radius:12px; background:var(--card);">
-        <p style="font-size:14px; color:white; margin-bottom:4px;"><strong>Your Score: ____ / 10</strong></p>
-        <p style="font-size:12px; color:#888;">
+        <p style="font-size:17px; color:white; margin-bottom:4px;"><strong>Your Score: ____ / 10</strong></p>
+        <p style="font-size:14px; color:#888;">
             <span style="color:var(--green);">8-10:</span> Strong foundation — consider a pentest to validate.
             <span style="color:var(--yellow);">5-7:</span> Gaps exist that attackers will find.
             <span style="color:var(--red);">0-4:</span> Your tenant is likely already compromised or trivially exploitable.
@@ -941,41 +951,41 @@
     <div class="callout callout-red">
         <h4>🔓 #1 Finding: Overprivileged Service Accounts with No MFA</h4>
         <p>Almost every tenant has service accounts (backup tools, scanners, CRM integrations) that are Global Admin or Exchange Admin with basic passwords and no MFA. These are the first accounts we target. Attackers use credential stuffing and password spraying against these because they know service accounts are rarely monitored.</p>
-        <p style="margin-top:8px;font-size:12px;color:var(--teal);">Fix: Audit all accounts with admin roles. Convert service accounts to managed identities where possible. Enforce MFA on ALL admin accounts with zero exceptions. Use Entra ID PIM for just-in-time access.</p>
+        <p style="margin-top:8px;font-size:14px;color:var(--teal);">Fix: Audit all accounts with admin roles. Convert service accounts to managed identities where possible. Enforce MFA on ALL admin accounts with zero exceptions. Use Entra ID PIM for just-in-time access.</p>
     </div>
 
     <div class="callout callout-orange">
         <h4>📬 #2 Finding: Mailbox Forwarding Rules to External Addresses</h4>
         <p>We frequently find mailbox rules forwarding email to external addresses — often left behind from a previous compromise that was never fully remediated. Attackers create rules that forward copies of invoices and financial emails to their own inbox, then wait for the right moment to inject a payment redirect.</p>
-        <p style="margin-top:8px;font-size:12px;color:var(--teal);">Detection command: Get-TransportRule | Where-Object {$_.RedirectMessageTo -ne $null} — and check per-user Outlook rules via Get-InboxRule for all users. Look for rules that delete or move messages to unusual folders.</p>
+        <p style="margin-top:8px;font-size:14px;color:var(--teal);">Detection command: Get-TransportRule | Where-Object {$_.RedirectMessageTo -ne $null} — and check per-user Outlook rules via Get-InboxRule for all users. Look for rules that delete or move messages to unusual folders.</p>
     </div>
 
     <div class="callout" style="border-left:4px solid var(--yellow);">
         <h4 style="color:var(--yellow);">🔑 #3 Finding: OAuth App Consent Grants to Unknown Applications</h4>
         <p>Users click "Allow" on OAuth consent prompts without reading them. We've found apps with Mail.ReadWrite, Files.ReadWrite.All, and User.Read.All permissions granted by regular users — giving third-party apps full access to email, files, and directory data. This is how the "OAuth device code phishing" campaigns work — Russia-linked actors used this exact technique against M365 tenants in late 2025.</p>
-        <p style="margin-top:8px;font-size:12px;color:var(--teal);">Audit: Entra ID → Enterprise Applications → filter by "User consent" → review permissions. Restrict consent to admin-only. Review all apps with Graph API: GET /servicePrincipals?$select=displayName,appId,oauth2PermissionGrants</p>
+        <p style="margin-top:8px;font-size:14px;color:var(--teal);">Audit: Entra ID → Enterprise Applications → filter by "User consent" → review permissions. Restrict consent to admin-only. Review all apps with Graph API: GET /servicePrincipals?$select=displayName,appId,oauth2PermissionGrants</p>
     </div>
 
     <div class="callout" style="border-left:4px solid var(--blue);">
         <h4 style="color:var(--blue);">📊 #4 Finding: Audit Logs Disabled or Insufficient Retention</h4>
         <p>When we ask clients to provide audit logs for our testing period, ~30% discover their unified audit log was never enabled. Without logs, you cannot detect lateral movement, data exfiltration, or identify which accounts were compromised during an incident. E3 tenants default to 90-day retention — barely enough for investigation. Many breaches aren't discovered for months.</p>
-        <p style="margin-top:8px;font-size:12px;color:var(--teal);">Verify: Search-UnifiedAuditLog -StartDate (Get-Date).AddDays(-1) -EndDate (Get-Date) — if this returns nothing, logging is disabled. Enable immediately in Purview and increase retention to maximum (365 days for E5, consider log export for E3).</p>
+        <p style="margin-top:8px;font-size:14px;color:var(--teal);">Verify: Search-UnifiedAuditLog -StartDate (Get-Date).AddDays(-1) -EndDate (Get-Date) — if this returns nothing, logging is disabled. Enable immediately in Purview and increase retention to maximum (365 days for E5, consider log export for E3).</p>
     </div>
 
     <div class="callout" style="border-left:4px solid var(--green);">
         <h4 style="color:var(--green);">🌐 #5 Finding: SharePoint/OneDrive "Anyone with a Link" Sharing</h4>
         <p>Default sharing is often set to "Anyone" — meaning a shared link works for anyone on the internet, no authentication required. We've found client contracts, employee records, financial spreadsheets, and technical architecture documents accessible via public links. Combine this with AI OSINT scraping and an attacker can harvest sensitive documents before launching their social engineering campaign.</p>
-        <p style="margin-top:8px;font-size:12px;color:var(--teal);">Fix: SharePoint admin → Policies → Sharing → set to "New and existing guests" at minimum. Review existing links: Get-SPOSite | Select Url, SharingCapability — and audit active sharing links.</p>
+        <p style="margin-top:8px;font-size:14px;color:var(--teal);">Fix: SharePoint admin → Policies → Sharing → set to "New and existing guests" at minimum. Review existing links: Get-SPOSite | Select Url, SharingCapability — and audit active sharing links.</p>
     </div>
 
     <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-top:16px;text-align:center;">
-        <p style="font-size:14px;color:white;margin-bottom:8px;"><strong>Our M365 Security Assessment Checks 47 Configuration Points</strong></p>
-        <p style="font-size:12px;color:#888;">Including: Conditional Access gaps, stale admin accounts, mail flow rules, external forwarding, DLP policy coverage, eDiscovery permissions, Teams guest access, Power Platform data connectors, sensitivity labelling gaps, and tenant-wide sharing defaults.</p>
+        <p style="font-size:17px;color:white;margin-bottom:8px;"><strong>Our M365 Security Assessment Checks 47 Configuration Points</strong></p>
+        <p style="font-size:14px;color:#888;">Including: Conditional Access gaps, stale admin accounts, mail flow rules, external forwarding, DLP policy coverage, eDiscovery permissions, Teams guest access, Power Platform data connectors, sensitivity labelling gaps, and tenant-wide sharing defaults.</p>
     </div>
 </div>
 
 <!-- ═══════════════ CTA PAGE ═══════════════ -->
-<div class="page" style="display:flex; flex-direction:column; justify-content:center; text-align:center;">
+<div class="page cta-page" style="display:flex; flex-direction:column; justify-content:center; text-align:center;">
     <div class="section-label" style="text-align:center;">WHAT'S NEXT</div>
     <h2 class="section-title" style="text-align:center;">
         Don't Guess.<br><span style="background:linear-gradient(135deg,var(--cyan),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Get Tested.</span>
@@ -990,13 +1000,13 @@
         <a href="https://score.wehack.co.nz" class="cta-btn">Take Your Free Security Score →</a>
     </div>
 
-    <p style="color:#888; font-size:13px; margin-top:30px;">
+    <p style="color:#888; font-size:15px; margin-top:30px;">
         Every business has different security challenges. Book a free 15-minute chat and we'll recommend the right approach &mdash; no obligation.
     </p>
 
     <div style="margin-top:30px;">
-        <p style="color:#999; font-size:13px;">Mustafa Demirsoy</p>
-        <p style="color:#888; font-size:12px;">Founder &amp; Hacker, WeHack</p>
+        <p style="color:#AAAAAA; font-size:15px;">Mustafa Demirsoy</p>
+        <p style="color:#888; font-size:14px;">Founder &amp; Hacker, WeHack</p>
     </div>
 
     <div class="footer">
