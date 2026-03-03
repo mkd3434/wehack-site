@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teleprompter — NZ SMB Cyber Threat Briefing 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Questrial&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0F0F10;--text:#E8E8E8;--dim:#888;--cyan:#B8F0F0;--green:#C4FF9E;
+  --red:#FF4444;--orange:#FF8C00;--purple:#A78BFA;--card:#1A1A1C;
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Questrial',sans-serif}
+
+/* Top bar */
+.topbar{
+  position:fixed;top:0;left:0;right:0;height:48px;
+  background:var(--card);border-bottom:1px solid #333;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 24px;z-index:100;
+}
+.topbar-left{display:flex;align-items:center;gap:16px}
+.topbar-brand{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--cyan);letter-spacing:1px}
+.topbar-title{font-size:13px;color:var(--dim)}
+.topbar-right{display:flex;align-items:center;gap:12px}
+
+/* Controls */
+.btn{
+  background:none;border:1px solid #444;color:var(--text);
+  padding:6px 14px;border-radius:4px;cursor:pointer;font-family:'JetBrains Mono',monospace;
+  font-size:12px;transition:all .15s;
+}
+.btn:hover{border-color:var(--cyan);color:var(--cyan)}
+.btn.active{background:var(--cyan);color:var(--bg);border-color:var(--cyan)}
+.speed-display{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--dim);min-width:60px;text-align:center}
+
+/* Slide indicator */
+.slide-indicator{
+  position:fixed;top:48px;left:0;right:0;height:36px;
+  background:#141416;border-bottom:1px solid #222;
+  display:flex;align-items:center;padding:0 24px;gap:8px;z-index:99;
+  overflow-x:auto;
+}
+.slide-pip{
+  flex-shrink:0;padding:4px 12px;border-radius:3px;
+  font-family:'JetBrains Mono',monospace;font-size:11px;
+  color:var(--dim);cursor:pointer;background:none;border:1px solid transparent;
+  transition:all .15s;white-space:nowrap;
+}
+.slide-pip:hover{border-color:#444}
+.slide-pip.active{background:var(--cyan);color:var(--bg);border-color:var(--cyan)}
+.slide-pip.past{color:var(--green)}
+
+/* Script area */
+.script-wrap{
+  position:fixed;top:84px;bottom:0;left:0;right:0;
+  overflow-y:auto;scroll-behavior:smooth;
+}
+.script-inner{
+  max-width:860px;margin:0 auto;padding:60px 32px 50vh;
+}
+
+/* Sections */
+.section{
+  margin-bottom:48px;padding:32px;
+  border-radius:8px;border-left:3px solid #333;
+  transition:border-color .3s, background .3s;
+}
+.section.active{border-left-color:var(--cyan);background:rgba(184,240,240,.04)}
+.section.past{border-left-color:var(--green);opacity:.6}
+
+.section-header{
+  display:flex;align-items:center;gap:12px;margin-bottom:20px;
+}
+.section-badge{
+  font-family:'JetBrains Mono',monospace;font-size:11px;
+  background:var(--cyan);color:var(--bg);padding:3px 10px;border-radius:3px;
+  font-weight:600;
+}
+.section-title{font-size:15px;color:var(--cyan);font-family:'JetBrains Mono',monospace}
+
+.section p{
+  font-size:var(--font-size,22px);line-height:1.65;margin-bottom:16px;color:var(--text);
+}
+.section .highlight{color:var(--green);font-weight:600}
+.section .stat{color:var(--orange);font-family:'JetBrains Mono',monospace}
+.section .warn{color:var(--red)}
+.section .next-cue{
+  display:inline-block;margin-top:12px;
+  font-family:'JetBrains Mono',monospace;font-size:13px;
+  color:var(--purple);border:1px solid var(--purple);
+  padding:4px 12px;border-radius:3px;
+}
+
+/* Mirror mode */
+.mirror .script-inner{transform:scaleX(-1)}
+
+/* Font size control */
+.font-slider{width:80px;accent-color:var(--cyan)}
+
+/* Keyboard help */
+.help-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;
+  display:none;align-items:center;justify-content:center;
+}
+.help-overlay.visible{display:flex}
+.help-box{
+  background:var(--card);border:1px solid #444;border-radius:8px;
+  padding:32px;max-width:420px;width:90%;
+}
+.help-box h3{color:var(--cyan);margin-bottom:16px;font-family:'JetBrains Mono',monospace;font-size:15px}
+.help-row{display:flex;justify-content:space-between;padding:6px 0;font-size:14px}
+.help-key{font-family:'JetBrains Mono',monospace;color:var(--green);font-size:13px}
+.help-close{margin-top:20px;width:100%}
+
+@media(max-width:600px){
+  .topbar{padding:0 12px}
+  .script-inner{padding:40px 16px 50vh}
+  .section{padding:20px 16px}
+  .section p{font-size:18px !important}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-brand">WEHACK</span>
+    <span class="topbar-title">Teleprompter — NZ Threat Briefing 2026</span>
+  </div>
+  <div class="topbar-right">
+    <input type="range" class="font-slider" id="fontSlider" min="16" max="36" value="22" title="Font size">
+    <button class="btn" id="mirrorBtn" title="Mirror mode for glass teleprompter">Mirror</button>
+    <button class="btn" id="scrollBtn" title="Auto-scroll">Scroll</button>
+    <span class="speed-display" id="speedDisplay">1.0x</span>
+    <button class="btn" id="helpBtn" title="Keyboard shortcuts">?</button>
+  </div>
+</div>
+
+<div class="slide-indicator" id="slideIndicator"></div>
+
+<div class="script-wrap" id="scriptWrap">
+<div class="script-inner" id="scriptInner">
+
+<!-- SLIDE 1 -->
+<div class="section" data-slide="1">
+  <div class="section-header">
+    <span class="section-badge">SLIDE 1</span>
+    <span class="section-title">Title</span>
+  </div>
+  <p>Hey everyone, I'm Mustafa from WeHack.</p>
+  <p>Today I'm going to walk you through what's actually happening in the cybersecurity threat landscape for New Zealand businesses in <span class="stat">2026</span>.</p>
+  <p>This isn't theory. Every stat in this briefing comes from the world's top security research teams — IBM, CrowdStrike, Palo Alto, and New Zealand's own NCSC.</p>
+  <p>I'll keep it practical. By the end, you'll know exactly where the threats are, and the <span class="highlight">10 things you can do about them</span> — most of which are free.</p>
+  <p>Let's jump in.</p>
+  <span class="next-cue">NEXT SLIDE &rarr;</span>
+</div>
+
+<!-- SLIDE 2 -->
+<div class="section" data-slide="2">
+  <div class="section-header">
+    <span class="section-badge">SLIDE 2</span>
+    <span class="section-title">The Landscape Has Changed</span>
+  </div>
+  <p>So here's the big picture.</p>
+  <p><span class="stat">78%</span> of companies were hit by ransomware in the past year. That's not a niche problem — that's almost <span class="highlight">4 out of 5 businesses</span>.</p>
+  <p>The average attacker now takes full control of your network in <span class="stat">29 minutes</span>. Not days. Not hours. Minutes.</p>
+  <p>And here's what's really changed: <span class="stat">82%</span> of attacks don't even use malware anymore. They just use <span class="warn">stolen credentials</span>. Your username and password. They walk right in the front door.</p>
+  <p><span class="stat">75%</span> of small and medium businesses now rank cyberattacks as their <span class="highlight">number one business risk</span> — ahead of economic concerns. That's a first.</p>
+  <p>And <span class="stat">90%</span> of the attacks we're seeing exploit <span class="warn">basic misconfigurations</span>. Not sophisticated hacking. Basic gaps that should have been closed.</p>
+  <p>Let me show you the three big threat areas.</p>
+  <span class="next-cue">NEXT SLIDE &rarr;</span>
+</div>
+
+<!-- SLIDE 3 -->
+<div class="section" data-slide="3">
+  <div class="section-header">
+    <span class="section-badge">SLIDE 3</span>
+    <span class="section-title">AI Deepfakes ($1.1B)</span>
+  </div>
+  <p>First up: AI deepfakes.</p>
+  <p>This is the threat that didn't exist three years ago and is now a <span class="warn">billion-dollar problem</span>.</p>
+  <p><span class="stat">$1.1 billion</span> was lost to deepfake fraud in the US in 2025 alone. That's triple what it was in 2024. This is growing faster than any other attack type.</p>
+  <p>Voice cloning fraud is up <span class="stat">680%</span> year over year. <span class="stat">400 companies per day</span> are targeted by CEO deepfake fraud — where someone impersonates a company executive using AI.</p>
+  <p>And here's the concerning part: <span class="stat">80%</span> of companies have <span class="warn">no deepfake detection or response protocols</span> in place. None. Zero.</p>
+  <span class="next-cue">NEXT SLIDE &rarr;</span>
+</div>
+
+<!-- SLIDE 4 -->
+<div class="section" data-slide="4">
+  <div class="section-header">
+    <span class="section-badge">SLIDE 4</span>
+    <span class="section-title">Voice Cloning (3 Seconds)</span>
+  </div>
+  <p><span class="stat">3 seconds</span>. That's all it takes.</p>
+  <p>3 seconds of audio from a LinkedIn video, a podcast, or even a phone call — and someone can clone your voice at <span class="stat">85% accuracy</span>.</p>
+  <p><span class="stat">77%</span> of people who were targeted by a voice clone <span class="warn">lost money</span>.</p>
+  <p>And <span class="stat">70%</span> of people cannot tell a cloned voice from a real one. That means if someone calls your accounts team sounding exactly like you, asking them to make a transfer — your team will probably do it.</p>
+  <p>AI phishing emails are now getting <span class="stat">4x higher click rates</span> than the ones humans write. The game has changed.</p>
+  <span class="next-cue">NEXT SLIDE &rarr;</span>
+</div>
+
+<!-- SLIDE 5 -->
+<div class="section" data-slide="5">
+  <div class="section-header">
+    <span class="section-badge">SLIDE 5</span>
+    <span class="section-title">Case Study: Arup ($25M)</span>
+  </div>
+  <p>This is the case study that should keep every business owner up at night.</p>
+  <p>Arup Corporation — a major international engineering firm. An employee was invited to a video conference call with what appeared to be senior management.</p>
+  <p><span class="warn">Every single person on that call was an AI-generated deepfake.</span> Every one of them.</p>
+  <p>The employee was instructed to transfer funds. The company lost <span class="stat">$25 million</span> in a single call.</p>
+  <p>This isn't science fiction. This happened. And the tools to do this are getting cheaper and more accessible every month.</p>
+  <span class="next-cue">NEXT SLIDE &rarr;</span>
+</div>
+
+<!-- SLIDE 6 -->
+<div class="section" data-slide="6">
+  <div class="section-header">
+    <span class="section-badge">SLIDE 6</span>
+    <span class="section-title">Ransomware</span>
+  </div>
+  <p>Let's talk about ransomware.</p>
+  <p>Ransomware attacks <span class="highlight">tripled</span> in 12 months — from 572 to over <span class="stat">1,500</span>. And it's still accelerating.</p>
+  <p>But here's what people don't realise about paying the ransom.</p>
+  <p><span class="stat">83%</span> of companies that pay the ransom <span class="warn">get attacked again</span>. The attackers know you'll pay, so they come back.</p>
+  <p>And <span class="stat">93%</span> of companies that pay still have their <span class="warn">data stolen and leaked publicly</span>. Paying doesn't protect your data. It's gone either way.</p>
+  <p>Global ransomware damage is projected at <span class="stat">$74 billion</span> in 2026. By 2031, it's forecast to hit <span class="stat">$275 billion</span>.</p>
+  <span class="next-cue">NEXT SLIDE &rarr;</span>
+</div>
+
+<!-- SLIDE 7 -->
+<div class="section" data-slide="7">
+  <div class="section-header">
+    <span class="section-badge">SLIDE 7</span>
+    <span class="section-title">Pay vs Prepare</span>
+  </div>
+  <p>So you have a choice. <span class="warn">Pay</span> or <span class="highlight">prepare</span>.</p>
+  <p>If you pay: <span class="stat">83%</span> chance you get hit again. <span class="stat">93%</span> chance your data is still leaked. Only <span class="stat">22%</span> recover within 24 hours. And the average total cost? <span class="stat">$5.08 million</span>.</p>
+  <p>If you prepare: internal detection saves you <span class="highlight">$900,000</span> on average. AI-based security tools save <span class="highlight">$1.9 million</span> compared to companies without them. Proper backups mean <span class="highlight">zero ransom</span>. And regular testing means you find the gaps before attackers do.</p>
+  <p><span class="stat">40%</span> of SMBs say a <span class="warn">$100,000 attack would shut them down</span> entirely. And yet only <span class="stat">38%</span> fix the vulnerability that let the attacker in after a breach. They get hit, and they don't even close the door.</p>
+  <span class="next-cue">NEXT SLIDE &rarr;</span>
+</div>
+
+<!-- SLIDE 8 -->
+<div class="section" data-slide="8">
+  <div class="section-header">
+    <span class="section-badge">SLIDE 8</span>
+    <span class="section-title">Attack Speed (27 Seconds)</span>
+  </div>
+  <p>This slide should scare you.</p>
+  <p><span class="stat">27 seconds</span>. That's the fastest observed breakout time in 2025. From initial access to <span class="warn">full control of the entire network</span>. 27 seconds.</p>
+  <p>The average is <span class="stat">29 minutes</span>. That means once an attacker gets a foothold, you have less than half an hour before they own your network.</p>
+  <p>And from access to your data leaving the building? <span class="stat">72 minutes</span> in the fastest cases. That's <span class="highlight">4x faster</span> than the previous year.</p>
+  <p>What this means practically: you don't have time to react manually. If you're relying on someone noticing something weird and calling IT — it's already too late. You need proactive defences. You need to find the vulnerabilities before they do.</p>
+  <span class="next-cue">NEXT SLIDE &rarr;</span>
+</div>
+
+<!-- SLIDE 9 -->
+<div class="section" data-slide="9">
+  <div class="section-header">
+    <span class="section-badge">SLIDE 9</span>
+    <span class="section-title">NZ: The Local Picture</span>
+  </div>
+  <p>Now let's bring this home to New Zealand.</p>
+  <p><span class="stat">$7.8 million</span> lost by New Zealanders in just the first quarter of 2025. That's a <span class="stat">14.7%</span> increase from the previous quarter. Second-highest quarterly loss ever recorded.</p>
+  <p>Nearly <span class="stat">6,000</span> cyber incidents were reported in the 2024/25 year. The NCSC is now handling about <span class="highlight">one nationally significant incident every single day</span>.</p>
+  <p><span class="stat">26,000</span> New Zealanders were proactively contacted about Lumma Stealer malware compromising their devices. And <span class="stat">25%</span> of nationally significant incidents were linked to <span class="warn">state-sponsored actors</span> — this isn't just random hackers.</p>
+  <span class="next-cue">NEXT SLIDE &rarr;</span>
+</div>
+
+<!-- SLIDE 10 -->
+<div class="section" data-slide="10">
+  <div class="section-header">
+    <span class="section-badge">SLIDE 10</span>
+    <span class="section-title">ManageMyHealth Case Study</span>
+  </div>
+  <p>This one hit close to home.</p>
+  <p>ManageMyHealth — the platform used by New Zealand medical practices for patient records. Hit by the "Kazu" ransomware group in January 2026.</p>
+  <p><span class="stat">120,000+</span> patient records stolen. Clinical notes, lab results, vaccination records, medical photographs. <span class="stat">108 gigabytes</span> of data exfiltrated.</p>
+  <p>The ransom demand? Only <span class="stat">$60,000 US</span>. That's the cruel irony. The ransom is pocket change compared to the real cost — which will run into <span class="warn">millions</span> in legal fees, Privacy Commissioner investigations, notification costs, and the trust that can never be rebuilt.</p>
+  <p>Under the NZ Privacy Act, businesses must report serious breaches within <span class="highlight">72 hours</span>. Do you have a plan for that?</p>
+  <span class="next-cue">NEXT SLIDE &rarr;</span>
+</div>
+
+<!-- SLIDE 11 -->
+<div class="section" data-slide="11">
+  <div class="section-header">
+    <span class="section-badge">SLIDE 11</span>
+    <span class="section-title">The 10 Actions</span>
+  </div>
+  <p>So what do you actually do about all of this?</p>
+  <p>Here are the <span class="highlight">10 actions that matter most</span> — based on what we actually see when we test NZ businesses.</p>
+  <p><span class="stat">1.</span> Enable MFA everywhere. Not just for admins. Everyone. This blocks <span class="highlight">99.9%</span> of automated credential attacks.</p>
+  <p><span class="stat">2.</span> Test your backups today. Not next month. Today. If you can't actually restore from a backup, it's not a backup.</p>
+  <p><span class="stat">3.</span> Close any remote access that's exposed to the internet. RDP, VPN portals, admin panels.</p>
+  <p><span class="stat">4.</span> Patch critical vulnerabilities within <span class="highlight">48 hours</span>. 42% of exploited vulnerabilities were weaponised before they were even publicly disclosed.</p>
+  <p><span class="stat">5.</span> Review who has access. Remove ex-employees. Reduce admin accounts. Identity is the number one attack surface in 2026.</p>
+  <p><span class="stat">6.</span> Configure your email security — SPF, DKIM, DMARC. Your IT person can do this in 30 minutes.</p>
+  <p><span class="stat">7.</span> Train your team on deepfakes and AI phishing. Security awareness training reduces phishing success by <span class="highlight">86%</span> after one year.</p>
+  <p><span class="stat">8.</span> Implement verbal verification for financial requests. Code words, callback procedures. This is the only reliable defence against deepfakes.</p>
+  <p><span class="stat">9.</span> Create an incident response plan. Who calls who? Who pulls the plug? Who contacts the Privacy Commissioner? Figure this out now, not during a crisis.</p>
+  <p><span class="stat">10.</span> Get a professional penetration test. <span class="highlight">90%</span> of breaches exploited basic misconfigurations that testing would have caught. Your IT team keeps systems running — a pentester finds what they miss.</p>
+  <span class="next-cue">NEXT SLIDE &rarr;</span>
+</div>
+
+<!-- SLIDE 12 -->
+<div class="section" data-slide="12">
+  <div class="section-header">
+    <span class="section-badge">SLIDE 12</span>
+    <span class="section-title">Secure vs Vulnerable</span>
+  </div>
+  <p>Here's what separates the businesses that survive from those that don't.</p>
+  <p>Look at this comparison. <span class="warn">Vulnerable</span> businesses use passwords only, MFA on some accounts. <span class="highlight">Protected</span> businesses enforce MFA everywhere.</p>
+  <p><span class="warn">Vulnerable</span> businesses say "we'll get to patching." <span class="highlight">Protected</span> businesses patch within 48 hours.</p>
+  <p><span class="warn">Vulnerable</span> businesses have ex-staff who still have access. <span class="highlight">Protected</span> businesses do quarterly access reviews.</p>
+  <p><span class="warn">Vulnerable</span> businesses have backups they've never tested. <span class="highlight">Protected</span> businesses test theirs quarterly and keep an offline copy.</p>
+  <p>The pattern is clear. The gap between vulnerable and protected isn't about budget. It's about <span class="highlight">consistently applying basic practices</span>.</p>
+  <span class="next-cue">NEXT SLIDE &rarr;</span>
+</div>
+
+<!-- SLIDE 13 -->
+<div class="section" data-slide="13">
+  <div class="section-header">
+    <span class="section-badge">SLIDE 13</span>
+    <span class="section-title">Cost Comparison</span>
+  </div>
+  <p>People often ask: what does this actually cost?</p>
+  <p>Here's the reality. After a breach — reactively — you're looking at <span class="stat">$15 to $40K</span> for forensic investigation. <span class="stat">$20 to $60K</span> to rebuild systems. <span class="stat">$10 to $30K</span> in legal and regulatory costs. <span class="stat">$20 to $80K</span> or more in business downtime. And reputation damage that you simply can't put a number on. Total: anywhere from <span class="warn">$100K to half a million</span> or more.</p>
+  <p>Compare that to being proactive. Our security assessment is <span class="highlight">free</span>. Staff awareness training is often <span class="highlight">free</span>. MFA, patching, and backups are <span class="highlight">free</span>. Policy and governance? Just takes your time.</p>
+  <p>The question isn't "can we afford to test?" The question is: <span class="highlight">can you afford not to?</span></p>
+  <span class="next-cue">NEXT SLIDE &rarr;</span>
+</div>
+
+<!-- SLIDE 14 -->
+<div class="section" data-slide="14">
+  <div class="section-header">
+    <span class="section-badge">SLIDE 14</span>
+    <span class="section-title">CTA</span>
+  </div>
+  <p>So here's what I'd encourage you to do right now.</p>
+  <p>We've built a <span class="highlight">free security posture assessment</span>. It takes about 4 minutes, covers 6 security domains, and gives you an A through F grade with specific recommendations tailored to your business.</p>
+  <p>No sales pitch. No strings attached. It's completely free.</p>
+  <p>Just go to <span class="stat">score.wehack.co.nz</span>.</p>
+  <p>And if you want to go deeper — if you want a penetration test, a security review, or just an honest conversation about where your risks are — we're here. We specialise in helping New Zealand businesses understand and fix their security gaps.</p>
+  <p>You can reach us at <span class="stat">wehack.co.nz</span> or <span class="stat">info@wehack.co.nz</span>.</p>
+  <p>Thanks for your time today. Stay safe out there.</p>
+  <span class="next-cue">END OF SCRIPT</span>
+</div>
+
+</div>
+</div>
+
+<!-- Help overlay -->
+<div class="help-overlay" id="helpOverlay">
+<div class="help-box">
+  <h3>Keyboard Shortcuts</h3>
+  <div class="help-row"><span>Navigate slides</span><span class="help-key">1-9, 0</span></div>
+  <div class="help-row"><span>Next / Previous slide</span><span class="help-key">Arrow Down / Up</span></div>
+  <div class="help-row"><span>Toggle auto-scroll</span><span class="help-key">Space</span></div>
+  <div class="help-row"><span>Speed up</span><span class="help-key">+ or =</span></div>
+  <div class="help-row"><span>Slow down</span><span class="help-key">- or _</span></div>
+  <div class="help-row"><span>Toggle mirror</span><span class="help-key">M</span></div>
+  <div class="help-row"><span>Increase font</span><span class="help-key">] or }</span></div>
+  <div class="help-row"><span>Decrease font</span><span class="help-key">[ or {</span></div>
+  <div class="help-row"><span>Show help</span><span class="help-key">?</span></div>
+  <div class="help-row"><span>Close help</span><span class="help-key">Escape</span></div>
+  <button class="btn help-close" onclick="document.getElementById('helpOverlay').classList.remove('visible')">Close</button>
+</div>
+</div>
+
+<script>
+const sections = document.querySelectorAll('.section');
+const scriptWrap = document.getElementById('scriptWrap');
+const slideIndicator = document.getElementById('slideIndicator');
+const scrollBtn = document.getElementById('scrollBtn');
+const mirrorBtn = document.getElementById('mirrorBtn');
+const helpBtn = document.getElementById('helpBtn');
+const helpOverlay = document.getElementById('helpOverlay');
+const fontSlider = document.getElementById('fontSlider');
+const speedDisplay = document.getElementById('speedDisplay');
+
+let currentSlide = 0;
+let scrolling = false;
+let scrollSpeed = 1.0;
+let scrollInterval = null;
+
+// Build slide pips
+sections.forEach((s, i) => {
+  const pip = document.createElement('div');
+  pip.className = 'slide-pip';
+  pip.textContent = s.dataset.slide;
+  pip.onclick = () => scrollToSlide(i);
+  slideIndicator.appendChild(pip);
+});
+const pips = slideIndicator.querySelectorAll('.slide-pip');
+updatePips();
+
+function scrollToSlide(index) {
+  if (index < 0 || index >= sections.length) return;
+  currentSlide = index;
+  sections[index].scrollIntoView({ behavior: 'smooth', block: 'start' });
+  updatePips();
+}
+
+function updatePips() {
+  pips.forEach((p, i) => {
+    p.classList.toggle('active', i === currentSlide);
+    p.classList.toggle('past', i < currentSlide);
+  });
+  sections.forEach((s, i) => {
+    s.classList.toggle('active', i === currentSlide);
+    s.classList.toggle('past', i < currentSlide);
+  });
+}
+
+// Detect which slide is in view
+scriptWrap.addEventListener('scroll', () => {
+  const wrapTop = scriptWrap.scrollTop + 120;
+  for (let i = sections.length - 1; i >= 0; i--) {
+    if (sections[i].offsetTop <= wrapTop) {
+      if (currentSlide !== i) {
+        currentSlide = i;
+        updatePips();
+      }
+      break;
+    }
+  }
+});
+
+// Auto-scroll
+function startScroll() {
+  scrolling = true;
+  scrollBtn.classList.add('active');
+  scrollBtn.textContent = 'Stop';
+  scrollInterval = setInterval(() => {
+    scriptWrap.scrollTop += scrollSpeed;
+  }, 16);
+}
+function stopScroll() {
+  scrolling = false;
+  scrollBtn.classList.remove('active');
+  scrollBtn.textContent = 'Scroll';
+  clearInterval(scrollInterval);
+}
+scrollBtn.onclick = () => scrolling ? stopScroll() : startScroll();
+
+// Mirror
+mirrorBtn.onclick = () => {
+  document.body.classList.toggle('mirror');
+  mirrorBtn.classList.toggle('active');
+};
+
+// Help
+helpBtn.onclick = () => helpOverlay.classList.toggle('visible');
+
+// Font size
+fontSlider.oninput = () => {
+  document.getElementById('scriptInner').style.setProperty('--font-size', fontSlider.value + 'px');
+};
+
+// Keyboard
+document.addEventListener('keydown', (e) => {
+  if (helpOverlay.classList.contains('visible')) {
+    if (e.key === 'Escape') helpOverlay.classList.remove('visible');
+    return;
+  }
+  switch(e.key) {
+    case ' ':
+      e.preventDefault();
+      scrolling ? stopScroll() : startScroll();
+      break;
+    case 'ArrowDown':
+      e.preventDefault();
+      scrollToSlide(Math.min(currentSlide + 1, sections.length - 1));
+      break;
+    case 'ArrowUp':
+      e.preventDefault();
+      scrollToSlide(Math.max(currentSlide - 1, 0));
+      break;
+    case '+': case '=':
+      scrollSpeed = Math.min(scrollSpeed + 0.25, 5);
+      speedDisplay.textContent = scrollSpeed.toFixed(1) + 'x';
+      break;
+    case '-': case '_':
+      scrollSpeed = Math.max(scrollSpeed - 0.25, 0.25);
+      speedDisplay.textContent = scrollSpeed.toFixed(1) + 'x';
+      break;
+    case 'm': case 'M':
+      mirrorBtn.click();
+      break;
+    case ']': case '}':
+      fontSlider.value = Math.min(+fontSlider.value + 2, 36);
+      fontSlider.dispatchEvent(new Event('input'));
+      break;
+    case '[': case '{':
+      fontSlider.value = Math.max(+fontSlider.value - 2, 16);
+      fontSlider.dispatchEvent(new Event('input'));
+      break;
+    case '?':
+      helpOverlay.classList.add('visible');
+      break;
+    default:
+      // Number keys 1-9, 0 for slide 10+
+      const num = parseInt(e.key);
+      if (!isNaN(num)) {
+        const target = num === 0 ? 9 : num - 1;
+        if (target < sections.length) scrollToSlide(target);
+      }
+  }
+});
+</script>
+</body>
+</html>
