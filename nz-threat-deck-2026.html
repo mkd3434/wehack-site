@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 NZ Cyber Threat Briefing — WeHack</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Questrial&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --cyan: #B8F0F0;
+            --green: #C4FF9E;
+            --black: #0F0F10;
+            --dark: #141416;
+            --card: #1A1A1C;
+            --border: #2A2A2E;
+            --white: #FFFFFF;
+            --gray-100: #F0F0F0;
+            --gray-300: #CCCCCC;
+            --gray-500: #999999;
+            --red: #FF4444;
+            --orange: #FF8C00;
+            --yellow: #FFD700;
+        }
+        html, body { height: 100%; overflow: hidden; }
+        body {
+            font-family: 'Questrial', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--black);
+            color: var(--white);
+            line-height: 1.5;
+        }
+
+        /* === SLIDE ENGINE === */
+        .slide {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px 80px;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .slide.active {
+            display: flex;
+            pointer-events: auto;
+        }
+
+        /* === PROGRESS BAR === */
+        .progress-bar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--cyan), var(--green));
+            transition: width 0.4s ease;
+            z-index: 100;
+        }
+
+        /* === SLIDE COUNTER === */
+        .slide-counter {
+            position: fixed;
+            bottom: 24px;
+            right: 32px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: var(--gray-500);
+            z-index: 100;
+        }
+
+        /* === LOGO === */
+        .deck-logo {
+            position: fixed;
+            top: 24px;
+            left: 32px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--white);
+            z-index: 100;
+        }
+        .deck-logo span { color: var(--green); }
+
+        /* === NAV HINT === */
+        .nav-hint {
+            position: fixed;
+            bottom: 24px;
+            left: 32px;
+            font-size: 12px;
+            color: var(--gray-500);
+            z-index: 100;
+            opacity: 0.6;
+        }
+
+        /* === TYPOGRAPHY === */
+        .slide-section {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--cyan);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 16px;
+        }
+        .slide-title {
+            font-size: clamp(32px, 4.5vw, 56px);
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -2px;
+            margin-bottom: 16px;
+            text-align: center;
+            max-width: 900px;
+        }
+        .slide-title .accent {
+            background: linear-gradient(135deg, var(--cyan), var(--green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .slide-subtitle {
+            font-size: 20px;
+            color: var(--gray-300);
+            text-align: center;
+            max-width: 700px;
+            line-height: 1.6;
+            margin-bottom: 32px;
+        }
+
+        /* === BIG STAT === */
+        .big-stat {
+            font-size: clamp(72px, 12vw, 140px);
+            font-weight: 800;
+            line-height: 1;
+            letter-spacing: -4px;
+            margin-bottom: 12px;
+        }
+        .big-stat.red { color: var(--red); }
+        .big-stat.orange { color: var(--orange); }
+        .big-stat.yellow { color: var(--yellow); }
+        .big-stat.cyan { color: var(--cyan); }
+        .big-stat.green { color: var(--green); }
+
+        .stat-label {
+            font-size: 22px;
+            color: var(--gray-300);
+            text-align: center;
+            max-width: 600px;
+            line-height: 1.5;
+        }
+        .stat-source {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--gray-500);
+            margin-top: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* === STAT ROW === */
+        .stat-row {
+            display: flex;
+            gap: 48px;
+            margin-top: 32px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .stat-item { text-align: center; }
+        .stat-item-num {
+            font-size: 48px;
+            font-weight: 800;
+            line-height: 1;
+        }
+        .stat-item-label {
+            font-size: 14px;
+            color: var(--gray-500);
+            margin-top: 6px;
+            max-width: 160px;
+        }
+
+        /* === GRID STATS === */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 24px;
+            max-width: 800px;
+            width: 100%;
+        }
+        .stat-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 28px 20px;
+            text-align: center;
+        }
+        .stat-card-num {
+            font-size: 36px;
+            font-weight: 800;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+        .stat-card-label {
+            font-size: 14px;
+            color: var(--gray-300);
+            line-height: 1.4;
+        }
+
+        /* === CASE STUDY === */
+        .case-box {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--red);
+            border-radius: 12px;
+            padding: 36px 40px;
+            max-width: 750px;
+            width: 100%;
+            margin-top: 20px;
+        }
+        .case-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--red);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+        .case-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+        .case-desc {
+            font-size: 16px;
+            color: var(--gray-300);
+            line-height: 1.7;
+        }
+
+        /* === TWO COLUMNS === */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            max-width: 800px;
+            width: 100%;
+            margin-top: 24px;
+        }
+        .col-box {
+            border-radius: 12px;
+            padding: 28px 24px;
+        }
+        .col-box.bad {
+            background: rgba(255, 68, 68, 0.06);
+            border: 1px solid rgba(255, 68, 68, 0.2);
+        }
+        .col-box.good {
+            background: rgba(184, 240, 240, 0.06);
+            border: 1px solid rgba(184, 240, 240, 0.15);
+        }
+        .col-box h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        .col-box p {
+            font-size: 15px;
+            color: var(--gray-300);
+            line-height: 1.8;
+        }
+
+        /* === TIMELINE === */
+        .timeline {
+            max-width: 700px;
+            width: 100%;
+            margin-top: 24px;
+        }
+        .tl-item {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .tl-item:last-child { border-bottom: none; }
+        .tl-num {
+            font-size: 40px;
+            font-weight: 800;
+            min-width: 110px;
+            text-align: center;
+        }
+        .tl-num small {
+            display: block;
+            font-size: 11px;
+            color: var(--gray-500);
+            font-weight: 600;
+            margin-top: 2px;
+        }
+        .tl-desc h4 { font-size: 16px; font-weight: 700; margin-bottom: 2px; }
+        .tl-desc p { font-size: 15px; color: var(--gray-300); }
+
+        /* === ACTION LIST === */
+        .action-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            max-width: 850px;
+            width: 100%;
+            margin-top: 20px;
+        }
+        .action-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px 18px;
+        }
+        .action-num {
+            min-width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--cyan), var(--green));
+            color: var(--black);
+            font-size: 14px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .action-text h4 { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+        .action-text p { font-size: 13px; color: var(--gray-500); line-height: 1.4; }
+
+        /* === COMPARISON TABLE === */
+        .comp-grid {
+            max-width: 800px;
+            width: 100%;
+            margin-top: 20px;
+        }
+        .comp-row {
+            display: grid;
+            grid-template-columns: 140px 1fr 1fr;
+            border-bottom: 1px solid var(--border);
+        }
+        .comp-row.header {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .comp-cell {
+            padding: 12px 14px;
+            font-size: 14px;
+            color: var(--gray-300);
+        }
+        .comp-cell.label { color: var(--white); font-weight: 700; font-size: 13px; }
+        .comp-cell.bad { color: var(--gray-500); }
+        .comp-cell.good { color: var(--green); }
+        .comp-row.header .comp-cell:nth-child(2) { color: var(--red); }
+        .comp-row.header .comp-cell:nth-child(3) { color: var(--green); }
+
+        /* === CTA SLIDE === */
+        .cta-box {
+            background: linear-gradient(135deg, var(--cyan), var(--green));
+            color: var(--black);
+            padding: 36px 48px;
+            border-radius: 16px;
+            text-align: center;
+            margin-top: 24px;
+            max-width: 550px;
+        }
+        .cta-box h3 { font-size: 24px; font-weight: 800; margin-bottom: 8px; }
+        .cta-box p { color: #333; font-size: 15px; margin-bottom: 16px; }
+        .cta-btn {
+            display: inline-block;
+            background: var(--black);
+            color: var(--white);
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            text-decoration: none;
+        }
+        .contact-line {
+            margin-top: 32px;
+            font-size: 15px;
+            color: var(--gray-300);
+            text-align: center;
+        }
+        .contact-line strong { color: var(--white); }
+
+        /* === BULLET LIST === */
+        .bullet-list {
+            list-style: none;
+            padding: 0;
+            max-width: 700px;
+            width: 100%;
+            margin-top: 16px;
+        }
+        .bullet-list li {
+            font-size: 17px;
+            color: var(--gray-300);
+            padding: 10px 0 10px 24px;
+            position: relative;
+            line-height: 1.6;
+        }
+        .bullet-list li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 16px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--cyan);
+        }
+        .bullet-list li strong { color: var(--white); }
+
+        /* === RADIAL GLOW BACKGROUNDS === */
+        .glow-cyan::before {
+            content: '';
+            position: absolute;
+            top: -200px; right: -200px;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(184,240,240,0.05) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .glow-red::before {
+            content: '';
+            position: absolute;
+            top: -100px; left: -100px;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(255,68,68,0.04) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .glow-green::after {
+            content: '';
+            position: absolute;
+            bottom: -200px; left: -100px;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(196,255,158,0.04) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        /* === COVER STATS === */
+        .cover-stats {
+            display: flex;
+            gap: 48px;
+            margin-top: 48px;
+        }
+        .cover-stat { text-align: center; }
+        .cover-stat-num {
+            font-size: 40px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--cyan), var(--green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .cover-stat-label {
+            font-size: 12px;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 4px;
+        }
+
+        /* === HIGHLIGHT BOX === */
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(184,240,240,0.08), rgba(196,255,158,0.04));
+            border: 1px solid rgba(184,240,240,0.15);
+            border-radius: 12px;
+            padding: 24px 28px;
+            max-width: 700px;
+            width: 100%;
+            margin-top: 20px;
+            text-align: center;
+        }
+        .highlight-box p {
+            font-size: 18px;
+            color: var(--gray-300);
+            line-height: 1.7;
+        }
+        .highlight-box strong { color: var(--white); }
+
+        /* === FULLSCREEN BUTTON === */
+        .fs-btn {
+            position: fixed;
+            top: 24px;
+            right: 32px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            color: var(--gray-500);
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            z-index: 100;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .fs-btn:hover { color: var(--white); border-color: var(--gray-500); }
+    </style>
+</head>
+<body>
+
+<!-- Fixed UI -->
+<div class="deck-logo">We<span>Hack</span></div>
+<div class="progress-bar" id="progressBar"></div>
+<div class="slide-counter" id="slideCounter"></div>
+<div class="nav-hint">Arrow keys or click to navigate</div>
+<button class="fs-btn" onclick="toggleFullscreen()">Fullscreen</button>
+
+<!-- ============================================================ -->
+<!-- SLIDE 1: TITLE -->
+<!-- ============================================================ -->
+<div class="slide active glow-cyan glow-green" data-slide="1">
+    <div class="slide-section">Free Briefing &bull; March 2026</div>
+    <div class="slide-title">The 2026 NZ SMB<br><span class="accent">Cyber Threat Briefing</span></div>
+    <div class="slide-subtitle">What every New Zealand business owner needs to know about AI-powered attacks, ransomware, and the threats targeting your business right now.</div>
+    <div class="cover-stats">
+        <div class="cover-stat">
+            <div class="cover-stat-num">$7.8M</div>
+            <div class="cover-stat-label">Lost by NZers in Q1 2025</div>
+        </div>
+        <div class="cover-stat">
+            <div class="cover-stat-num">89%</div>
+            <div class="cover-stat-label">Increase in AI attacks</div>
+        </div>
+        <div class="cover-stat">
+            <div class="cover-stat-num">27s</div>
+            <div class="cover-stat-label">Fastest attack breakout</div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 2: THE LANDSCAPE -->
+<!-- ============================================================ -->
+<div class="slide glow-cyan" data-slide="2">
+    <div class="slide-section">The Big Picture</div>
+    <div class="slide-title">The Threat Landscape<br><span class="accent">Has Changed</span></div>
+    <div class="stat-grid">
+        <div class="stat-card">
+            <div class="stat-card-num" style="color:var(--red);">78%</div>
+            <div class="stat-card-label">of companies hit by ransomware in the past year</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-num" style="color:var(--orange);">29 min</div>
+            <div class="stat-card-label">average time for attackers to take full control</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-num" style="color:var(--yellow);">82%</div>
+            <div class="stat-card-label">of attacks now use NO malware (just stolen credentials)</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-num" style="color:var(--cyan);">75%</div>
+            <div class="stat-card-label">of SMBs rank cyberattacks as #1 business risk</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-num" style="color:var(--green);">3 sec</div>
+            <div class="stat-card-label">of audio to clone anyone's voice</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-num" style="color:#4A9EFF;">90%</div>
+            <div class="stat-card-label">of attacks exploited misconfigurations, not sophisticated hacking</div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 3: AI DEEPFAKES - HEADLINE -->
+<!-- ============================================================ -->
+<div class="slide glow-red" data-slide="3">
+    <div class="slide-section">Section 01 &mdash; AI Deepfakes</div>
+    <div class="big-stat red">$1.1B</div>
+    <div class="stat-label">Lost to deepfake fraud in the US in 2025 alone.<br>That's 3x the $360 million lost in 2024.</div>
+    <div class="stat-source">Source: DeepStrike 2025</div>
+    <div class="stat-row">
+        <div class="stat-item">
+            <div class="stat-item-num" style="color:var(--red);">680%</div>
+            <div class="stat-item-label">increase in voice cloning fraud YoY</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-item-num" style="color:var(--orange);">400/day</div>
+            <div class="stat-item-label">companies targeted by CEO deepfake fraud</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-item-num" style="color:var(--yellow);">80%</div>
+            <div class="stat-item-label">of companies have NO deepfake protocols</div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 4: VOICE CLONING -->
+<!-- ============================================================ -->
+<div class="slide glow-cyan" data-slide="4">
+    <div class="slide-section">Section 01 &mdash; Voice Cloning</div>
+    <div class="big-stat orange">3 seconds</div>
+    <div class="stat-label">of audio from a LinkedIn video, podcast, or phone call<br>is enough to clone anyone's voice at 85% accuracy.</div>
+    <div class="stat-source">Source: DeepStrike 2025</div>
+    <ul class="bullet-list" style="margin-top:32px;">
+        <li><strong>77%</strong> of voice clone victims suffered financial loss</li>
+        <li><strong>70%</strong> of people cannot tell a cloned voice from a real one</li>
+        <li><strong>Only 24.5%</strong> of humans can correctly identify a deepfake video</li>
+        <li>AI phishing emails get <strong>4x higher click rates</strong> than human-crafted ones</li>
+    </ul>
+</div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 5: CASE STUDY - ARUP -->
+<!-- ============================================================ -->
+<div class="slide glow-red" data-slide="5">
+    <div class="slide-section">Case Study</div>
+    <div class="slide-title" style="font-size:clamp(28px,3.5vw,44px);">$25 Million Lost in a<br><span class="accent" style="-webkit-text-fill-color:var(--red);color:var(--red);">Single Video Call</span></div>
+    <div class="case-box">
+        <div class="case-tag">Arup Corporation &mdash; 2025</div>
+        <div class="case-desc">An employee was invited to a video conference with senior management. Every person on the screen was an AI-generated deepfake. The employee was instructed to transfer funds.</div>
+        <div class="stat-row" style="margin-top:20px;gap:32px;">
+            <div class="stat-item">
+                <div class="stat-item-num" style="color:var(--red);font-size:36px;">$25M</div>
+                <div class="stat-item-label">Total loss</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-item-num" style="color:var(--orange);font-size:36px;">1</div>
+                <div class="stat-item-label">Video call</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-item-num" style="color:var(--yellow);font-size:36px;">100%</div>
+                <div class="stat-item-label">AI-generated attendees</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 6: RANSOMWARE -->
+<!-- ============================================================ -->
+<div class="slide glow-red" data-slide="6">
+    <div class="slide-section">Section 02 &mdash; Ransomware</div>
+    <div class="slide-title">Ransomware:<br><span class="accent" style="-webkit-text-fill-color:var(--red);color:var(--red);">Faster, Smarter, More Ruthless</span></div>
+    <div class="stat-grid">
+        <div class="stat-card">
+            <div class="stat-card-num" style="color:var(--red);">3x</div>
+            <div class="stat-card-label">Attacks tripled: 572 to 1,537 in one year</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-num" style="color:var(--orange);">83%</div>
+            <div class="stat-card-label">of victims who pay get attacked AGAIN</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-num" style="color:var(--yellow);">93%</div>
+            <div class="stat-card-label">who pay still have their data stolen and leaked</div>
+        </div>
+    </div>
+    <div class="highlight-box" style="margin-top:28px;">
+        <p>Global ransomware damage projected at <strong>$74 billion in 2026</strong>.<br>By 2031: <strong>$275 billion</strong>, with attacks every 2 seconds.</p>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 7: PAY VS PREPARE -->
+<!-- ============================================================ -->
+<div class="slide" data-slide="7">
+    <div class="slide-section">Section 02 &mdash; The Choice</div>
+    <div class="slide-title" style="font-size:clamp(28px,3.5vw,42px);">Pay the Ransom or <span class="accent">Prepare?</span></div>
+    <div class="two-col">
+        <div class="col-box bad">
+            <h3 style="color:var(--red);">If You Pay</h3>
+            <p><strong style="color:var(--red);">83%</strong> get hit again<br><strong style="color:var(--red);">93%</strong> still lose their data<br><strong style="color:var(--red);">Only 22%</strong> recover within 24h<br>Average cost: <strong style="color:var(--red);">$5.08 million</strong></p>
+        </div>
+        <div class="col-box good">
+            <h3 style="color:var(--green);">If You Prepare</h3>
+            <p>Internal detection saves <strong>$900K</strong> avg<br>AI/automation saves <strong>$1.9M</strong><br>Proper backups = <strong>zero ransom</strong><br>Testing = <strong>known gaps fixed</strong></p>
+        </div>
+    </div>
+    <div class="highlight-box" style="margin-top:20px;">
+        <p><strong>40% of SMBs</strong> say a $100K attack would shut them down. Only <strong>38%</strong> fix the vulnerability that let attackers in.</p>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 8: ATTACK SPEED -->
+<!-- ============================================================ -->
+<div class="slide glow-red" data-slide="8">
+    <div class="slide-section">Section 03 &mdash; Attack Speed</div>
+    <div class="big-stat red">27 seconds</div>
+    <div class="stat-label">Fastest observed breakout time in 2025.<br>From initial access to full network control.</div>
+    <div class="stat-source">Source: CrowdStrike 2026 Global Threat Report</div>
+    <div class="timeline" style="margin-top:32px;">
+        <div class="tl-item">
+            <div class="tl-num" style="color:var(--red);">27s<small>FASTEST</small></div>
+            <div class="tl-desc">
+                <h4>Initial Access to Full Control</h4>
+                <p>27 seconds from foothold to domain control</p>
+            </div>
+        </div>
+        <div class="tl-item">
+            <div class="tl-num" style="color:var(--orange);">29m<small>AVERAGE</small></div>
+            <div class="tl-desc">
+                <h4>Average eCrime Breakout</h4>
+                <p>65% faster than 2024</p>
+            </div>
+        </div>
+        <div class="tl-item">
+            <div class="tl-num" style="color:var(--yellow);">72m<small>DATA GONE</small></div>
+            <div class="tl-desc">
+                <h4>Access to Data Exfiltration</h4>
+                <p>4x faster than the previous year</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 9: NZ LOCAL PICTURE -->
+<!-- ============================================================ -->
+<div class="slide glow-cyan" data-slide="9">
+    <div class="slide-section">Section 04 &mdash; New Zealand</div>
+    <div class="slide-title">New Zealand:<br><span class="accent">The Local Picture</span></div>
+    <div class="stat-grid">
+        <div class="stat-card">
+            <div class="stat-card-num" style="color:var(--red);">$7.8M</div>
+            <div class="stat-card-label">lost in Q1 2025 alone (14.7% increase)</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-num" style="color:var(--orange);">5,995</div>
+            <div class="stat-card-label">cyber incidents reported in 2024/25 year</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-num" style="color:var(--yellow);">1/day</div>
+            <div class="stat-card-label">nationally significant incidents handled by NCSC</div>
+        </div>
+    </div>
+    <ul class="bullet-list" style="margin-top:24px;">
+        <li><strong>26,000 New Zealanders</strong> proactively contacted about Lumma Stealer malware</li>
+        <li><strong>150 million+</strong> malicious threats disrupted in Q1 2025 by NCSC</li>
+        <li><strong>25%</strong> of nationally significant incidents linked to state-sponsored actors</li>
+    </ul>
+</div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 10: NZ CASE STUDY - MANAGEMYHEALTH -->
+<!-- ============================================================ -->
+<div class="slide glow-red" data-slide="10">
+    <div class="slide-section">NZ Case Study</div>
+    <div class="slide-title" style="font-size:clamp(28px,3.5vw,44px);">120,000+ NZ Patient Records<br><span class="accent" style="-webkit-text-fill-color:var(--red);color:var(--red);">Stolen</span></div>
+    <div class="case-box">
+        <div class="case-tag">ManageMyHealth &mdash; January 2026</div>
+        <div class="case-desc">The platform used by NZ medical practices was hit by the "Kazu" ransomware group. Clinical notes, lab results, vaccination records, and medical photographs were stolen. The Privacy Commissioner launched a formal inquiry.</div>
+        <div class="stat-row" style="margin-top:20px;gap:32px;">
+            <div class="stat-item">
+                <div class="stat-item-num" style="color:var(--red);font-size:36px;">120K+</div>
+                <div class="stat-item-label">Patients affected</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-item-num" style="color:var(--orange);font-size:36px;">108 GB</div>
+                <div class="stat-item-label">Data exfiltrated</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-item-num" style="color:var(--yellow);font-size:36px;">$60K</div>
+                <div class="stat-item-label">Ransom demanded</div>
+            </div>
+        </div>
+    </div>
+    <div class="highlight-box" style="margin-top:16px;">
+        <p>The ransom was only <strong>$60,000 USD</strong>. The real cost in legal fees, notification costs, and lost trust will run into <strong>millions</strong>.</p>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 11: 10 ACTIONS (1-5) -->
+<!-- ============================================================ -->
+<div class="slide" data-slide="11">
+    <div class="slide-section">Section 05 &mdash; What To Do</div>
+    <div class="slide-title" style="font-size:clamp(28px,3.5vw,42px);">The 10 Actions That <span class="accent">Actually Matter</span></div>
+    <div class="slide-subtitle" style="margin-bottom:20px;">Based on what we see when testing NZ businesses. Prioritised by impact.</div>
+    <div class="action-grid">
+        <div class="action-item">
+            <div class="action-num">1</div>
+            <div class="action-text">
+                <h4>Enable MFA Everywhere</h4>
+                <p>Blocks 99.9% of automated credential attacks</p>
+            </div>
+        </div>
+        <div class="action-item">
+            <div class="action-num">2</div>
+            <div class="action-text">
+                <h4>Test Your Backups Today</h4>
+                <p>Backups that can't be restored aren't backups</p>
+            </div>
+        </div>
+        <div class="action-item">
+            <div class="action-num">3</div>
+            <div class="action-text">
+                <h4>Close Exposed Remote Access</h4>
+                <p>RDP, VPN, admin panels facing the internet</p>
+            </div>
+        </div>
+        <div class="action-item">
+            <div class="action-num">4</div>
+            <div class="action-text">
+                <h4>Patch Within 48 Hours</h4>
+                <p>42% exploited before public disclosure</p>
+            </div>
+        </div>
+        <div class="action-item">
+            <div class="action-num">5</div>
+            <div class="action-text">
+                <h4>Review Who Has Access</h4>
+                <p>Remove ex-employees, reduce admin accounts</p>
+            </div>
+        </div>
+        <div class="action-item">
+            <div class="action-num">6</div>
+            <div class="action-text">
+                <h4>Configure Email Security</h4>
+                <p>SPF, DKIM, DMARC. 30-minute fix.</p>
+            </div>
+        </div>
+        <div class="action-item">
+            <div class="action-num">7</div>
+            <div class="action-text">
+                <h4>Train on Deepfake Awareness</h4>
+                <p>Reduces phishing success by 86% in one year</p>
+            </div>
+        </div>
+        <div class="action-item">
+            <div class="action-num">8</div>
+            <div class="action-text">
+                <h4>Verbal Verification for Payments</h4>
+                <p>Code words, callbacks for transfers over $1K</p>
+            </div>
+        </div>
+        <div class="action-item">
+            <div class="action-num">9</div>
+            <div class="action-text">
+                <h4>Create an Incident Response Plan</h4>
+                <p>Don't figure this out during a crisis</p>
+            </div>
+        </div>
+        <div class="action-item">
+            <div class="action-num">10</div>
+            <div class="action-text">
+                <h4>Get a Professional Pen Test</h4>
+                <p>90% of breaches exploit basic misconfigs</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 12: SECURE VS VULNERABLE -->
+<!-- ============================================================ -->
+<div class="slide" data-slide="12">
+    <div class="slide-section">Section 06</div>
+    <div class="slide-title" style="font-size:clamp(28px,3.5vw,42px);"><span class="accent" style="-webkit-text-fill-color:var(--green);color:var(--green);">Secure</span> vs. <span class="accent" style="-webkit-text-fill-color:var(--red);color:var(--red);">Vulnerable</span></div>
+    <div class="comp-grid">
+        <div class="comp-row header">
+            <div class="comp-cell">Practice</div>
+            <div class="comp-cell">Vulnerable</div>
+            <div class="comp-cell">Protected</div>
+        </div>
+        <div class="comp-row">
+            <div class="comp-cell label">Auth</div>
+            <div class="comp-cell bad">Passwords only. MFA on some.</div>
+            <div class="comp-cell good">MFA everywhere. App-based.</div>
+        </div>
+        <div class="comp-row">
+            <div class="comp-cell label">Patching</div>
+            <div class="comp-cell bad">"We'll get to it." Weeks delayed.</div>
+            <div class="comp-cell good">Critical patches within 48h.</div>
+        </div>
+        <div class="comp-row">
+            <div class="comp-cell label">Access</div>
+            <div class="comp-cell bad">Ex-staff still have access.</div>
+            <div class="comp-cell good">Least privilege. Quarterly reviews.</div>
+        </div>
+        <div class="comp-row">
+            <div class="comp-cell label">Backups</div>
+            <div class="comp-cell bad">Exist. Never tested a restore.</div>
+            <div class="comp-cell good">Tested quarterly. Offline copy.</div>
+        </div>
+        <div class="comp-row">
+            <div class="comp-cell label">Incidents</div>
+            <div class="comp-cell bad">"We'll figure it out."</div>
+            <div class="comp-cell good">Written plan. Tested annually.</div>
+        </div>
+        <div class="comp-row">
+            <div class="comp-cell label">Testing</div>
+            <div class="comp-cell bad">Never tested externally.</div>
+            <div class="comp-cell good">Annual pentest. Fix and re-test.</div>
+        </div>
+        <div class="comp-row">
+            <div class="comp-cell label">Deepfakes</div>
+            <div class="comp-cell bad">No protocols. No training.</div>
+            <div class="comp-cell good">Code words. Callback verification.</div>
+        </div>
+    </div>
+    <div class="highlight-box" style="margin-top:16px;">
+        <p>The gap isn't budget. It's <strong>applying a handful of practices consistently</strong>. Most actions in this report are free.</p>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 13: COST COMPARISON -->
+<!-- ============================================================ -->
+<div class="slide" data-slide="13">
+    <div class="slide-section">The Cost Question</div>
+    <div class="slide-title" style="font-size:clamp(28px,3.5vw,42px);">Can You Afford <span class="accent">Not To Test?</span></div>
+    <div class="two-col">
+        <div class="col-box bad">
+            <h3 style="color:var(--red);">After a Breach (Reactive)</h3>
+            <p style="font-size:14px;">Forensic investigation: <strong>$15-40K</strong><br>System rebuild: <strong>$20-60K</strong><br>Legal &amp; regulatory: <strong>$10-30K</strong><br>Business downtime: <strong>$20-80K+</strong><br>Reputation damage: <strong>Unquantifiable</strong><br><br><strong style="color:var(--red);font-size:18px;">Total: $100K-$500K+</strong></p>
+        </div>
+        <div class="col-box good">
+            <h3 style="color:var(--green);">Before a Breach (Proactive)</h3>
+            <p style="font-size:14px;">Security assessment: <strong>Free (ours is)</strong><br>Penetration testing: <strong>Varies by scope</strong><br>Staff awareness: <strong>Often free</strong><br>MFA, patching, backups: <strong>Free</strong><br>Policy &amp; governance: <strong>Time only</strong><br><br><strong style="color:var(--green);font-size:18px;">Total: A fraction of a breach</strong></p>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SLIDE 14: CTA -->
+<!-- ============================================================ -->
+<div class="slide glow-cyan glow-green" data-slide="14">
+    <div class="slide-section">What's Next</div>
+    <div class="slide-title">Know Where <span class="accent">You Stand</span></div>
+    <div class="slide-subtitle">Every stat in this briefing points to the same conclusion: the businesses that test their defences before an attacker does are the ones that survive.</div>
+    <div class="cta-box">
+        <h3>Take Your Free Security Score</h3>
+        <p>20 questions. 4 minutes. Get your A-F grade across 6 security domains with personalised recommendations.</p>
+        <a href="https://score.wehack.co.nz" class="cta-btn">score.wehack.co.nz</a>
+    </div>
+    <div class="contact-line">
+        <strong>Mustafa Demirsoy</strong> &mdash; Founder &amp; Hacker, WeHack<br>
+        wehack.co.nz &nbsp;|&nbsp; info@wehack.co.nz &nbsp;|&nbsp; 022 091 7242
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SLIDE ENGINE JS -->
+<!-- ============================================================ -->
+<script>
+(function() {
+    const slides = document.querySelectorAll('.slide');
+    const total = slides.length;
+    let current = 0;
+
+    function updateUI() {
+        document.getElementById('slideCounter').textContent = (current + 1) + ' / ' + total;
+        document.getElementById('progressBar').style.width = ((current + 1) / total * 100) + '%';
+    }
+
+    function goTo(index) {
+        if (index < 0 || index >= total || index === current) return;
+        slides[current].classList.remove('active');
+        current = index;
+        slides[current].classList.add('active');
+        updateUI();
+    }
+
+    function next() { goTo(current + 1); }
+    function prev() { goTo(current - 1); }
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); next(); }
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); prev(); }
+        if (e.key === 'Home') { e.preventDefault(); goTo(0); }
+        if (e.key === 'End') { e.preventDefault(); goTo(total - 1); }
+    });
+
+    // Click navigation removed — use arrow keys, space, or touch swipe
+
+    // Touch support
+    let touchStartX = 0;
+    document.addEventListener('touchstart', function(e) { touchStartX = e.changedTouches[0].screenX; });
+    document.addEventListener('touchend', function(e) {
+        const diff = touchStartX - e.changedTouches[0].screenX;
+        if (Math.abs(diff) > 50) { diff > 0 ? next() : prev(); }
+    });
+
+    updateUI();
+})();
+
+function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+    } else {
+        document.exitFullscreen();
+    }
+}
+</script>
+
+</body>
+</html>
